@@ -5,9 +5,23 @@ summary: Learn the MPP mode of TiFlash and how to use it.
 
 # TiFlash MPP モードを使用する {#use-tiflash-mpp-mode}
 
-このドキュメントでは、 TiFlashの MPP モードとその使用方法を紹介します。
+<CustomContent platform="tidb">
+
+このドキュメントでは、 TiFlashの[超並列処理 (MPP)](/glossary.md#mpp)モードとその使用方法を紹介します。
+
+</CustomContent>
+
+<CustomContent platform="tidb-cloud">
+
+このドキュメントでは、 TiFlashの[超並列処理 (MPP)](/tidb-cloud/tidb-cloud-glossary.md#mpp)モードとその使用方法を紹介します。
+
+</CustomContent>
 
 TiFlash は、計算にクロスノード データ交換 (データ シャッフル プロセス) を導入するクエリの実行に MPP モードの使用をサポートします。 TiDB は、オプティマイザーのコスト推定を使用して、MPP モードを選択するかどうかを自動的に決定します。 [`tidb_allow_mpp`](/system-variables.md#tidb_allow_mpp-new-in-v50)と[`tidb_enforce_mpp`](/system-variables.md#tidb_enforce_mpp-new-in-v51)の値を変更することで、選択戦略を変更できます。
+
+次の図は、MPP モードがどのように機能するかを示しています。
+
+![mpp-mode](/media/tiflash/tiflash-mpp.png)
 
 ## MPP モードを選択するかどうかを制御します {#control-whether-to-select-the-mpp-mode}
 
@@ -22,15 +36,11 @@ TiFlash は、計算にクロスノード データ交換 (データ シャッ�
 
 たとえば、MPP モードを使用したくない場合は、次のステートメントを実行できます。
 
-{{< copyable "" >}}
-
 ```sql
 set @@session.tidb_allow_mpp=0;
 ```
 
 TiDB のコストベースのオプティマイザーに MPP モード (デフォルト) を使用するかどうかを自動的に決定させたい場合は、次のステートメントを実行できます。
-
-{{< copyable "" >}}
 
 ```sql
 set @@session.tidb_allow_mpp=1;
@@ -38,8 +48,6 @@ set @@session.tidb_enforce_mpp=0;
 ```
 
 TiDB にオプティマイザーのコスト推定を無視させ、強制的に MPP モードを選択させるには、次のステートメントを実行できます。
-
-{{< copyable "" >}}
 
 ```sql
 set @@session.tidb_allow_mpp=1;
@@ -52,9 +60,9 @@ set @@session.tidb_enforce_mpp=1;
 
 </CustomContent>
 
-> **ノート：**
+> **注記：**
 >
-> `tidb_enforce_mpp=1`が有効になると、TiDB オプティマイザーはコスト推定を無視して MPP モードを選択します。ただし、他の要因が MPP モードをブロックする場合、TiDB は MPP モードを選択しません。これらの要因には、 TiFlashレプリカの欠如、 TiFlashレプリカの未完了のレプリケーション、MPP モードでサポートされていない演算子または関数を含むステートメントが含まれます。
+> `tidb_enforce_mpp=1`が有効になると、TiDB オプティマイザーはコスト見積もりを無視して MPP モードを選択します。ただし、他の要因が MPP モードをブロックする場合、TiDB は MPP モードを選択しません。これらの要因には、 TiFlashレプリカの欠如、 TiFlashレプリカの未完了のレプリケーション、MPP モードでサポートされていない演算子または関数を含むステートメントが含まれます。
 >
 > TiDB オプティマイザーがコスト見積もり以外の理由で MPP モードを選択できない場合、 `EXPLAIN`ステートメントを使用して実行プランをチェックアウトすると、理由を説明する警告が返されます。例えば：
 >
@@ -65,13 +73,11 @@ set @@session.tidb_enforce_mpp=1;
 > show warnings;
 > ```
 >
-> ```
-> +---------+------+-----------------------------------------------------------------------------+
-> | Level   | Code | Message                                                                     |
-> +---------+------+-----------------------------------------------------------------------------+
-> | Warning | 1105 | MPP mode may be blocked because there aren't tiflash replicas of table `t`. |
-> +---------+------+-----------------------------------------------------------------------------+
-> ```
+>     +---------+------+-----------------------------------------------------------------------------+
+>     | Level   | Code | Message                                                                     |
+>     +---------+------+-----------------------------------------------------------------------------+
+>     | Warning | 1105 | MPP mode may be blocked because there aren't tiflash replicas of table `t`. |
+>     +---------+------+-----------------------------------------------------------------------------+
 
 ## MPP モードのアルゴリズムのサポート {#algorithm-support-for-the-mpp-mode}
 
@@ -81,19 +87,19 @@ MPP モードは、ブロードキャスト ハッシュ結合、シャッフル
 
 ```sql
 explain select count(*) from customer c join nation n on c.c_nationkey=n.n_nationkey;
-+------------------------------------------+------------+-------------------+---------------+----------------------------------------------------------------------------+
-| id                                       | estRows    | task              | access object | operator info                                                              |
-+------------------------------------------+------------+-------------------+---------------+----------------------------------------------------------------------------+
-| HashAgg_23                               | 1.00       | root              |               | funcs:count(Column#16)->Column#15                                          |
-| └─TableReader_25                         | 1.00       | root              |               | data:ExchangeSender_24                                                     |
-|   └─ExchangeSender_24                    | 1.00       | batchCop[tiflash] |               | ExchangeType: PassThrough                                                  |
-|     └─HashAgg_12                         | 1.00       | batchCop[tiflash] |               | funcs:count(1)->Column#16                                                  |
-|       └─HashJoin_17                      | 3000000.00 | batchCop[tiflash] |               | inner join, equal:[eq(tpch.nation.n_nationkey, tpch.customer.c_nationkey)] |
-|         ├─ExchangeReceiver_21(Build)     | 25.00      | batchCop[tiflash] |               |                                                                            |
-|         │ └─ExchangeSender_20            | 25.00      | batchCop[tiflash] |               | ExchangeType: Broadcast                                                    |
-|         │   └─TableFullScan_18           | 25.00      | batchCop[tiflash] | table:n       | keep order:false                                                           |
-|         └─TableFullScan_22(Probe)        | 3000000.00 | batchCop[tiflash] | table:c       | keep order:false                                                           |
-+------------------------------------------+------------+-------------------+---------------+----------------------------------------------------------------------------+
++------------------------------------------+------------+--------------+---------------+----------------------------------------------------------------------------+
+| id                                       | estRows    | task         | access object | operator info                                                              |
++------------------------------------------+------------+--------------+---------------+----------------------------------------------------------------------------+
+| HashAgg_23                               | 1.00       | root         |               | funcs:count(Column#16)->Column#15                                          |
+| └─TableReader_25                         | 1.00       | root         |               | data:ExchangeSender_24                                                     |
+|   └─ExchangeSender_24                    | 1.00       | mpp[tiflash] |               | ExchangeType: PassThrough                                                  |
+|     └─HashAgg_12                         | 1.00       | mpp[tiflash] |               | funcs:count(1)->Column#16                                                  |
+|       └─HashJoin_17                      | 3000000.00 | mpp[tiflash] |               | inner join, equal:[eq(tpch.nation.n_nationkey, tpch.customer.c_nationkey)] |
+|         ├─ExchangeReceiver_21(Build)     | 25.00      | mpp[tiflash] |               |                                                                            |
+|         │ └─ExchangeSender_20            | 25.00      | mpp[tiflash] |               | ExchangeType: Broadcast                                                    |
+|         │   └─TableFullScan_18           | 25.00      | mpp[tiflash] | table:n       | keep order:false                                                           |
+|         └─TableFullScan_22(Probe)        | 3000000.00 | mpp[tiflash] | table:c       | keep order:false                                                           |
++------------------------------------------+------------+--------------+---------------+----------------------------------------------------------------------------+
 9 rows in set (0.00 sec)
 ```
 

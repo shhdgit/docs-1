@@ -27,7 +27,7 @@ TiDB は MySQL プロトコルと高い互換性がありますが、一部の�
 
 サポートレベル:**フル**
 
-[MySQL ドキュメント](https://dev.mysql.com/doc/connector-j/8.0/en/)に従って、 Java JDBC ドライバーをダウンロードして構成できます。 TiDB v6.3.0 以降では MySQL Connector/J 8.0.33 以降を使用することをお勧めします。
+[MySQL ドキュメント](https://dev.mysql.com/doc/connector-j/en/)に従って、 Java JDBC ドライバーをダウンロードして構成できます。 TiDB v6.3.0 以降では MySQL Connector/J 8.0.33 以降を使用することをお勧めします。
 
 > **ヒント：**
 >
@@ -263,7 +263,7 @@ mysqlclient を使用して TiDB アプリケーションを構築する例に�
 
 サポートレベル:**互換性あり**
 
-[MySQL コネクタ/Python ドキュメント](https://dev.mysql.com/doc/connector-python/en/connector-python-installation-binary.html)に従ってドライバーをダウンロードして設定できます。 Connector/Python 8.0.31 以降のバージョンを使用することをお勧めします。
+[MySQL コネクタ/Python ドキュメント](https://dev.mysql.com/doc/connector-python/en/connector-python-installation-binary.html)に従ってドライバーをダウンロードして構成できます。 Connector/Python 8.0.31 以降のバージョンを使用することをお勧めします。
 
 MySQL コネクタ/Python を使用して TiDB アプリケーションを構築する例については、 [MySQL コネクタ/Python を使用して TiDB に接続する](/develop/dev-guide-sample-application-python-mysql-connector.md)を参照してください。
 
@@ -297,7 +297,7 @@ SQLAlchemy を使用して TiDB アプリケーションを構築する例につ
 
 [ピーピー](http://docs.peewee-orm.com/en/latest/)は、Python の人気のある ORM フレームワークです。アプリケーション内のすべての依存関係を取得するには、 `pip install peewee==3.15.4`コマンドを使用します。 peewee 3.15.4 以降のバージョンを使用することをお勧めします。
 
-peewee を使用して TiDB アプリケーションを構築する例については、 [peewee で TiDB に接続する](/develop/dev-guide-sample-application-python-peewee.md#step-2-get-the-code)を参照してください。
+peewee を使用して TiDB アプリケーションを構築する例については、 [peewee で TiDB に接続する](/develop/dev-guide-sample-application-python-peewee.md)を参照してください。
 
 </div>
 </SimpleTab>

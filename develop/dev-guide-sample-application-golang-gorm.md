@@ -3,152 +3,154 @@ title: Connect to TiDB with GORM
 summary: Learn how to connect to TiDB using GORM. This tutorial gives Golang sample code snippets that work with TiDB using GORM.
 ---
 
-# GORM を使用して TiDB に接続する {#connect-to-tidb-with-gorm}
+# GORMを使用してTiDBに接続する {#connect-to-tidb-with-gorm}
 
-TiDB は MySQL 互換データベースであり、 [ゴーム](https://gorm.io/index.html)はGolang用の人気のあるオープンソース ORM フレームワークです。 GORM は、 `AUTO_RANDOM`や[デフォルトのデータベース オプションとして TiDB をサポートします](https://gorm.io/docs/connecting_to_the_database.html#TiDB)などの TiDB 機能に適応します。
+TiDBはMySQL互換のデータベースであり、[GORM](https://gorm.io/index.html)はGolang向けの人気のあるオープンソースのORMフレームワークです。GORMは`AUTO_RANDOM`などのTiDBの機能に適応し、[デフォルトのデータベースオプションとしてTiDBをサポート](https://gorm.io/docs/connecting_to_the_database.html#TiDB)しています。
 
-このチュートリアルでは、TiDB と GORM を使用して次のタスクを実行する方法を学習できます。
+このチュートリアルでは、TiDBとGORMを使用して次のタスクを達成する方法を学ぶことができます:
 
--   環境をセットアップします。
--   GORM を使用して TiDB クラスターに接続します。
--   アプリケーションをビルドして実行します。オプションで、基本的な CRUD 操作の[サンプルコードスニペット](#sample-code-snippets)を見つけることができます。
+-   環境をセットアップする。
+-   GORMを使用してTiDBクラスタに接続する。
+-   アプリケーションをビルドして実行する。オプションで、基本的なCRUD操作の[サンプルコードスニペット](#sample-code-snippets)を見つけることができます。
 
-> **注記：**
+> **注意:**
 >
-> このチュートリアルは、TiDB サーバーレス、TiDB 専用、および TiDB セルフホストで動作します。
+> このチュートリアルは、TiDB Serverless、TiDB Dedicated、TiDB Self-Hostedと連携します。
 
 ## 前提条件 {#prerequisites}
 
-このチュートリアルを完了するには、次のものが必要です。
+このチュートリアルを完了するには、以下が必要です:
 
--   [行く](https://go.dev/) **1.20**以上。
--   [ギット](https://git-scm.com/downloads) 。
--   TiDB クラスター。
+-   [Go](https://go.dev/) **1.20** 以上。
+-   [Git](https://git-scm.com/downloads)。
+-   TiDBクラスタ。
 
 <CustomContent platform="tidb">
 
-**TiDB クラスターがない場合は、次のように作成できます。**
+**TiDBクラスタを持っていない場合は、以下のように作成できます:**
 
--   (推奨) [TiDB サーバーレスクラスターの作成](/develop/dev-guide-build-cluster-in-cloud.md)に従って、独自のTiDB Cloudクラスターを作成します。
--   [ローカル テスト TiDB クラスターをデプロイ](/quick-start-with-tidb.md#deploy-a-local-test-cluster)または[本番TiDB クラスターをデプロイ](/production-deployment-using-tiup.md)に従ってローカル クラスターを作成します。
+-   (推奨) [TiDB Serverlessクラスタの作成](/develop/dev-guide-build-cluster-in-cloud.md)に従って、独自のTiDB Cloudクラスタを作成します。
+-   [ローカルテストTiDBクラスタのデプロイ](/quick-start-with-tidb.md#deploy-a-local-test-cluster)または[本番用TiDBクラスタのデプロイ](/production-deployment-using-tiup.md)に従って、ローカルクラスタを作成します。
 
 </CustomContent>
 <CustomContent platform="tidb-cloud">
 
-**TiDB クラスターがない場合は、次のように作成できます。**
+**TiDBクラスタを持っていない場合は、以下のように作成できます:**
 
--   (推奨) [TiDB サーバーレスクラスターの作成](/develop/dev-guide-build-cluster-in-cloud.md)に従って、独自のTiDB Cloudクラスターを作成します。
--   [ローカル テスト TiDB クラスターをデプロイ](https://docs.pingcap.com/tidb/stable/quick-start-with-tidb#deploy-a-local-test-cluster)または[本番TiDB クラスターをデプロイ](https://docs.pingcap.com/tidb/stable/production-deployment-using-tiup)に従ってローカル クラスターを作成します。
+-   (推奨) [TiDB Serverlessクラスタの作成](/develop/dev-guide-build-cluster-in-cloud.md)に従って、独自のTiDB Cloudクラスタを作成します。
+-   [ローカルテストTiDBクラスタのデプロイ](https://docs.pingcap.com/tidb/stable/quick-start-with-tidb#deploy-a-local-test-cluster)または[本番用TiDBクラスタのデプロイ](https://docs.pingcap.com/tidb/stable/production-deployment-using-tiup)に従って、ローカルクラスタを作成します。
 
 </CustomContent>
 
-## サンプル アプリを実行して TiDB に接続する {#run-the-sample-app-to-connect-to-tidb}
+## サンプルアプリを実行してTiDBに接続する {#run-the-sample-app-to-connect-to-tidb}
 
-このセクションでは、サンプル アプリケーション コードを実行して TiDB に接続する方法を説明します。
+このセクションでは、サンプルアプリケーションコードを実行してTiDBに接続する方法を示します。
 
-### ステップ 1: サンプル アプリ リポジトリのクローンを作成する {#step-1-clone-the-sample-app-repository}
+### ステップ1: サンプルアプリのリポジトリをクローンする {#step-1-clone-the-sample-app-repository}
 
-ターミナル ウィンドウで次のコマンドを実行して、サンプル コード リポジトリのクローンを作成します。
+次のコマンドをターミナルウィンドウで実行して、サンプルコードリポジトリをクローンします:
 
 ```shell
 git clone https://github.com/tidb-samples/tidb-golang-gorm-quickstart.git
 cd tidb-golang-gorm-quickstart
 ```
 
-### ステップ 2: 接続情報を構成する {#step-2-configure-connection-information}
+### ステップ2：接続情報を構成する {#step-2-configure-connection-information}
 
-選択した TiDB デプロイメント オプションに応じて、TiDB クラスターに接続します。
+TiDBクラスタに接続するには、選択したTiDBデプロイメントオプションに応じて行います。
 
 <SimpleTab>
-<div label="TiDB Serverless">
+<div label="TiDBサーバーレス">
 
-1.  [**クラスター**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲット クラスターの名前をクリックして、その概要ページに移動します。
+1.  [**クラスタ**](https://tidbcloud.com/console/clusters) ページに移動し、対象のクラスタの名前をクリックして概要ページに移動します。
 
-2.  右上隅にある**「接続」**をクリックします。接続ダイアログが表示されます。
+2.  右上隅の **Connect** をクリックします。接続ダイアログが表示されます。
 
-3.  接続ダイアログの設定が動作環境と一致していることを確認してください。
+3.  接続ダイアログの構成が、操作環境に一致することを確認します。
 
-    -   **エンドポイント タイプは**`Public`に設定されます
+    -   **エンドポイントタイプ** が `Public` に設定されていること
 
-    -   **[接続先] は**`General`に設定されています
+    -   **Branch** が `main` に設定されていること
 
-    -   **オペレーティング システムが**環境に一致します。
+    -   **Connect With** が `General` に設定されていること
 
-    > **ヒント：**
+    -   **Operating System** が環境に一致していること
+
+    > **ヒント:**
     >
-    > プログラムが Windows Subsystem for Linux (WSL) で実行されている場合は、対応する Linux ディストリビューションに切り替えます。
+    > もしプログラムがWindows Subsystem for Linux (WSL)で実行されている場合は、対応するLinuxディストリビューションに切り替えてください。
 
-4.  **「パスワードの作成」**をクリックしてランダムなパスワードを作成します。
+4.  **Generate Password** をクリックしてランダムなパスワードを作成します。
 
-    > **ヒント：**
+    > **ヒント:**
     >
-    > 以前にパスワードを作成したことがある場合は、元のパスワードを使用するか、 **「パスワードのリセット」**をクリックして新しいパスワードを生成できます。
+    > もし以前にパスワードを作成している場合は、元のパスワードを使用するか、新しいパスワードを生成するために **Reset Password** をクリックします。
 
-5.  次のコマンドを実行して`.env.example`をコピーし、名前を`.env`に変更します。
+5.  次のコマンドを実行して、`.env.example` をコピーして `.env` にリネームします：
 
     ```shell
     cp .env.example .env
     ```
 
-6.  対応する接続​​文字列をコピーして`.env`ファイルに貼り付けます。結果の例は次のとおりです。
+6.  対応する接続文字列を `.env` ファイルにコピーして貼り付けます。例として以下のようになります：
 
     ```dotenv
-    TIDB_HOST='{host}'  # e.g. gateway01.ap-northeast-1.prod.aws.tidbcloud.com
+    TIDB_HOST='{host}'  # 例: gateway01.ap-northeast-1.prod.aws.tidbcloud.com
     TIDB_PORT='4000'
-    TIDB_USER='{user}'  # e.g. xxxxxx.root
+    TIDB_USER='{user}'  # 例: xxxxxx.root
     TIDB_PASSWORD='{password}'
     TIDB_DB_NAME='test'
     USE_SSL='true'
     ```
 
-    プレースホルダー`{}` 、接続ダイアログから取得した接続パラメーターに必ず置き換えてください。
+    接続ダイアログから取得した接続パラメータでプレースホルダ `{}` を置き換えるようにしてください。
 
-    TiDB サーバーレスには安全な接続が必要です。したがって、 `USE_SSL` ～ `true`の値を設定する必要があります。
+    TiDBサーバーレスでは安全な接続が必要です。そのため、`USE_SSL` の値を `true` に設定する必要があります。
 
-7.  `.env`ファイルを保存します。
+7.  `.env` ファイルを保存します。
 
 </div>
-<div label="TiDB Dedicated">
+<div label="TiDB専用">
 
-1.  [**クラスター**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲット クラスターの名前をクリックして、その概要ページに移動します。
+1.  [**クラスタ**](https://tidbcloud.com/console/clusters) ページに移動し、対象のクラスタの名前をクリックして概要ページに移動します。
 
-2.  右上隅にある**「接続」**をクリックします。接続ダイアログが表示されます。
+2.  右上隅の **Connect** をクリックします。接続ダイアログが表示されます。
 
-3.  **「どこからでもアクセスを許可」**をクリックし、 **「TiDB クラスター CA のダウンロード」**をクリックして CA 証明書をダウンロードします。
+3.  **どこからでもアクセスを許可** をクリックし、その後 **TiDBクラスタCAをダウンロード** をクリックしてCA証明書をダウンロードします。
 
-    接続文字列の取得方法の詳細については、 [TiDB専用標準接続](https://docs.pingcap.com/tidbcloud/connect-via-standard-connection)を参照してください。
+    接続文字列の取得方法の詳細については、[TiDB専用標準接続](https://docs.pingcap.com/tidbcloud/connect-via-standard-connection) を参照してください。
 
-4.  次のコマンドを実行して`.env.example`をコピーし、名前を`.env`に変更します。
+4.  次のコマンドを実行して、`.env.example` をコピーして `.env` にリネームします：
 
     ```shell
     cp .env.example .env
     ```
 
-5.  対応する接続​​文字列をコピーして`.env`ファイルに貼り付けます。結果の例は次のとおりです。
+5.  対応する接続文字列を `.env` ファイルにコピーして貼り付けます。例として以下のようになります：
 
     ```dotenv
-    TIDB_HOST='{host}'  # e.g. tidb.xxxx.clusters.tidb-cloud.com
+    TIDB_HOST='{host}'  # 例: tidb.xxxx.clusters.tidb-cloud.com
     TIDB_PORT='4000'
-    TIDB_USER='{user}'  # e.g. root
+    TIDB_USER='{user}'  # 例: root
     TIDB_PASSWORD='{password}'
     TIDB_DB_NAME='test'
     USE_SSL='false'
     ```
 
-    プレースホルダー`{}` 、接続ダイアログから取得した接続パラメーターに必ず置き換えてください。
+    接続ダイアログから取得した接続パラメータでプレースホルダ `{}` を置き換えるようにしてください。
 
-6.  `.env`ファイルを保存します。
+6.  `.env` ファイルを保存します。
 
 </div>
-<div label="TiDB Self-Hosted">
+<div label="TiDBセルフホスト">
 
-1.  次のコマンドを実行して`.env.example`をコピーし、名前を`.env`に変更します。
+1.  次のコマンドを実行して、`.env.example` をコピーして `.env` にリネームします：
 
     ```shell
     cp .env.example .env
     ```
 
-2.  対応する接続​​文字列をコピーして`.env`ファイルに貼り付けます。結果の例は次のとおりです。
+2.  対応する接続文字列を `.env` ファイルにコピーして貼り付けます。例として以下のようになります：
 
     ```dotenv
     TIDB_HOST='{host}'
@@ -159,30 +161,30 @@ cd tidb-golang-gorm-quickstart
     USE_SSL='false'
     ```
 
-    必ずプレースホルダー`{}`接続パラメーターに置き換えて、 `USE_SSL`を`false`に設定してください。 TiDB をローカルで実行している場合、デフォルトのホスト アドレスは`127.0.0.1`で、パスワードは空です。
+    接続パラメータをプレースホルダ `{}` で置き換え、`USE_SSL` を `false` に設定するようにしてください。TiDBをローカルで実行している場合、デフォルトのホストアドレスは `127.0.0.1` であり、パスワードは空です。
 
-3.  `.env`ファイルを保存します。
+3.  `.env` ファイルを保存します。
 
 </div>
 </SimpleTab>
 
-### ステップ 3: コードを実行して結果を確認する {#step-3-run-the-code-and-check-the-result}
+### ステップ3：コードを実行して結果を確認する {#step-3-run-the-code-and-check-the-result}
 
-1.  次のコマンドを実行してサンプル コードを実行します。
+1.  次のコマンドを実行してサンプルコードを実行します：
 
     ```shell
     make
     ```
 
-2.  [予想される出力.txt](https://github.com/tidb-samples/tidb-golang-gorm-quickstart/blob/main/Expected-Output.txt)チェックして、出力が一致するかどうかを確認します。
+2.  出力が一致しているかを確認するために [Expected-Output.txt](https://github.com/tidb-samples/tidb-golang-gorm-quickstart/blob/main/Expected-Output.txt) を確認してください。
 
 ## サンプルコードスニペット {#sample-code-snippets}
 
-次のサンプル コード スニペットを参照して、独自のアプリケーション開発を完了できます。
+次のサンプルコードスニペットを参照して、独自のアプリケーション開発を完了させることができます。
 
-完全なサンプル コードとその実行方法については、 [tidb-samples/tidb-golang-gorm-quickstart](https://github.com/tidb-samples/tidb-golang-gorm-quickstart)リポジトリを確認してください。
+完全なサンプルコードとその実行方法については、[tidb-samples/tidb-golang-gorm-quickstart](https://github.com/tidb-samples/tidb-golang-gorm-quickstart) リポジトリをチェックしてください。
 
-### TiDB に接続する {#connect-to-tidb}
+### TiDBへの接続 {#connect-to-tidb}
 
 ```golang
 func createDB() *gorm.DB {
@@ -200,7 +202,7 @@ func createDB() *gorm.DB {
 }
 ```
 
-この関数を使用する場合、 `${tidb_host}` 、 `${tidb_port}` 、 `${tidb_user}` 、 `${tidb_password}` 、および`${tidb_db_name}`を TiDB クラスターの実際の値に置き換える必要があります。 TiDB サーバーレスには安全な接続が必要です。したがって、 `${use_ssl}`の値を`true`に設定する必要があります。
+この機能を使用する際には、`${tidb_host}`、`${tidb_port}`、`${tidb_user}`、`${tidb_password}`、`${tidb_db_name}`をTiDBクラスターの実際の値で置き換える必要があります。TiDB Serverlessでは安全な接続が必要です。したがって、`${use_ssl}`の値を`true`に設定する必要があります。
 
 ### データの挿入 {#insert-data}
 
@@ -208,24 +210,24 @@ func createDB() *gorm.DB {
 db.Create(&Player{ID: "id", Coins: 1, Goods: 1})
 ```
 
-詳細については、 [データの挿入](/develop/dev-guide-insert-data.md)を参照してください。
+[データを挿入](/develop/dev-guide-insert-data.md) に関する詳細は、参照してください。
 
-### クエリデータ {#query-data}
+### データのクエリ {#query-data}
 
 ```golang
 var queryPlayer Player
 db.Find(&queryPlayer, "id = ?", "id")
 ```
 
-詳細については、 [クエリデータ](/develop/dev-guide-get-data-from-single-table.md)を参照してください。
+詳細については、[クエリデータ](/develop/dev-guide-get-data-from-single-table.md)を参照してください。
 
-### データを更新する {#update-data}
+### データの更新 {#update-data}
 
 ```golang
 db.Save(&Player{ID: "id", Coins: 100, Goods: 1})
 ```
 
-詳細については、 [データを更新する](/develop/dev-guide-update-data.md)を参照してください。
+[データの更新](/develop/dev-guide-update-data.md)に関する詳細は、こちらを参照してください。
 
 ### データの削除 {#delete-data}
 
@@ -233,14 +235,14 @@ db.Save(&Player{ID: "id", Coins: 100, Goods: 1})
 db.Delete(&Player{ID: "id"})
 ```
 
-詳細については、 [データの削除](/develop/dev-guide-delete-data.md)を参照してください。
+詳細については、[データの削除](/develop/dev-guide-delete-data.md)を参照してください。
 
 ## 次のステップ {#next-steps}
 
--   GORM の使い方については[GORM のドキュメント](https://gorm.io/docs/index.html)と[GORM のドキュメントの TiDB セクション](https://gorm.io/docs/connecting_to_the_database.html#TiDB)から学びましょう。
--   TiDB アプリケーション[データの削除](/develop/dev-guide-delete-data.md) [単一テーブルの読み取り](/develop/dev-guide-get-data-from-single-table.md)ベスト プラクティス[SQLパフォーマンスの最適化](/develop/dev-guide-optimize-sql-overview.md)は、 [開発者ガイド](/develop/dev-guide-overview.md)の章 ( [データの挿入](/develop/dev-guide-insert-data.md)など) [データを更新する](/develop/dev-guide-update-data.md)参照[トランザクション](/develop/dev-guide-transaction-overview.md)てください。
--   プロフェッショナルとして[TiDB 開発者コース](https://www.pingcap.com/education/)を学び、試験合格後に[TiDB 認定](https://www.pingcap.com/education/certification/)獲得します。
+-   [GORMのドキュメント](https://gorm.io/docs/index.html)および[GORMのTiDBセクションのドキュメント](https://gorm.io/docs/connecting_to_the_database.html#TiDB)から、GORMのさらなる使用法を学びます。
+-   [開発者ガイド](/develop/dev-guide-overview.md)の章を通じて、TiDBアプリケーション開発のベストプラクティスを学びます。たとえば、[データの挿入](/develop/dev-guide-insert-data.md)、[データの更新](/develop/dev-guide-update-data.md)、[データの削除](/develop/dev-guide-delete-data.md)、[単一テーブルの読み取り](/develop/dev-guide-get-data-from-single-table.md)、[トランザクション](/develop/dev-guide-transaction-overview.md)、および[SQLパフォーマンスの最適化](/develop/dev-guide-optimize-sql-overview.md)。
+-   [TiDB開発者コース](https://www.pingcap.com/education/)を通じて学び、試験に合格した後に[TiDB認定資格](https://www.pingcap.com/education/certification/)を取得します。
 
-## 助けが必要？ {#need-help}
+## ヘルプが必要ですか？ {#need-help}
 
-[不和](https://discord.gg/vYU9h56kAX)または[サポートチケットを作成する](https://support.pingcap.com/)について質問してください。
+[Discord](https://discord.gg/vYU9h56kAX)で質問するか、[サポートチケットを作成](https://support.pingcap.com/)してください。

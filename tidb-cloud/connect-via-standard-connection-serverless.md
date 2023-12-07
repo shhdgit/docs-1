@@ -3,35 +3,37 @@ title: Connect to TiDB Serverless via Public Endpoint
 summary: Learn how to connect to your TiDB Serverless cluster via public endpoint.
 ---
 
-# パブリックエンドポイント経由で TiDB サーバーレスに接続する {#connect-to-tidb-serverless-via-public-endpoint}
+# TiDB Serverlessへのパブリックエンドポイント経由での接続 {#connect-to-tidb-serverless-via-public-endpoint}
 
-このドキュメントでは、パブリック エンドポイント経由で TiDB サーバーレス クラスターに接続する方法について説明します。パブリック エンドポイントを使用すると、ラップトップから SQL クライアント経由で TiDB サーバーレス クラスターに接続できます。
+このドキュメントでは、TiDB Serverlessクラスターにパブリックエンドポイント経由で接続する方法について説明します。パブリックエンドポイントを使用すると、ラップトップからSQLクライアントを使用してTiDB Serverlessクラスターに接続できます。
 
-> **ヒント：**
+> **ヒント:**
 >
-> パブリック エンドポイント経由で TiDB 専用クラスターに接続する方法については、 [標準接続経由で TiDB 専用に接続する](/tidb-cloud/connect-via-standard-connection.md)を参照してください。
+> TiDB Dedicatedクラスターに標準接続経由で接続する方法については、[標準接続経由でTiDB Dedicatedに接続する](/tidb-cloud/connect-via-standard-connection.md)を参照してください。
 
-パブリック エンドポイント経由で TiDB サーバーレス クラスターに接続するには、次の手順を実行します。
+TiDB Serverlessクラスターにパブリックエンドポイント経由で接続するには、以下の手順を実行してください:
 
-1.  [**クラスター**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲット クラスターの名前をクリックして、その概要ページに移動します。
+1.  [**クラスター**](https://tidbcloud.com/console/clusters)ページに移動し、対象のクラスターの名前をクリックして概要ページに移動します。
 
-2.  右上隅にある**「接続」**をクリックします。接続ダイアログが表示されます。
+2.  右上隅の**接続**をクリックします。接続ダイアログが表示されます。
 
-3.  ダイアログでは、エンドポイント タイプのデフォルト設定を`Public`のままにし、優先接続方法とオペレーティング システムを選択して、対応する接続​​文字列を取得します。
+3.  ダイアログで、エンドポイントタイプをデフォルト設定のまま`Public`とし、希望の接続方法とオペレーティングシステムを選択して、対応する接続文字列を取得します。
 
-    > **ノート：**
+    > **注意:**
     >
-    > -   エンドポイント タイプを`Public`のままにすると、接続が標準の TLS 接続を介して行われることを意味します。詳細については、 [TiDB サーバーレスへの TLS 接続](/tidb-cloud/secure-connections-to-serverless-clusters.md)を参照してください。
-    > -   **[エンドポイント タイプ]**ドロップダウン リストで**[プライベート]**を選択した場合、接続がプライベート エンドポイント経由であることを意味します。詳細については、 [プライベートエンドポイント経由で TiDB サーバーレスに接続する](/tidb-cloud/set-up-private-endpoint-connections-serverless.md)を参照してください。
+    > -   エンドポイントタイプを`Public`のままにすると、接続が標準TLS接続経由となります。詳細については、[TiDB ServerlessへのTLS接続](/tidb-cloud/secure-connections-to-serverless-clusters.md)を参照してください。
+    > -   **エンドポイントタイプ**のドロップダウンリストで**Private**を選択すると、接続がプライベートエンドポイント経由となります。詳細については、[TiDB Serverlessへのプライベートエンドポイント経由での接続](/tidb-cloud/set-up-private-endpoint-connections-serverless.md)を参照してください。
 
-4.  パスワードをまだ設定していない場合は、 **「パスワードの作成」**をクリックしてランダムなパスワードを生成します。生成されたパスワードは再度表示されないため、パスワードを安全な場所に保存してください。
+4.  TiDB Serverlessでは、クラスターのために[ブランチ](/tidb-cloud/branch-overview.md)を作成できます。ブランチが作成された後、**ブランチ**のドロップダウンリストからブランチに接続することができます。`main`はクラスター自体を表します。
 
-5.  接続文字列を使用してクラスターに接続します。
+5.  パスワードをまだ設定していない場合は、**パスワードを生成**をクリックしてランダムなパスワードを生成します。生成されたパスワードは再表示されないため、安全な場所に保存してください。
 
-    > **ノート：**
+6.  接続文字列を使用してクラスターに接続します。
+
+    > **注意:**
     >
-    > TiDB サーバーレス クラスターに接続するときは、ユーザー名にクラスターのプレフィックスを含め、名前を引用符で囲む必要があります。詳細については、 [ユーザー名のプレフィックス](/tidb-cloud/select-cluster-tier.md#user-name-prefix)を参照してください。
+    > TiDB Serverlessクラスターに接続する際は、ユーザー名にクラスターの接頭辞を含め、名前を引用符で囲む必要があります。詳細については、[ユーザー名の接頭辞](/tidb-cloud/select-cluster-tier.md#user-name-prefix)を参照してください。
 
-## 次は何ですか {#what-s-next}
+## 次のステップ {#what-s-next}
 
-TiDB クラスターに正常に接続したら、 [TiDB で SQL ステートメントを探索する](/basic-sql-operations.md)を行うことができます。
+TiDBクラスターに正常に接続した後、[TiDBでSQLステートメントを探索](/basic-sql-operations.md)することができます。

@@ -3,108 +3,110 @@ title: Connect to TiDB with SQLAlchemy
 summary: Learn how to connect to TiDB using SQLAlchemy. This tutorial gives Python sample code snippets that work with TiDB using SQLAlchemy.
 ---
 
-# SQLAlchemy を使用して TiDB に接続する {#connect-to-tidb-with-sqlalchemy}
+# Connect to TiDB with SQLAlchemy {#connect-to-tidb-with-sqlalchemy}
 
-TiDB は MySQL 互換データベースであり、 [SQLアルケミー](https://www.sqlalchemy.org/)は人気のある Python SQL ツールキットおよびオブジェクト リレーショナル マッパー (ORM) です。
+TiDB is a MySQL-compatible database, and [SQLAlchemy](https://www.sqlalchemy.org/) is a popular Python SQL toolkit and Object Relational Mapper (ORM).
 
-このチュートリアルでは、TiDB と SQLAlchemy を使用して次のタスクを実行する方法を学習できます。
+In this tutorial, you can learn how to use TiDB and SQLAlchemy to accomplish the following tasks:
 
--   環境をセットアップします。
--   SQLAlchemy を使用して TiDB クラスターに接続します。
--   アプリケーションをビルドして実行します。オプションで、基本的な CRUD 操作のサンプル コード スニペットを見つけることができます。
+-   Set up your environment.
+-   Connect to your TiDB cluster using SQLAlchemy.
+-   Build and run your application. Optionally, you can find sample code snippets for basic CRUD operations.
 
-> **注記：**
+> **Note:**
 >
-> このチュートリアルは、TiDB サーバーレス、TiDB 専用、および TiDB セルフホスト クラスターで動作します。
+> This tutorial works with TiDB Serverless, TiDB Dedicated, and TiDB Self-Hosted clusters.
 
-## 前提条件 {#prerequisites}
+## Prerequisites {#prerequisites}
 
-このチュートリアルを完了するには、次のものが必要です。
+To complete this tutorial, you need:
 
--   [Python 3.8以降](https://www.python.org/downloads/) 。
--   [ギット](https://git-scm.com/downloads) 。
--   TiDB クラスター。
+-   [Python 3.8 or higher](https://www.python.org/downloads/).
+-   [Git](https://git-scm.com/downloads).
+-   A TiDB cluster.
 
 <CustomContent platform="tidb">
 
-**TiDB クラスターがない場合は、次のように作成できます。**
+**If you don't have a TiDB cluster, you can create one as follows:**
 
--   (推奨) [TiDB サーバーレスクラスターの作成](/develop/dev-guide-build-cluster-in-cloud.md)に従って、独自のTiDB Cloudクラスターを作成します。
--   [ローカル テスト TiDB クラスターをデプロイ](/quick-start-with-tidb.md#deploy-a-local-test-cluster)または[本番TiDB クラスターをデプロイ](/production-deployment-using-tiup.md)に従ってローカル クラスターを作成します。
+-   (Recommended) Follow [Creating a TiDB Serverless cluster](/develop/dev-guide-build-cluster-in-cloud.md) to create your own TiDB Cloud cluster.
+-   Follow [Deploy a local test TiDB cluster](/quick-start-with-tidb.md#deploy-a-local-test-cluster) or [Deploy a production TiDB cluster](/production-deployment-using-tiup.md) to create a local cluster.
 
 </CustomContent>
 <CustomContent platform="tidb-cloud">
 
-**TiDB クラスターがない場合は、次のように作成できます。**
+**If you don't have a TiDB cluster, you can create one as follows:**
 
--   (推奨) [TiDB サーバーレスクラスターの作成](/develop/dev-guide-build-cluster-in-cloud.md)に従って、独自のTiDB Cloudクラスターを作成します。
--   [ローカル テスト TiDB クラスターをデプロイ](https://docs.pingcap.com/tidb/stable/quick-start-with-tidb#deploy-a-local-test-cluster)または[本番TiDB クラスターをデプロイ](https://docs.pingcap.com/tidb/stable/production-deployment-using-tiup)に従ってローカル クラスターを作成します。
+-   (Recommended) Follow [Creating a TiDB Serverless cluster](/develop/dev-guide-build-cluster-in-cloud.md) to create your own TiDB Cloud cluster.
+-   Follow [Deploy a local test TiDB cluster](https://docs.pingcap.com/tidb/stable/quick-start-with-tidb#deploy-a-local-test-cluster) or [Deploy a production TiDB cluster](https://docs.pingcap.com/tidb/stable/production-deployment-using-tiup) to create a local cluster.
 
 </CustomContent>
 
-## サンプル アプリを実行して TiDB に接続する {#run-the-sample-app-to-connect-to-tidb}
+## Run the sample app to connect to TiDB {#run-the-sample-app-to-connect-to-tidb}
 
-このセクションでは、サンプル アプリケーション コードを実行して TiDB に接続する方法を説明します。
+This section demonstrates how to run the sample application code and connect to TiDB.
 
-### ステップ 1: サンプル アプリ リポジトリのクローンを作成する {#step-1-clone-the-sample-app-repository}
+### Step 1: Clone the sample app repository {#step-1-clone-the-sample-app-repository}
 
-ターミナル ウィンドウで次のコマンドを実行して、サンプル コード リポジトリのクローンを作成します。
+Run the following commands in your terminal window to clone the sample code repository:
 
 ```shell
 git clone https://github.com/tidb-samples/tidb-python-sqlalchemy-quickstart.git
 cd tidb-python-sqlalchemy-quickstart
 ```
 
-### ステップ 2: 依存関係をインストールする {#step-2-install-dependencies}
+### Step 2: Install dependencies {#step-2-install-dependencies}
 
-次のコマンドを実行して、サンプル アプリに必要なパッケージ (SQLAlchemy と PyMySQL を含む) をインストールします。
+Run the following command to install the required packages (including SQLAlchemy and PyMySQL) for the sample app:
 
 ```shell
 pip install -r requirements.txt
 ```
 
-#### PyMySQL を使用する理由 {#why-use-pymysql}
+#### Why use PyMySQL? {#why-use-pymysql}
 
-SQLAlchemy は、複数のデータベースで動作する ORM ライブラリです。これはデータベースの高レベルの抽象化を提供し、開発者がよりオブジェクト指向の方法で SQL ステートメントを作成するのに役立ちます。ただし、SQLAlchemy にはデータベース ドライバーが含まれていません。データベースに接続するには、データベース ドライバーをインストールする必要があります。このサンプル アプリケーションは、データベース ドライバーとして PyMySQL を使用します。これは、TiDB と互換性があり、すべてのプラットフォームにインストールできる純粋な Python MySQL クライアント ライブラリです。
+SQLAlchemy is an ORM library that works with multiple databases. It provides a high-level abstraction of the database, which helps developers write SQL statements in a more object-oriented way. However, SQLAlchemy does not include a database driver. To connect to a database, you need to install a database driver. This sample application uses PyMySQL as the database driver, which is a pure Python MySQL client library that is compatible with TiDB and can be installed on all platforms.
 
-[mysqlクライアント](https://github.com/PyMySQL/mysqlclient)や[mysql-コネクタ-Python](https://dev.mysql.com/doc/connector-python/en/)など、他のデータベース ドライバーを使用することもできます。ただし、これらは純粋な Python ライブラリではなく、コンパイルには対応する C/C++ コンパイラと MySQL クライアントが必要です。詳細については、 [SQLAlchemy 公式ドキュメント](https://docs.sqlalchemy.org/en/20/core/engines.html#mysql)を参照してください。
+You can also use other database drivers, such as [mysqlclient](https://github.com/PyMySQL/mysqlclient) and [mysql-connector-python](https://dev.mysql.com/doc/connector-python/en/). But they are not pure Python libraries and require the corresponding C/C++ compiler and MySQL client for compiling. For more information, refer to [SQLAlchemy official documentation](https://docs.sqlalchemy.org/en/20/core/engines.html#mysql).
 
-### ステップ 3: 接続情報を構成する {#step-3-configure-connection-information}
+### Step 3: Configure connection information {#step-3-configure-connection-information}
 
-選択した TiDB デプロイメント オプションに応じて、TiDB クラスターに接続します。
+Connect to your TiDB cluster depending on the TiDB deployment option you've selected.
 
 <SimpleTab>
 <div label="TiDB Serverless">
 
-1.  [**クラスター**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲット クラスターの名前をクリックして、その概要ページに移動します。
+1.  Navigate to the [**Clusters**](https://tidbcloud.com/console/clusters) page, and then click the name of your target cluster to go to its overview page.
 
-2.  右上隅にある**「接続」**をクリックします。接続ダイアログが表示されます。
+2.  Click **Connect** in the upper-right corner. A connection dialog is displayed.
 
-3.  接続ダイアログの設定が動作環境と一致していることを確認してください。
+3.  Ensure the configurations in the connection dialog match your operating environment.
 
-    -   **エンドポイント タイプは**`Public`に設定されます
+    -   **Endpoint Type** is set to `Public`
 
-    -   **[接続先] は**`General`に設定されています
+    -   **Branch** is set to `main`
 
-    -   **オペレーティング システムが**環境に一致します。
+    -   **Connect With** is set to `General`
 
-    > **ヒント：**
+    -   **Operating System** matches your environment.
+
+    > **Tip:**
     >
-    > プログラムが Windows Subsystem for Linux (WSL) で実行されている場合は、対応する Linux ディストリビューションに切り替えます。
+    > If your program is running in Windows Subsystem for Linux (WSL), switch to the corresponding Linux distribution.
 
-4.  **「パスワードの作成」**をクリックしてランダムなパスワードを作成します。
+4.  Click **Generate Password** to create a random password.
 
-    > **ヒント：**
+    > **Tip:**
     >
-    > 以前にパスワードを作成したことがある場合は、元のパスワードを使用するか、 **「パスワードのリセット」**をクリックして新しいパスワードを生成できます。
+    > If you have created a password before, you can either use the original password or click **Reset Password** to generate a new one.
 
-5.  次のコマンドを実行して`.env.example`をコピーし、名前を`.env`に変更します。
+5.  Run the following command to copy `.env.example` and rename it to `.env`:
 
     ```shell
     cp .env.example .env
     ```
 
-6.  対応する接続​​文字列をコピーして`.env`ファイルに貼り付けます。結果の例は次のとおりです。
+6.  Copy and paste the corresponding connection string into the `.env` file. The example result is as follows:
 
     ```dotenv
     TIDB_HOST='{host}'  # e.g. gateway01.ap-northeast-1.prod.aws.tidbcloud.com
@@ -115,28 +117,28 @@ SQLAlchemy は、複数のデータベースで動作する ORM ライブラリ�
     CA_PATH='{ssl_ca}'  # e.g. /etc/ssl/certs/ca-certificates.crt (Debian / Ubuntu / Arch)
     ```
 
-    プレースホルダー`{}` 、接続ダイアログから取得した接続パラメーターに必ず置き換えてください。
+    Be sure to replace the placeholders `{}` with the connection parameters obtained from the connection dialog.
 
-7.  `.env`ファイルを保存します。
+7.  Save the `.env` file.
 
 </div>
 <div label="TiDB Dedicated">
 
-1.  [**クラスター**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲット クラスターの名前をクリックして、その概要ページに移動します。
+1.  Navigate to the [**Clusters**](https://tidbcloud.com/console/clusters) page, and then click the name of your target cluster to go to its overview page.
 
-2.  右上隅にある**「接続」**をクリックします。接続ダイアログが表示されます。
+2.  Click **Connect** in the upper-right corner. A connection dialog is displayed.
 
-3.  **「どこからでもアクセスを許可」**をクリックし、 **「TiDB クラスター CA のダウンロード」**をクリックして CA 証明書をダウンロードします。
+3.  Click **Allow Access from Anywhere** and then click **Download TiDB cluster CA** to download the CA certificate.
 
-    接続文字列の取得方法の詳細については、 [TiDB専用標準接続](https://docs.pingcap.com/tidbcloud/connect-via-standard-connection)を参照してください。
+    For more details about how to obtain the connection string, refer to [TiDB Dedicated standard connection](https://docs.pingcap.com/tidbcloud/connect-via-standard-connection).
 
-4.  次のコマンドを実行して`.env.example`をコピーし、名前を`.env`に変更します。
+4.  Run the following command to copy `.env.example` and rename it to `.env`:
 
     ```shell
     cp .env.example .env
     ```
 
-5.  対応する接続​​文字列をコピーして`.env`ファイルに貼り付けます。結果の例は次のとおりです。
+5.  Copy and paste the corresponding connection string into the `.env` file. The example result is as follows:
 
     ```dotenv
     TIDB_HOST='{host}'  # e.g. tidb.xxxx.clusters.tidb-cloud.com
@@ -147,20 +149,20 @@ SQLAlchemy は、複数のデータベースで動作する ORM ライブラリ�
     CA_PATH='{your-downloaded-ca-path}'
     ```
 
-    必ずプレースホルダー`{}`接続ダイアログから取得した接続パラメーターに置き換え、 `CA_PATH`前の手順でダウンロードした証明書パスで構成してください。
+    Be sure to replace the placeholders `{}` with the connection parameters obtained from the connection dialog, and configure `CA_PATH` with the certificate path downloaded in the previous step.
 
-6.  `.env`ファイルを保存します。
+6.  Save the `.env` file.
 
 </div>
 <div label="TiDB Self-Hosted">
 
-1.  次のコマンドを実行して`.env.example`をコピーし、名前を`.env`に変更します。
+1.  Run the following command to copy `.env.example` and rename it to `.env`:
 
     ```shell
     cp .env.example .env
     ```
 
-2.  対応する接続​​文字列をコピーして`.env`ファイルに貼り付けます。結果の例は次のとおりです。
+2.  Copy and paste the corresponding connection string into the `.env` file. The example result is as follows:
 
     ```dotenv
     TIDB_HOST='{tidb_server_host}'
@@ -170,30 +172,30 @@ SQLAlchemy は、複数のデータベースで動作する ORM ライブラリ�
     TIDB_DB_NAME='test'
     ```
 
-    必ずプレースホルダー`{}`接続パラメーターに置き換えて、 `CA_PATH`行を削除してください。 TiDB をローカルで実行している場合、デフォルトのホスト アドレスは`127.0.0.1`で、パスワードは空です。
+    Be sure to replace the placeholders `{}` with the connection parameters, and remove the `CA_PATH` line. If you are running TiDB locally, the default host address is `127.0.0.1`, and the password is empty.
 
-3.  `.env`ファイルを保存します。
+3.  Save the `.env` file.
 
 </div>
 </SimpleTab>
 
-### ステップ 4: コードを実行して結果を確認する {#step-4-run-the-code-and-check-the-result}
+### Step 4: Run the code and check the result {#step-4-run-the-code-and-check-the-result}
 
-1.  次のコマンドを実行してサンプル コードを実行します。
+1.  Execute the following command to run the sample code:
 
     ```shell
     python sqlalchemy_example.py
     ```
 
-2.  [予想される出力.txt](https://github.com/tidb-samples/tidb-python-sqlalchemy-quickstart/blob/main/Expected-Output.txt)チェックして、出力が一致するかどうかを確認します。
+2.  Check the [Expected-Output.txt](https://github.com/tidb-samples/tidb-python-sqlalchemy-quickstart/blob/main/Expected-Output.txt) to see if the output matches.
 
-## サンプルコードスニペット {#sample-code-snippets}
+## Sample code snippets {#sample-code-snippets}
 
-次のサンプル コード スニペットを参照して、独自のアプリケーション開発を完了できます。
+You can refer to the following sample code snippets to complete your own application development.
 
-完全なサンプル コードとその実行方法については、 [tidb-samples/tidb-python-sqlalchemy-quickstart](https://github.com/tidb-samples/tidb-python-sqlalchemy-quickstart)リポジトリを確認してください。
+For complete sample code and how to run it, check out the [tidb-samples/tidb-python-sqlalchemy-quickstart](https://github.com/tidb-samples/tidb-python-sqlalchemy-quickstart) repository.
 
-### TiDB に接続する {#connect-to-tidb}
+### Connect to TiDB {#connect-to-tidb}
 
 ```python
 from sqlalchemy import create_engine, URL
@@ -223,9 +225,9 @@ engine = get_db_engine()
 Session = sessionmaker(bind=engine)
 ```
 
-この関数を使用する場合、 `${tidb_host}` 、 `${tidb_port}` 、 `${tidb_user}` 、 `${tidb_password}` 、 `${tidb_db_name}`および`${ca_path}`を TiDB クラスターの実際の値に置き換える必要があります。
+When using this function, you need to replace `${tidb_host}`, `${tidb_port}`, `${tidb_user}`, `${tidb_password}`, `${tidb_db_name}` and `${ca_path}` with the actual values of your TiDB cluster.
 
-### テーブルを定義する {#define-a-table}
+### Define a table {#define-a-table}
 
 ```python
 from sqlalchemy import Column, Integer, String
@@ -242,9 +244,9 @@ class Player(Base):
     __tablename__ = "players"
 ```
 
-詳細については、 [SQLAlchemy ドキュメント: 宣言によるクラスのマッピング](https://docs.sqlalchemy.org/en/20/orm/declarative_mapping.html)を参照してください。
+For more information, refer to [SQLAlchemy documentation: Mapping classes with declarative](https://docs.sqlalchemy.org/en/20/orm/declarative_mapping.html).
 
-### データの挿入 {#insert-data}
+### Insert data {#insert-data}
 
 ```python
 with Session() as session:
@@ -253,9 +255,9 @@ with Session() as session:
     session.commit()
 ```
 
-詳細については、 [データの挿入](/develop/dev-guide-insert-data.md)を参照してください。
+For more information, refer to [Insert data](/develop/dev-guide-insert-data.md).
 
-### クエリデータ {#query-data}
+### Query data {#query-data}
 
 ```python
 with Session() as session:
@@ -263,9 +265,9 @@ with Session() as session:
     print(player)
 ```
 
-詳細については、 [クエリデータ](/develop/dev-guide-get-data-from-single-table.md)を参照してください。
+For more information, refer to [Query data](/develop/dev-guide-get-data-from-single-table.md).
 
-### データを更新する {#update-data}
+### Update data {#update-data}
 
 ```python
 with Session() as session:
@@ -274,9 +276,9 @@ with Session() as session:
     session.commit()
 ```
 
-詳細については、 [データを更新する](/develop/dev-guide-update-data.md)を参照してください。
+For more information, refer to [Update data](/develop/dev-guide-update-data.md).
 
-### データの削除 {#delete-data}
+### Delete data {#delete-data}
 
 ```python
 with Session() as session:
@@ -285,14 +287,14 @@ with Session() as session:
     session.commit()
 ```
 
-詳細については、 [データの削除](/develop/dev-guide-delete-data.md)を参照してください。
+For more information, refer to [Delete data](/develop/dev-guide-delete-data.md).
 
-## 次のステップ {#next-steps}
+## Next steps {#next-steps}
 
--   SQLAlchemy の使用法を[SQLAlchemy のドキュメント](https://www.sqlalchemy.org/)から学びましょう。
--   TiDB アプリケーション[データの削除](/develop/dev-guide-delete-data.md) [単一テーブルの読み取り](/develop/dev-guide-get-data-from-single-table.md)ベスト プラクティス[SQLパフォーマンスの最適化](/develop/dev-guide-optimize-sql-overview.md)は、 [開発者ガイド](/develop/dev-guide-overview.md)の章 ( [データの挿入](/develop/dev-guide-insert-data.md)など) [データを更新する](/develop/dev-guide-update-data.md)参照[トランザクション](/develop/dev-guide-transaction-overview.md)てください。
--   プロフェッショナルとして[TiDB 開発者コース](https://www.pingcap.com/education/)を学び、試験合格後に[TiDB 認定](https://www.pingcap.com/education/certification/)獲得します。
+-   Learn more usage of SQLAlchemy from [the documentation of SQLAlchemy](https://www.sqlalchemy.org/).
+-   Learn the best practices for TiDB application development with the chapters in the [Developer guide](/develop/dev-guide-overview.md), such as [Insert data](/develop/dev-guide-insert-data.md), [Update data](/develop/dev-guide-update-data.md), [Delete data](/develop/dev-guide-delete-data.md), [Single table reading](/develop/dev-guide-get-data-from-single-table.md), [Transactions](/develop/dev-guide-transaction-overview.md), and [SQL performance optimization](/develop/dev-guide-optimize-sql-overview.md).
+-   Learn through the professional [TiDB developer courses](https://www.pingcap.com/education/) and earn [TiDB certifications](https://www.pingcap.com/education/certification/) after passing the exam.
 
-## 助けが必要？ {#need-help}
+## Need help? {#need-help}
 
-[不和](https://discord.gg/vYU9h56kAX)または[サポートチケットを作成する](https://support.pingcap.com/)について質問してください。
+Ask questions on the [Discord](https://discord.gg/vYU9h56kAX), or [create a support ticket](https://support.pingcap.com/).

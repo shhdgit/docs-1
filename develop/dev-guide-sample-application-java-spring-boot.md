@@ -4,153 +4,155 @@ summary: Learn how to connect to TiDB using Spring Boot. This tutorial gives Jav
 aliases: ['/tidb/v7.1/dev-guide-sample-application-spring-boot']
 ---
 
-# Spring Boot を使用して TiDB に接続する {#connect-to-tidb-with-spring-boot}
+# Spring Bootを使用してTiDBに接続する {#connect-to-tidb-with-spring-boot}
 
-TiDB は MySQL 互換データベースであり、 Java用の人気の[春](https://spring.io/)オープンソース コンテナ フレームワークです。このドキュメントでは Spring の使用方法として[スプリングブーツ](https://spring.io/projects/spring-boot)を使用します。
+TiDBはMySQL互換のデータベースであり、[Spring](https://spring.io/)はJava向けの人気のあるオープンソースのコンテナフレームワークです。このドキュメントでは、[Spring Boot](https://spring.io/projects/spring-boot)をSpringの使用方法として使用します。
 
-このチュートリアルでは、TiDB を JPA プロバイダーとして[Spring Data JPA](https://spring.io/projects/spring-data-jpa)および[休止状態](https://hibernate.org/orm/)とともに使用して、次のタスクを実行する方法を学習できます。
+このチュートリアルでは、以下のタスクを達成するために、TiDBを[Spring Data JPA](https://spring.io/projects/spring-data-jpa)と[Hibernate](https://hibernate.org/orm/)をJPAプロバイダとして使用します。
 
--   環境をセットアップします。
--   Hibernate と Spring Data JPA を使用して TiDB クラスターに接続します。
--   アプリケーションをビルドして実行します。オプションで、基本的な CRUD 操作の[サンプルコードスニペット](#sample-code-snippets)を見つけることができます。
+-   環境をセットアップする。
+-   HibernateとSpring Data JPAを使用してTiDBクラスタに接続する。
+-   アプリケーションをビルドして実行する。オプションで、基本的なCRUD操作の[サンプルコードスニペット](#sample-code-snippets)を見つけることができます。
 
-> **注記：**
+> **注意:**
 >
-> このチュートリアルは、TiDB サーバーレス、TiDB 専用、および TiDB セルフホストで動作します。
+> このチュートリアルは、TiDB Serverless、TiDB Dedicated、TiDB Self-Hostedと連携します。
 
 ## 前提条件 {#prerequisites}
 
-このチュートリアルを完了するには、次のものが必要です。
+このチュートリアルを完了するには、以下が必要です:
 
--   **Java開発キット (JDK) 17**以降。ビジネスや個人の要件に基づいて[OpenJDK](https://openjdk.org/)または[オラクルJDK](https://www.oracle.com/hk/java/technologies/downloads/)を選択できます。
--   [メイビン](https://maven.apache.org/install.html) **3.8**以上。
--   [ギット](https://git-scm.com/downloads) 。
--   TiDB クラスター。
+-   **Java Development Kit (JDK) 17** 以上。ビジネスおよび個人の要件に基づいて、[OpenJDK](https://openjdk.org/)または[Oracle JDK](https://www.oracle.com/hk/java/technologies/downloads/)を選択できます。
+-   [Maven](https://maven.apache.org/install.html) **3.8** 以上。
+-   [Git](https://git-scm.com/downloads)。
+-   TiDBクラスタ。
 
 <CustomContent platform="tidb">
 
-**TiDB クラスターがない場合は、次のように作成できます。**
+**TiDBクラスタを持っていない場合、以下のように作成できます:**
 
--   (推奨) [TiDB サーバーレスクラスターの作成](/develop/dev-guide-build-cluster-in-cloud.md)に従って、独自のTiDB Cloudクラスターを作成します。
--   [ローカル テスト TiDB クラスターをデプロイ](/quick-start-with-tidb.md#deploy-a-local-test-cluster)または[本番TiDB クラスターをデプロイ](/production-deployment-using-tiup.md)に従ってローカル クラスターを作成します。
+-   (推奨) [TiDB Serverlessクラスタの作成](/develop/dev-guide-build-cluster-in-cloud.md)に従って、独自のTiDB Cloudクラスタを作成します。
+-   [ローカルテストTiDBクラスタのデプロイ](/quick-start-with-tidb.md#deploy-a-local-test-cluster)または[本番TiDBクラスタのデプロイ](/production-deployment-using-tiup.md)に従って、ローカルクラスタを作成します。
 
 </CustomContent>
 <CustomContent platform="tidb-cloud">
 
-**TiDB クラスターがない場合は、次のように作成できます。**
+**TiDBクラスタを持っていない場合、以下のように作成できます:**
 
--   (推奨) [TiDB サーバーレスクラスターの作成](/develop/dev-guide-build-cluster-in-cloud.md)に従って、独自のTiDB Cloudクラスターを作成します。
--   [ローカル テスト TiDB クラスターをデプロイ](https://docs.pingcap.com/tidb/stable/quick-start-with-tidb#deploy-a-local-test-cluster)または[本番TiDB クラスターをデプロイ](https://docs.pingcap.com/tidb/stable/production-deployment-using-tiup)に従ってローカル クラスターを作成します。
+-   (推奨) [TiDB Serverlessクラスタの作成](/develop/dev-guide-build-cluster-in-cloud.md)に従って、独自のTiDB Cloudクラスタを作成します。
+-   [ローカルテストTiDBクラスタのデプロイ](https://docs.pingcap.com/tidb/stable/quick-start-with-tidb#deploy-a-local-test-cluster)または[本番TiDBクラスタのデプロイ](https://docs.pingcap.com/tidb/stable/production-deployment-using-tiup)に従って、ローカルクラスタを作成します。
 
 </CustomContent>
 
-## サンプル アプリを実行して TiDB に接続する {#run-the-sample-app-to-connect-to-tidb}
+## サンプルアプリを実行してTiDBに接続する {#run-the-sample-app-to-connect-to-tidb}
 
-このセクションでは、サンプル アプリケーション コードを実行して TiDB に接続する方法を説明します。
+このセクションでは、サンプルアプリケーションコードを実行してTiDBに接続する方法を示します。
 
-### ステップ 1: サンプル アプリ リポジトリのクローンを作成する {#step-1-clone-the-sample-app-repository}
+### ステップ1: サンプルアプリのリポジトリをクローンする {#step-1-clone-the-sample-app-repository}
 
-ターミナル ウィンドウで次のコマンドを実行して、サンプル コード リポジトリのクローンを作成します。
+ターミナルウィンドウで以下のコマンドを実行して、サンプルコードリポジトリをクローンします:
 
 ```shell
 git clone https://github.com/tidb-samples/tidb-java-springboot-jpa-quickstart.git
 cd tidb-java-springboot-jpa-quickstart
 ```
 
-### ステップ 2: 接続情報を構成する {#step-2-configure-connection-information}
+### ステップ2：接続情報を構成する {#step-2-configure-connection-information}
 
-選択した TiDB デプロイメント オプションに応じて、TiDB クラスターに接続します。
+TiDBクラスタに接続するには、選択したTiDBデプロイメントオプションに応じて行います。
 
 <SimpleTab>
-<div label="TiDB Serverless">
+<div label="TiDBサーバーレス">
 
-1.  [**クラスター**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲット クラスターの名前をクリックして、その概要ページに移動します。
+1.  [**クラスタ**](https://tidbcloud.com/console/clusters) ページに移動し、対象のクラスタの名前をクリックして概要ページに移動します。
 
-2.  右上隅にある**「接続」**をクリックします。接続ダイアログが表示されます。
+2.  右上隅の **Connect** をクリックします。接続ダイアログが表示されます。
 
-3.  接続ダイアログの設定が動作環境と一致していることを確認してください。
+3.  接続ダイアログの構成が、操作環境に一致することを確認します。
 
-    -   **エンドポイント タイプは**`Public`に設定されます
+    -   **エンドポイントタイプ** が `Public` に設定されていること
 
-    -   **[接続先] は**`General`に設定されています
+    -   **ブランチ** が `main` に設定されていること
 
-    -   **オペレーティング システムが**環境に一致します。
+    -   **Connect With** が `General` に設定されていること
 
-    > **ヒント：**
+    -   **オペレーティングシステム** が環境に一致していること
+
+    > **ヒント:**
     >
-    > プログラムが Windows Subsystem for Linux (WSL) で実行されている場合は、対応する Linux ディストリビューションに切り替えます。
+    > もしプログラムがWindows Subsystem for Linux（WSL）で実行されている場合は、対応するLinuxディストリビューションに切り替えてください。
 
-4.  **「パスワードの作成」**をクリックしてランダムなパスワードを作成します。
+4.  **Generate Password** をクリックしてランダムなパスワードを作成します。
 
-    > **ヒント：**
+    > **ヒント:**
     >
-    > 以前にパスワードを作成したことがある場合は、元のパスワードを使用するか、 **「パスワードのリセット」**をクリックして新しいパスワードを生成できます。
+    > もし以前にパスワードを作成している場合は、元のパスワードを使用するか、新しいパスワードを生成するために **Reset Password** をクリックすることができます。
 
-5.  次のコマンドを実行して`env.sh.example`をコピーし、名前を`env.sh`に変更します。
+5.  以下のコマンドを実行して `env.sh.example` をコピーし、`env.sh` にリネームします：
 
     ```shell
     cp env.sh.example env.sh
     ```
 
-6.  対応する接続​​文字列をコピーして`env.sh`ファイルに貼り付けます。結果の例は次のとおりです。
+6.  対応する接続文字列を `env.sh` ファイルにコピーして貼り付けます。例として以下のようになります：
 
     ```shell
-    export TIDB_HOST='{host}'  # e.g. gateway01.ap-northeast-1.prod.aws.tidbcloud.com
+    export TIDB_HOST='{host}'  # 例: gateway01.ap-northeast-1.prod.aws.tidbcloud.com
     export TIDB_PORT='4000'
-    export TIDB_USER='{user}'  # e.g. xxxxxx.root
+    export TIDB_USER='{user}'  # 例: xxxxxx.root
     export TIDB_PASSWORD='{password}'
     export TIDB_DB_NAME='test'
     export USE_SSL='true'
     ```
 
-    プレースホルダー`{}` 、接続ダイアログから取得した接続パラメーターに必ず置き換えてください。
+    接続ダイアログから取得した接続パラメータでプレースホルダ `{}` を置き換えるようにしてください。
 
-    TiDB サーバーレスには安全な接続が必要です。したがって、 `USE_SSL` ～ `true`の値を設定する必要があります。
+    TiDBサーバーレスでは安全な接続が必要です。そのため、`USE_SSL` の値を `true` に設定する必要があります。
 
-7.  `env.sh`ファイルを保存します。
+7.  `env.sh` ファイルを保存します。
 
 </div>
-<div label="TiDB Dedicated">
+<div label="TiDB専用">
 
-1.  [**クラスター**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲット クラスターの名前をクリックして、その概要ページに移動します。
+1.  [**クラスタ**](https://tidbcloud.com/console/clusters) ページに移動し、対象のクラスタの名前をクリックして概要ページに移動します。
 
-2.  右上隅にある**「接続」**をクリックします。接続ダイアログが表示されます。
+2.  右上隅の **Connect** をクリックします。接続ダイアログが表示されます。
 
-3.  **「どこからでもアクセスを許可」**をクリックし、 **「TiDB クラスター CA のダウンロード」**をクリックして CA 証明書をダウンロードします。
+3.  **どこからでもアクセスを許可** をクリックし、その後 **TiDBクラスタCAをダウンロード** をクリックしてCA証明書をダウンロードします。
 
-    接続文字列の取得方法の詳細については、 [TiDB専用標準接続](https://docs.pingcap.com/tidbcloud/connect-via-standard-connection)を参照してください。
+    接続文字列の取得方法の詳細については、[TiDB専用標準接続](https://docs.pingcap.com/tidbcloud/connect-via-standard-connection) を参照してください。
 
-4.  次のコマンドを実行して`env.sh.example`をコピーし、名前を`env.sh`に変更します。
+4.  以下のコマンドを実行して `env.sh.example` をコピーし、`env.sh` にリネームします：
 
     ```shell
     cp env.sh.example env.sh
     ```
 
-5.  対応する接続​​文字列をコピーして`env.sh`ファイルに貼り付けます。結果の例は次のとおりです。
+5.  対応する接続文字列を `env.sh` ファイルにコピーして貼り付けます。例として以下のようになります：
 
     ```shell
-    export TIDB_HOST='{host}'  # e.g. tidb.xxxx.clusters.tidb-cloud.com
+    export TIDB_HOST='{host}'  # 例: tidb.xxxx.clusters.tidb-cloud.com
     export TIDB_PORT='4000'
-    export TIDB_USER='{user}'  # e.g. root
+    export TIDB_USER='{user}'  # 例: root
     export TIDB_PASSWORD='{password}'
     export TIDB_DB_NAME='test'
     export USE_SSL='false'
     ```
 
-    プレースホルダー`{}` 、接続ダイアログから取得した接続パラメーターに必ず置き換えてください。
+    接続ダイアログから取得した接続パラメータでプレースホルダ `{}` を置き換えるようにしてください。
 
-6.  `env.sh`ファイルを保存します。
+6.  `env.sh` ファイルを保存します。
 
 </div>
-<div label="TiDB Self-Hosted">
+<div label="TiDBセルフホスト">
 
-1.  次のコマンドを実行して`env.sh.example`をコピーし、名前を`env.sh`に変更します。
+1.  以下のコマンドを実行して `env.sh.example` をコピーし、`env.sh` にリネームします：
 
     ```shell
     cp env.sh.example env.sh
     ```
 
-2.  対応する接続​​文字列をコピーして`env.sh`ファイルに貼り付けます。結果の例は次のとおりです。
+2.  対応する接続文字列を `env.sh` ファイルにコピーして貼り付けます。例として以下のようになります：
 
     ```shell
     export TIDB_HOST='{host}'
@@ -161,38 +163,38 @@ cd tidb-java-springboot-jpa-quickstart
     export USE_SSL='false'
     ```
 
-    必ずプレースホルダー`{}`接続パラメーターに置き換えて、 `USE_SSL`を`false`に設定してください。 TiDB をローカルで実行している場合、デフォルトのホスト アドレスは`127.0.0.1`で、パスワードは空です。
+    接続パラメータのプレースホルダ `{}` を置き換えるようにしてください。TiDBをローカルで実行している場合、デフォルトのホストアドレスは `127.0.0.1` であり、パスワードは空です。
 
-3.  `env.sh`ファイルを保存します。
+3.  `env.sh` ファイルを保存します。
 
 </div>
 </SimpleTab>
 
-### ステップ 3: コードを実行して結果を確認する {#step-3-run-the-code-and-check-the-result}
+### ステップ3：コードを実行して結果を確認する {#step-3-run-the-code-and-check-the-result}
 
-1.  次のコマンドを実行してサンプル コードを実行します。
+1.  サンプルコードを実行するには、次のコマンドを実行します：
 
     ```shell
     make
     ```
 
-2.  別のターミナル セッションでリクエスト スクリプトを実行します。
+2.  別のターミナルセッションでリクエストスクリプトを実行します：
 
     ```shell
     make request
     ```
 
-3.  [予想される出力.txt](https://github.com/tidb-samples/tidb-java-springboot-jpa-quickstart/blob/main/Expected-Output.txt)チェックして、出力が一致するかどうかを確認します。
+3.  出力が一致するかどうかを確認するために、[Expected-Output.txt](https://github.com/tidb-samples/tidb-java-springboot-jpa-quickstart/blob/main/Expected-Output.txt) を確認してください。
 
 ## サンプルコードスニペット {#sample-code-snippets}
 
-次のサンプル コード スニペットを参照して、独自のアプリケーション開発を完了できます。
+次のサンプルコードスニペットを参照して、独自のアプリケーション開発を完了させることができます。
 
-完全なサンプル コードとその実行方法については、 [tidb-samples/tidb-java-springboot-jpa-quickstart](https://github.com/tidb-samples/tidb-java-springboot-jpa-quickstart)リポジトリを確認してください。
+完全なサンプルコードとその実行方法については、[tidb-samples/tidb-java-springboot-jpa-quickstart](https://github.com/tidb-samples/tidb-java-springboot-jpa-quickstart) リポジトリを確認してください。
 
-### TiDB に接続する {#connect-to-tidb}
+### TiDB への接続 {#connect-to-tidb}
 
-構成ファイル`application.yml`を編集します。
+構成ファイル `application.yml` を編集します：
 
 ```yaml
 spring:
@@ -208,15 +210,15 @@ spring:
       ddl-auto: create-drop
 ```
 
-構成後、環境変数`TIDB_JDBC_URL` 、 `TIDB_USER` 、および`TIDB_PASSWORD`を TiDB クラスターの実際の値に設定します。構成ファイルは、これらの環境変数のデフォルト設定を提供します。環境変数を設定しない場合、デフォルト値は次のとおりです。
+設定後、環境変数`TIDB_JDBC_URL`、`TIDB_USER`、および`TIDB_PASSWORD`をTiDBクラスターの実際の値に設定してください。構成ファイルはこれらの環境変数のデフォルト設定を提供します。環境変数を構成しない場合、デフォルト値は次のとおりです：
 
--   `TIDB_JDBC_URL` ： `"jdbc:mysql://localhost:4000/test"`
--   `TIDB_USER` ： `"root"`
--   `TIDB_PASSWORD` ： `""`
+-   `TIDB_JDBC_URL`: `"jdbc:mysql://localhost:4000/test"`
+-   `TIDB_USER`: `"root"`
+-   `TIDB_PASSWORD`: `""`
 
-### データ管理: <code>@Repository</code> {#data-management-code-repository-code}
+### データ管理：`@Repository` {#data-management-repository}
 
-Spring Data JPA は`@Repository`インターフェイスを通じてデータを管理します。 `JpaRepository`によって提供される CRUD 操作を使用するには、 `JpaRepository`インターフェイスを拡張する必要があります。
+Spring Data JPAは`@Repository`インターフェースを介してデータを管理します。`JpaRepository`が提供するCRUD操作を使用するには、`JpaRepository`インターフェースを拡張する必要があります。
 
 ```java
 @Repository
@@ -224,7 +226,7 @@ public interface PlayerRepository extends JpaRepository<PlayerBean, Long> {
 }
 ```
 
-その後、 `PlayerRepository`を必要とするクラスで自動依存関係注入に`@Autowired`使用できます。これにより、CRUD関数を直接使用できるようになります。以下は例です。
+その後、`PlayerRepository`を必要とする任意のクラスで`@Autowired`を使用して自動的な依存性の注入ができます。これにより、直接CRUD機能を使用することができます。以下は例です：
 
 ```java
 @Autowired
@@ -233,19 +235,21 @@ private PlayerRepository playerRepository;
 
 ### データの挿入または更新 {#insert-or-update-data}
 
+以上
+
 ```java
 playerRepository.save(player);
 ```
 
-詳細については、 [データの挿入](/develop/dev-guide-insert-data.md)および[データを更新する](/develop/dev-guide-update-data.md)を参照してください。
+[データの挿入](/develop/dev-guide-insert-data.md)と[データの更新](/develop/dev-guide-update-data.md)については、詳細情報を参照してください。
 
-### クエリデータ {#query-data}
+### データのクエリ {#query-data}
 
 ```java
 PlayerBean player = playerRepository.findById(id).orElse(null);
 ```
 
-詳細については、 [クエリデータ](/develop/dev-guide-get-data-from-single-table.md)を参照してください。
+[クエリデータ](/develop/dev-guide-get-data-from-single-table.md)を参照して、詳細情報をご覧ください。
 
 ### データの削除 {#delete-data}
 
@@ -253,25 +257,25 @@ PlayerBean player = playerRepository.findById(id).orElse(null);
 playerRepository.deleteById(id);
 ```
 
-詳細については、 [データの削除](/develop/dev-guide-delete-data.md)を参照してください。
+詳細については、[データの削除](/develop/dev-guide-delete-data.md)を参照してください。
 
 ## 次のステップ {#next-steps}
 
--   Hibernate の詳しい使い方を[Hibernate のドキュメント](https://hibernate.org/orm/documentation)から学びましょう。
+-   [Hibernateのドキュメント](https://hibernate.org/orm/documentation)からHibernateのさらなる使用法を学びます。
 
--   このドキュメントで使用されているサードパーティのライブラリとフレームワークの使用方法の詳細については、公式ドキュメントを参照してください。
+-   このドキュメントで使用されているサードパーティ製のライブラリやフレームワークのさらなる使用法については、それぞれの公式ドキュメントを参照してください：
 
     -   [Spring Frameworkのドキュメント](https://spring.io/projects/spring-framework)
-    -   [Spring Boot のドキュメント](https://spring.io/projects/spring-boot)
+    -   [Spring Bootのドキュメント](https://spring.io/projects/spring-boot)
     -   [Spring Data JPAのドキュメント](https://spring.io/projects/spring-data-jpa)
-    -   [Hibernate のドキュメント](https://hibernate.org/orm/documentation)
+    -   [Hibernateのドキュメント](https://hibernate.org/orm/documentation)
 
--   TiDB アプリケーション[データの削除](/develop/dev-guide-delete-data.md) [単一テーブルの読み取り](/develop/dev-guide-get-data-from-single-table.md)ベスト プラクティス[SQLパフォーマンスの最適化](/develop/dev-guide-optimize-sql-overview.md)は、 [開発者ガイド](/develop/dev-guide-overview.md)の章 ( [データの挿入](/develop/dev-guide-insert-data.md)など) [データを更新する](/develop/dev-guide-update-data.md)参照[トランザクション](/develop/dev-guide-transaction-overview.md)てください。
+-   [開発者ガイド](/develop/dev-guide-overview.md)の章を通じてTiDBアプリケーション開発のベストプラクティスを学びます。例えば、[データの挿入](/develop/dev-guide-insert-data.md)、[データの更新](/develop/dev-guide-update-data.md)、[データの削除](/develop/dev-guide-delete-data.md)、[単一テーブルからのデータ取得](/develop/dev-guide-get-data-from-single-table.md)、[トランザクション](/develop/dev-guide-transaction-overview.md)、および[SQLパフォーマンスの最適化](/develop/dev-guide-optimize-sql-overview.md)。
 
--   プロフェッショナルとして[TiDB 開発者コース](https://www.pingcap.com/education/)を学び、試験合格後に[TiDB 認定](https://www.pingcap.com/education/certification/)獲得します。
+-   [TiDB開発者コース](https://www.pingcap.com/education/)を通じて学び、試験に合格した後に[TiDB認定資格](https://www.pingcap.com/education/certification/)を取得します。
 
--   Java開発者向けのコースを通じて[Javaから TiDB を操作する](https://eng.edu.pingcap.com/catalog/info/id:212)を学びます。
+-   Java開発者向けのコースを通じて学びます：[JavaからTiDBを操作する](https://eng.edu.pingcap.com/catalog/info/id:212)。
 
-## 助けが必要？ {#need-help}
+## ヘルプが必要ですか？ {#need-help}
 
-[不和](https://discord.gg/vYU9h56kAX)または[サポートチケットを作成する](https://support.pingcap.com/)について質問してください。
+[Discord](https://discord.gg/vYU9h56kAX)で質問するか、[サポートチケットを作成](https://support.pingcap.com/)してください。

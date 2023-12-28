@@ -3,197 +3,197 @@ title: Connect to TiDB with SQLAlchemy
 summary: Learn how to connect to TiDB using SQLAlchemy. This tutorial gives Python sample code snippets that work with TiDB using SQLAlchemy.
 ---
 
-# SQLAlchemy を使用して TiDB に接続する {#connect-to-tidb-with-sqlalchemy}
+# SQLAlchemyを使用してTiDBに接続する {#connect-to-tidb-with-sqlalchemy}
 
-TiDB は MySQL 互換データベースであり、 [SQLアルケミー](https://www.sqlalchemy.org/)は人気のある Python SQL ツールキットおよびオブジェクト リレーショナル マッパー (ORM) です。
+TiDBはMySQL互換のデータベースであり、[SQLAlchemy](https://www.sqlalchemy.org/)は人気のあるPython SQLツールキットおよびオブジェクト関係マッパー（ORM）です。
 
-このチュートリアルでは、TiDB と SQLAlchemy を使用して次のタスクを実行する方法を学習できます。
+このチュートリアルでは、次のタスクを実行するためにTiDBとSQLAlchemyを使用する方法を学ぶことができます。
 
--   環境をセットアップします。
--   SQLAlchemy を使用して TiDB クラスターに接続します。
--   アプリケーションをビルドして実行します。オプションで、基本的な CRUD 操作のサンプル コード スニペットを見つけることができます。
+- 環境をセットアップする。
+- SQLAlchemyを使用してTiDBクラスターに接続する。
+- アプリケーションをビルドして実行する。オプションで、基本的なCRUD操作のためのサンプルコードスニペットを見つけることができます。
 
-> **注記：**
+> **Note:**
 >
-> このチュートリアルは、TiDB サーバーレス、TiDB 専用、および TiDB セルフホスト クラスターで動作します。
+> このチュートリアルは、TiDB Serverless、TiDB Dedicated、およびTiDB Self-Hostedクラスターで動作します。
 
 ## 前提条件 {#prerequisites}
 
 このチュートリアルを完了するには、次のものが必要です。
 
--   [Python 3.8以降](https://www.python.org/downloads/) 。
--   [ギット](https://git-scm.com/downloads) 。
--   TiDB クラスター。
+- [Python 3.8以上](https://www.python.org/downloads/)。
+- [Git](https://git-scm.com/downloads)。
+- TiDBクラスター。
 
 <CustomContent platform="tidb">
 
-**TiDB クラスターがない場合は、次のように作成できます。**
+**TiDBクラスターをお持ちでない場合は、次のように作成することができます。**
 
--   (推奨) [TiDB サーバーレスクラスターの作成](/develop/dev-guide-build-cluster-in-cloud.md)に従って、独自のTiDB Cloudクラスターを作成します。
--   [ローカル テスト TiDB クラスターをデプロイ](/quick-start-with-tidb.md#deploy-a-local-test-cluster)または[本番TiDB クラスターをデプロイ](/production-deployment-using-tiup.md)に従ってローカル クラスターを作成します。
+- （推奨）[TiDB Serverlessクラスターの作成](/develop/dev-guide-build-cluster-in-cloud.md)に従って、独自のTiDB Cloudクラスターを作成します。
+- [ローカルテストTiDBクラスターのデプロイ](/quick-start-with-tidb.md#deploy-a-local-test-cluster)または[本番TiDBクラスターのデプロイ](/production-deployment-using-tiup.md)に従って、ローカルクラスターを作成します。
 
 </CustomContent>
 <CustomContent platform="tidb-cloud">
 
-**TiDB クラスターがない場合は、次のように作成できます。**
+**TiDBクラスターをお持ちでない場合は、次のように作成することができます。**
 
--   (推奨) [TiDB サーバーレスクラスターの作成](/develop/dev-guide-build-cluster-in-cloud.md)に従って、独自のTiDB Cloudクラスターを作成します。
--   [ローカル テスト TiDB クラスターをデプロイ](https://docs.pingcap.com/tidb/stable/quick-start-with-tidb#deploy-a-local-test-cluster)または[本番TiDB クラスターをデプロイ](https://docs.pingcap.com/tidb/stable/production-deployment-using-tiup)に従ってローカル クラスターを作成します。
+- （推奨）[TiDB Serverlessクラスターの作成](/develop/dev-guide-build-cluster-in-cloud.md)に従って、独自のTiDB Cloudクラスターを作成します。
+- [ローカルテストTiDBクラスターのデプロイ](https://docs.pingcap.com/tidb/stable/quick-start-with-tidb#deploy-a-local-test-cluster)または[本番TiDBクラスターのデプロイ](https://docs.pingcap.com/tidb/stable/production-deployment-using-tiup)に従って、ローカルクラスターを作成します。
 
 </CustomContent>
 
-## サンプル アプリを実行して TiDB に接続する {#run-the-sample-app-to-connect-to-tidb}
+## サンプルアプリを実行してTiDBに接続する {#run-the-sample-app-to-connect-to-tidb}
 
-このセクションでは、サンプル アプリケーション コードを実行して TiDB に接続する方法を説明します。
+このセクションでは、サンプルアプリケーションコードを実行してTiDBに接続する方法を示します。
 
-### ステップ 1: サンプル アプリ リポジトリのクローンを作成する {#step-1-clone-the-sample-app-repository}
+### ステップ1：サンプルアプリリポジトリをクローンする {#step-1-clone-the-sample-app-repository}
 
-ターミナル ウィンドウで次のコマンドを実行して、サンプル コード リポジトリのクローンを作成します。
+ターミナルウィンドウで次のコマンドを実行して、サンプルコードリポジトリをクローンします：
 
 ```shell
 git clone https://github.com/tidb-samples/tidb-python-sqlalchemy-quickstart.git
 cd tidb-python-sqlalchemy-quickstart
 ```
 
-### ステップ 2: 依存関係をインストールする {#step-2-install-dependencies}
+### ステップ2：依存関係のインストール {#step-2-install-dependencies}
 
-次のコマンドを実行して、サンプル アプリに必要なパッケージ (SQLAlchemy と PyMySQL を含む) をインストールします。
+次のコマンドを実行して、サンプルアプリケーションに必要なパッケージ（SQLAlchemyとPyMySQLを含む）をインストールします。
 
 ```shell
 pip install -r requirements.txt
 ```
 
-#### PyMySQL を使用する理由 {#why-use-pymysql}
+#### PyMySQLを使用する理由 {#why-use-pymysql}
 
-SQLAlchemy は、複数のデータベースで動作する ORM ライブラリです。これはデータベースの高レベルの抽象化を提供し、開発者がよりオブジェクト指向の方法で SQL ステートメントを作成するのに役立ちます。ただし、SQLAlchemy にはデータベース ドライバーが含まれていません。データベースに接続するには、データベース ドライバーをインストールする必要があります。このサンプル アプリケーションは、データベース ドライバーとして PyMySQL を使用します。これは、TiDB と互換性があり、すべてのプラットフォームにインストールできる純粋な Python MySQL クライアント ライブラリです。
+SQLAlchemyは、複数のデータベースと連携するORMライブラリです。データベースの高レベルな抽象化を提供し、開発者がよりオブジェクト指向的な方法でSQL文を記述できるように支援します。しかし、SQLAlchemyにはデータベースドライバが含まれていません。データベースに接続するには、データベースドライバをインストールする必要があります。このサンプルアプリケーションでは、TiDBと互換性のある純粋なPython MySQLクライアントライブラリであるPyMySQLをデータベースドライバとして使用しています。また、[mysqlclient](https://github.com/PyMySQL/mysqlclient)や[mysql-connector-python](https://dev.mysql.com/doc/connector-python/en/)などの他のデータベースドライバを使用することもできます。しかし、これらは純粋なPythonライブラリではなく、対応するC/C++コンパイラとMySQLクライアントのコンパイルが必要です。詳細については、[SQLAlchemy公式ドキュメント](https://docs.sqlalchemy.org/en/20/core/engines.html#mysql)を参照してください。
 
-[mysqlクライアント](https://github.com/PyMySQL/mysqlclient)や[mysql-コネクタ-Python](https://dev.mysql.com/doc/connector-python/en/)など、他のデータベース ドライバーを使用することもできます。ただし、これらは純粋な Python ライブラリではなく、コンパイルには対応する C/C++ コンパイラと MySQL クライアントが必要です。詳細については、 [SQLAlchemy 公式ドキュメント](https://docs.sqlalchemy.org/en/20/core/engines.html#mysql)を参照してください。
+### ステップ3：接続情報を設定する {#step-3-configure-connection-information}
 
-### ステップ 3: 接続情報を構成する {#step-3-configure-connection-information}
-
-選択した TiDB デプロイメント オプションに応じて、TiDB クラスターに接続します。
+TiDBクラスタに接続するには、選択したTiDBデプロイメントオプションに応じて接続します。
 
 <SimpleTab>
 <div label="TiDB Serverless">
 
-1.  [**クラスター**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲット クラスターの名前をクリックして、その概要ページに移動します。
+1. [**Clusters**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲットクラスタの名前をクリックして、概要ページに移動します。
 
-2.  右上隅にある**「接続」**をクリックします。接続ダイアログが表示されます。
+2. 右上の**Connect**をクリックします。接続ダイアログが表示されます。
 
-3.  接続ダイアログの設定が動作環境と一致していることを確認してください。
+3. 接続ダイアログの設定が、オペレーティング環境に一致することを確認してください。
 
-    -   **エンドポイント タイプは**`Public`に設定されます
+   - **Endpoint Type**は`Public`に設定されていること
 
-    -   **[接続先] は**`General`に設定されています
+   - **Branch**は`main`に設定されていること
 
-    -   **オペレーティング システムが**環境に一致します。
+   - **Connect With**は`General`に設定されていること
 
-    > **ヒント：**
-    >
-    > プログラムが Windows Subsystem for Linux (WSL) で実行されている場合は、対応する Linux ディストリビューションに切り替えます。
+   - **Operating System**が環境に一致していること
 
-4.  **「パスワードの作成」**をクリックしてランダムなパスワードを作成します。
+   > **ヒント：**
+   >
+   > プログラムがWindows Subsystem for Linux（WSL）で実行されている場合は、対応するLinuxディストリビューションに切り替えてください。
 
-    > **ヒント：**
-    >
-    > 以前にパスワードを作成したことがある場合は、元のパスワードを使用するか、 **「パスワードのリセット」**をクリックして新しいパスワードを生成できます。
+4. **Generate Password**をクリックして、ランダムなパスワードを作成します。
 
-5.  次のコマンドを実行して`.env.example`をコピーし、名前を`.env`に変更します。
+   > **ヒント：**
+   >
+   > 以前にパスワードを作成したことがある場合は、元のパスワードを使用するか、**Reset Password**をクリックして新しいパスワードを生成することができます。
 
-    ```shell
-    cp .env.example .env
-    ```
+5. 次のコマンドを実行して、`.env.example`をコピーして`.env`に名前を変更します。
 
-6.  対応する接続​​文字列をコピーして`.env`ファイルに貼り付けます。結果の例は次のとおりです。
+   ```shell
+   cp .env.example .env
+   ```
 
-    ```dotenv
-    TIDB_HOST='{host}'  # e.g. gateway01.ap-northeast-1.prod.aws.tidbcloud.com
-    TIDB_PORT='4000'
-    TIDB_USER='{user}'  # e.g. xxxxxx.root
-    TIDB_PASSWORD='{password}'
-    TIDB_DB_NAME='test'
-    CA_PATH='{ssl_ca}'  # e.g. /etc/ssl/certs/ca-certificates.crt (Debian / Ubuntu / Arch)
-    ```
+6. 対応する接続文字列を`.env`ファイルにコピーして貼り付けます。例の結果は次のとおりです。
 
-    プレースホルダー`{}` 、接続ダイアログから取得した接続パラメーターに必ず置き換えてください。
+   ```dotenv
+   TIDB_HOST='{host}'  # e.g. gateway01.ap-northeast-1.prod.aws.tidbcloud.com
+   TIDB_PORT='4000'
+   TIDB_USER='{user}'  # e.g. xxxxxx.root
+   TIDB_PASSWORD='{password}'
+   TIDB_DB_NAME='test'
+   CA_PATH='{ssl_ca}'  # e.g. /etc/ssl/certs/ca-certificates.crt (Debian / Ubuntu / Arch)
+   ```
 
-7.  `.env`ファイルを保存します。
+   プレースホルダ`{}`を接続ダイアログから取得した接続パラメータで置き換えてください。
+
+7. `.env`ファイルを保存します。
 
 </div>
 <div label="TiDB Dedicated">
 
-1.  [**クラスター**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲット クラスターの名前をクリックして、その概要ページに移動します。
+1. [**Clusters**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲットクラスタの名前をクリックして、概要ページに移動します。
 
-2.  右上隅にある**「接続」**をクリックします。接続ダイアログが表示されます。
+2. 右上の**Connect**をクリックします。接続ダイアログが表示されます。
 
-3.  **「どこからでもアクセスを許可」**をクリックし、 **「TiDB クラスター CA のダウンロード」**をクリックして CA 証明書をダウンロードします。
+3. **Allow Access from Anywhere**をクリックし、**Download TiDB cluster CA**をクリックしてCA証明書をダウンロードします。
 
-    接続文字列の取得方法の詳細については、 [TiDB専用標準接続](https://docs.pingcap.com/tidbcloud/connect-via-standard-connection)を参照してください。
+   接続文字列を取得する詳細については、[TiDB Dedicated standard connection](https://docs.pingcap.com/tidbcloud/connect-via-standard-connection)を参照してください。
 
-4.  次のコマンドを実行して`.env.example`をコピーし、名前を`.env`に変更します。
+4. 次のコマンドを実行して、`.env.example`をコピーして`.env`に名前を変更します。
 
-    ```shell
-    cp .env.example .env
-    ```
+   ```shell
+   cp .env.example .env
+   ```
 
-5.  対応する接続​​文字列をコピーして`.env`ファイルに貼り付けます。結果の例は次のとおりです。
+5. 対応する接続文字列を`.env`ファイルにコピーして貼り付けます。例の結果は次のとおりです。
 
-    ```dotenv
-    TIDB_HOST='{host}'  # e.g. tidb.xxxx.clusters.tidb-cloud.com
-    TIDB_PORT='4000'
-    TIDB_USER='{user}'  # e.g. root
-    TIDB_PASSWORD='{password}'
-    TIDB_DB_NAME='test'
-    CA_PATH='{your-downloaded-ca-path}'
-    ```
+   ```dotenv
+   TIDB_HOST='{host}'  # e.g. tidb.xxxx.clusters.tidb-cloud.com
+   TIDB_PORT='4000'
+   TIDB_USER='{user}'  # e.g. root
+   TIDB_PASSWORD='{password}'
+   TIDB_DB_NAME='test'
+   CA_PATH='{your-downloaded-ca-path}'
+   ```
 
-    必ずプレースホルダー`{}`接続ダイアログから取得した接続パラメーターに置き換え、 `CA_PATH`前の手順でダウンロードした証明書パスで構成してください。
+   プレースホルダ`{}`を接続ダイアログから取得した接続パラメータで置き換え、`CA_PATH`を前のステップでダウンロードした証明書のパスに設定してください。
 
-6.  `.env`ファイルを保存します。
+6. `.env`ファイルを保存します。
 
 </div>
 <div label="TiDB Self-Hosted">
 
-1.  次のコマンドを実行して`.env.example`をコピーし、名前を`.env`に変更します。
+1. `.env.example`をコピーして`.env`にリネームするために、次のコマンドを実行します。
 
-    ```shell
-    cp .env.example .env
-    ```
+   ```shell
+   cp .env.example .env
+   ```
 
-2.  対応する接続​​文字列をコピーして`.env`ファイルに貼り付けます。結果の例は次のとおりです。
+2. 対応する接続文字列を`.env`ファイルにコピーして貼り付けます。例の結果は次のようになります。
 
-    ```dotenv
-    TIDB_HOST='{tidb_server_host}'
-    TIDB_PORT='4000'
-    TIDB_USER='root'
-    TIDB_PASSWORD='{password}'
-    TIDB_DB_NAME='test'
-    ```
+   ```dotenv
+   TIDB_HOST='{tidb_server_host}'
+   TIDB_PORT='4000'
+   TIDB_USER='root'
+   TIDB_PASSWORD='{password}'
+   TIDB_DB_NAME='test'
+   ```
 
-    必ずプレースホルダー`{}`接続パラメーターに置き換えて、 `CA_PATH`行を削除してください。 TiDB をローカルで実行している場合、デフォルトのホスト アドレスは`127.0.0.1`で、パスワードは空です。
+   接続パラメーターを`{}`で置き換え、`CA_PATH`の行を削除してください。TiDBをローカルで実行している場合、デフォルトのホストアドレスは`127.0.0.1`で、パスワードは空です。
 
-3.  `.env`ファイルを保存します。
+3. `.env`ファイルを保存します。
 
 </div>
 </SimpleTab>
 
-### ステップ 4: コードを実行して結果を確認する {#step-4-run-the-code-and-check-the-result}
+### ステップ4：コードを実行して結果を確認する {#step-4-run-the-code-and-check-the-result}
 
-1.  次のコマンドを実行してサンプル コードを実行します。
+1. サンプルコードを実行するには、次のコマンドを実行します。
 
-    ```shell
-    python sqlalchemy_example.py
-    ```
+   ```shell
+   python sqlalchemy_example.py
+   ```
 
-2.  [予想される出力.txt](https://github.com/tidb-samples/tidb-python-sqlalchemy-quickstart/blob/main/Expected-Output.txt)チェックして、出力が一致するかどうかを確認します。
+2. 出力が一致するかどうかを確認するには、[Expected-Output.txt](https://github.com/tidb-samples/tidb-python-sqlalchemy-quickstart/blob/main/Expected-Output.txt)を確認してください。
 
 ## サンプルコードスニペット {#sample-code-snippets}
 
-次のサンプル コード スニペットを参照して、独自のアプリケーション開発を完了できます。
+次のサンプルコードスニペットを参照して、独自のアプリケーション開発を完了させることができます。
 
-完全なサンプル コードとその実行方法については、 [tidb-samples/tidb-python-sqlalchemy-quickstart](https://github.com/tidb-samples/tidb-python-sqlalchemy-quickstart)リポジトリを確認してください。
+完全なサンプルコードと実行方法については、[tidb-samples/tidb-python-sqlalchemy-quickstart](https://github.com/tidb-samples/tidb-python-sqlalchemy-quickstart)リポジトリを確認してください。
 
-### TiDB に接続する {#connect-to-tidb}
+### TiDBに接続する {#connect-to-tidb}
 
 ```python
 from sqlalchemy import create_engine, URL
@@ -223,9 +223,9 @@ engine = get_db_engine()
 Session = sessionmaker(bind=engine)
 ```
 
-この関数を使用する場合、 `${tidb_host}` 、 `${tidb_port}` 、 `${tidb_user}` 、 `${tidb_password}` 、 `${tidb_db_name}`および`${ca_path}`を TiDB クラスターの実際の値に置き換える必要があります。
+この機能を使用する際には、`${tidb_host}`、`${tidb_port}`、`${tidb_user}`、`${tidb_password}`、`${tidb_db_name}`、`${ca_path}`を、お使いのTiDBクラスターの実際の値で置き換える必要があります。
 
-### テーブルを定義する {#define-a-table}
+### テーブルの定義 {#define-a-table}
 
 ```python
 from sqlalchemy import Column, Integer, String
@@ -242,7 +242,7 @@ class Player(Base):
     __tablename__ = "players"
 ```
 
-詳細については、 [SQLAlchemy ドキュメント: 宣言によるクラスのマッピング](https://docs.sqlalchemy.org/en/20/orm/declarative_mapping.html)を参照してください。
+詳細については、[SQLAlchemyドキュメント：宣言的なマッピングを使用したクラスのマッピング](https://docs.sqlalchemy.org/en/20/orm/declarative_mapping.html)を参照してください。
 
 ### データの挿入 {#insert-data}
 
@@ -253,9 +253,9 @@ with Session() as session:
     session.commit()
 ```
 
-詳細については、 [データの挿入](/develop/dev-guide-insert-data.md)を参照してください。
+詳細については、[データの挿入](/develop/dev-guide-insert-data.md)を参照してください。
 
-### クエリデータ {#query-data}
+### データのクエリ {#query-data}
 
 ```python
 with Session() as session:
@@ -263,9 +263,9 @@ with Session() as session:
     print(player)
 ```
 
-詳細については、 [クエリデータ](/develop/dev-guide-get-data-from-single-table.md)を参照してください。
+詳細については、[データのクエリ](/develop/dev-guide-get-data-from-single-table.md)を参照してください。
 
-### データを更新する {#update-data}
+### データの更新 {#update-data}
 
 ```python
 with Session() as session:
@@ -274,7 +274,7 @@ with Session() as session:
     session.commit()
 ```
 
-詳細については、 [データを更新する](/develop/dev-guide-update-data.md)を参照してください。
+詳細については、[データの更新](/develop/dev-guide-update-data.md)を参照してください。
 
 ### データの削除 {#delete-data}
 
@@ -285,14 +285,14 @@ with Session() as session:
     session.commit()
 ```
 
-詳細については、 [データの削除](/develop/dev-guide-delete-data.md)を参照してください。
+詳細については、[データの削除](/develop/dev-guide-delete-data.md)を参照してください。
 
 ## 次のステップ {#next-steps}
 
--   SQLAlchemy の使用法を[SQLAlchemy のドキュメント](https://www.sqlalchemy.org/)から学びましょう。
--   TiDB アプリケーション[データの削除](/develop/dev-guide-delete-data.md) [単一テーブルの読み取り](/develop/dev-guide-get-data-from-single-table.md)ベスト プラクティス[SQLパフォーマンスの最適化](/develop/dev-guide-optimize-sql-overview.md)は、 [開発者ガイド](/develop/dev-guide-overview.md)の章 ( [データの挿入](/develop/dev-guide-insert-data.md)など) [データを更新する](/develop/dev-guide-update-data.md)参照[トランザクション](/develop/dev-guide-transaction-overview.md)てください。
--   プロフェッショナルとして[TiDB 開発者コース](https://www.pingcap.com/education/)を学び、試験合格後に[TiDB 認定](https://www.pingcap.com/education/certification/)獲得します。
+- [SQLAlchemyのドキュメント](https://www.sqlalchemy.org/)からSQLAlchemyの使用方法を学びます。
+- [開発者ガイド](/develop/dev-guide-overview.md)の章を参照して、TiDBアプリケーション開発のベストプラクティスを学びます。例えば、[データの挿入](/develop/dev-guide-insert-data.md)、[データの更新](/develop/dev-guide-update-data.md)、[データの削除](/develop/dev-guide-delete-data.md)、[単一テーブルからのデータ取得](/develop/dev-guide-get-data-from-single-table.md)、[トランザクション](/develop/dev-guide-transaction-overview.md)、および[SQLパフォーマンスの最適化](/develop/dev-guide-optimize-sql-overview.md)。
+- 専門の[TiDB開発者コース](https://www.pingcap.com/education/)を通じて学び、試験に合格した後に[TiDB認定](https://www.pingcap.com/education/certification/)を取得します。
 
-## 助けが必要？ {#need-help}
+## ヘルプが必要ですか？ {#need-help}
 
-[不和](https://discord.gg/vYU9h56kAX)または[サポートチケットを作成する](https://support.pingcap.com/)について質問してください。
+[Discord](https://discord.gg/vYU9h56kAX)で質問するか、[サポートチケットを作成](https://support.pingcap.com/)してください。

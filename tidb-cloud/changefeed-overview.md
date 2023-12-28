@@ -3,99 +3,99 @@ title: Changefeed
 summary: TiDB Cloud changefeed helps you stream data from TiDB Cloud to other data services.
 ---
 
-# チェンジフィード {#changefeed}
+# Changefeed {#changefeed}
 
-TiDB Cloudチェンジフィードは、 TiDB Cloudから他のデータ サービスにデータをストリーミングするのに役立ちます。現在、 TiDB Cloud は、Apache Kafka、MySQL、 TiDB Cloud 、およびクラウドstorageへのストリーミング データをサポートしています。
+TiDB Cloudのchangefeed機能を使用すると、TiDB Cloudから他のデータサービスにデータをストリーム配信できます。現在、TiDB CloudではApache Kafka、MySQL、TiDB Cloud、およびクラウドストレージへのデータストリーミングをサポートしています。
 
-> **注記：**
+> **Note:**
 >
-> -   現在、 TiDB Cloudクラスターあたり最大 100 の変更フィードのみが許可されます。
-> -   現在、 TiDB Cloudでは、変更フィードごとに最大 100 個のテーブル フィルター ルールのみが許可されます。
-> -   [TiDB サーバーレスクラスター](/tidb-cloud/select-cluster-tier.md#tidb-serverless)の場合、チェンジフィード機能は使用できません。
+> - 現在、TiDB Cloudではクラスターごとに最大100のchangefeedを許可しています。
+> - 現在、TiDB Cloudではchangefeedごとに最大100のテーブルフィルタールールを許可しています。
+> - [TiDB Serverlessクラスター](/tidb-cloud/select-cluster-tier.md#tidb-serverless)の場合、changefeed機能は使用できません。
 
-チェンジフィード機能にアクセスするには、TiDB クラスターのクラスター概要ページに移動し、左側のナビゲーション ペインで**[チェンジフィード]**をクリックします。チェンジフィードページが表示されます。
+changefeed機能にアクセスするには、TiDBクラスターのクラスター概要ページに移動し、左側のナビゲーションペインで**Changefeed**をクリックします。changefeedページが表示されます。
 
-変更フィード ページでは、変更フィードの作成、既存の変更フィードのリストの表示、既存の変更フィードの操作 (変更フィードの拡大縮小、一時停止、再開、編集、削除など) を行うことができます。
+changefeedページでは、changefeedを作成したり、既存のchangefeedのリストを表示したり、既存のchangefeedを操作したり（スケーリング、一時停止、再開、編集、削除）、既存のchangefeedを操作したりすることができます。
 
-## 変更フィードを作成する {#create-a-changefeed}
+## changefeedを作成する {#create-a-changefeed}
 
-チェンジフィードを作成するには、次のチュートリアルを参照してください。
+changefeedを作成するには、次のチュートリアルを参照してください。
 
--   [Apache Kafka にシンクする](/tidb-cloud/changefeed-sink-to-apache-kafka.md)
--   [MySQL にシンクする](/tidb-cloud/changefeed-sink-to-mysql.md)
--   [TiDB Cloudへのシンク](/tidb-cloud/changefeed-sink-to-tidb-cloud.md)
--   [クラウドstorageにシンクする](/tidb-cloud/changefeed-sink-to-cloud-storage.md)
+- [Apache Kafkaへのシンク](/tidb-cloud/changefeed-sink-to-apache-kafka.md)
+- [MySQLへのシンク](/tidb-cloud/changefeed-sink-to-mysql.md)
+- [TiDB Cloudへのシンク](/tidb-cloud/changefeed-sink-to-tidb-cloud.md)
+- [クラウドストレージへのシンク](/tidb-cloud/changefeed-sink-to-cloud-storage.md)
 
-## 変更フィード RCU のクエリ {#query-changefeed-rcus}
+## changefeed RCUsをクエリする {#query-changefeed-rcus}
 
-1.  ターゲット TiDB クラスターのクラスター概要ページに移動し、左側のナビゲーション ペインで**[Changefeed]**をクリックします。
-2.  クエリを実行する対応する変更フィードを見つけて、 **[...]** &gt; **[アクション]**列の**[ビュー]**をクリックします。
-3.  現在の TiCDC レプリケーション キャパシティ ユニット (RCU) は、ページの**[仕様]**エリアで確認できます。
+1.ターゲットTiDBクラスターのクラスター概要ページに移動し、左側のナビゲーションペインで**Changefeed**をクリックします。
+2.クエリしたい対応するchangefeedを見つけ、**...** > **View**をクリックします。**Action**列。
+3.ページの**Specification**エリアで、現在のTiCDCレプリケーション容量ユニット（RCU）が表示されます。
 
-## チェンジフィードをスケールする {#scale-a-changefeed}
+## changefeedをスケーリングする {#scale-a-changefeed}
 
-変更フィードをスケールアップまたはスケールダウンすることによって、変更フィードの TiCDC レプリケーション キャパシティ ユニット (RCU) を変更できます。
+changefeedのTiCDCレプリケーション容量ユニット（RCU）をスケーリングアップまたはダウンして、changfeedを変更できます。
 
-> **注記：**
+> **Note:**
 >
-> -   クラスターの変更フィードをスケーリングするには、このクラスターのすべての変更フィードが 2023 年 3 月 28 日以降に作成されていることを確認してください。
-> -   クラスターに 2023 年 3 月 28 日より前に作成された変更フィードがある場合、このクラスターの既存の変更フィードも新しく作成された変更フィードもスケールアップまたはスケールダウンをサポートしません。
+> - クラスターのchangefeedをスケーリングするには、このクラスターのすべてのchangefeedが2023年3月28日以降に作成されていることを確認してください。
+> - クラスターに2023年3月28日以前に作成されたchangefeedがある場合、このクラスターの既存のchangefeedおよび新しく作成されたchangefeedのいずれも、スケーリングアップまたはダウンをサポートしません。
 
-1.  ターゲット TiDB クラスターのクラスター概要ページに移動し、左側のナビゲーション ペインで**[Changefeed]**をクリックします。
-2.  スケーリングする対応する変更フィードを見つけて、 **[アクション]**列の**[...]** &gt; **[スケールアップ/ダウン]**をクリックします。
-3.  新しい仕様を選択します。
-4.  **「送信」**をクリックします。
+1.ターゲットTiDBクラスターのクラスター概要ページに移動し、左側のナビゲーションペインで**Changefeed**をクリックします。
+2.スケーリングしたい対応するchangefeedを見つけ、**...** > **Scale Up/Down**をクリックします。**Action**列。
+3.新しい仕様を選択します。
+4.**Submit**をクリックします。
 
-スケーリング プロセスが完了するまでに約 10 分かかり (その間、変更フィードは正常に動作します)、新しい仕様に切り替えるには数秒かかります (その間、変更フィードは一時停止され、自動的に再開されます)。
+スケーリングプロセスは約10分かかります（この間、changfeedは正常に動作します）が、新しい仕様に切り替わるのに数秒かかります（この間、changefeedは自動的に一時停止および再開されます）。
 
-## チェンジフィードを一時停止または再開する {#pause-or-resume-a-changefeed}
+## changefeedを一時停止または再開する {#pause-or-resume-a-changefeed}
 
-1.  ターゲット TiDB クラスターのクラスター概要ページに移動し、左側のナビゲーション ペインで**[Changefeed]**をクリックします。
-2.  一時停止または再開する対応する変更フィードを見つけて、 **[アクション]**列の**[...]** &gt; **[一時停止/再開]**をクリックします。
+1.ターゲットTiDBクラスターのクラスター概要ページに移動し、左側のナビゲーションペインで**Changefeed**をクリックします。
+2.一時停止または再開したい対応するchangefeedを見つけ、**...** > **Pause/Resume**をクリックします。**Action**列。
 
-## 変更フィードを編集する {#edit-a-changefeed}
+## changefeedを編集する {#edit-a-changefeed}
 
-> **注記：**
+> **Note:**
 >
-> TiDB Cloud現在、一時停止ステータスでのみ変更フィードの編集が可能です。
+> TiDB Cloudでは、現在一時停止されているchangefeedの編集のみを許可しています。
 
-1.  ターゲット TiDB クラスターのクラスター概要ページに移動し、左側のナビゲーション ペインで**[Changefeed]**をクリックします。
+1.ターゲットTiDBクラスターのクラスター概要ページに移動し、左側のナビゲーションペインで**Changefeed**をクリックします。
 
-2.  一時停止する変更フィードを見つけて、 **[アクション]**列の**[...]** &gt; **[一時停止]**をクリックします。
+2.一時停止したいchangefeedを見つけ、**...** > **Pause**をクリックします。**Action**列。
 
-3.  チェンジフィードのステータスが`Paused`に変わったら、 **[...]** &gt; **[編集] を**クリックして、対応するチェンジフィードを編集します。
+3. changefeedのステータスが`Paused`に変更されたら、対応するchangefeedを編集するために\*\*...\*\* > **Edit**をクリックします。
 
-    TiDB Cloud は、デフォルトで変更フィード構成を設定します。次の構成を変更できます。
+   TiDB Cloudはデフォルトでchangefeed構成を入力します。次の構成を変更できます。
 
-    -   Apache Kafka シンク: すべての構成。
-    -   MySQL シンク: **MySQL 接続**、**テーブル フィルター**、および**イベント フィルター**。
-    -   TiDB Cloudシンク: **TiDB Cloud接続**、**テーブル フィルター**、および**イベント フィルター**。
-    -   クラウドstorageシンク:**ストレージ エンドポイント**、**テーブル フィルター**、および**イベント フィルター**。
+   - Apache Kafkaシンク：すべての構成。
+   - MySQLシンク：**MySQL Connection**、**Table Filter**、および**Event Filter**。
+   - TiDB Cloudシンク：**TiDB Cloud Connection**、**Table Filter**、および**Event Filter**。
+   - クラウドストレージシンク：**Storage Endpoint**、**Table Filter**、および**Event Filter**。
 
-4.  構成を編集した後、 **[...]** &gt; **[再開]**をクリックして、対応する変更フィードを再開します。
+4.構成を編集した後、対応するchangefeedを再開するために\*\*...\*\* > **Resume**をクリックします。
 
-## 変更フィードを削除する {#delete-a-changefeed}
+## changefeedを削除する {#delete-a-changefeed}
 
-1.  ターゲット TiDB クラスターのクラスター概要ページに移動し、左側のナビゲーション ペインで**[Changefeed]**をクリックします。
-2.  削除する対応する変更フィードを見つけて、 **[アクション]**列の**[...]** &gt; **[削除]**をクリックします。
+1. ターゲットTiDBクラスターのクラスター概要ページに移動し、左側のナビゲーションペインで**Changefeed**をクリックします。
+2. 削除したい対応するchangefeedを見つけ、**...** > **Delete**をクリックします。
 
-## 変更フィードの請求 {#changefeed-billing}
+## Changefeedの課金 {#changefeed-billing}
 
-TiDB Cloudでの変更フィードの請求については、 [変更フィードの請求](/tidb-cloud/tidb-cloud-billing-ticdc-rcu.md)を参照してください。
+TiDB Cloudでのchangefeedの課金については、[Changefeedの課金](/tidb-cloud/tidb-cloud-billing-ticdc-rcu.md)を参照してください。
 
-## フィード状態の変更 {#changefeed-states}
+## Changefeedの状態 {#changefeed-states}
 
-レプリケーション タスクの状態は、レプリケーション タスクの実行状態を表します。プロセスの実行中に、レプリケーション タスクがエラーで失敗したり、手動で一時停止または再開されたり、指定された`TargetTs`に達したりする可能性があります。これらの動作により、レプリケーション タスクの状態が変化する可能性があります。
+レプリケーションタスクの状態は、レプリケーションタスクの実行状態を表します。実行中のプロセスでは、レプリケーションタスクはエラーで失敗したり、手動で一時停止したり、再開したり、指定された`TargetTs`に到達したりすることがあります。これらの動作により、レプリケーションタスクの状態が変化することがあります。
 
 状態は次のように説明されます。
 
--   `CREATING` : レプリケーションタスクが作成されています。
--   `RUNNING` : レプリケーション タスクは正常に実行され、チェックポイント ts も正常に進行します。
--   `EDITING` : レプリケーションタスクは編集中です。
--   `PAUSING` : レプリケーションタスクは一時停止中です。
--   `PAUSED` : レプリケーションタスクは一時停止されています。
--   `RESUMING` : レプリケーションタスクが再開されています。
--   `DELETING` : レプリケーションタスクは削除中です。
--   `DELETED` : レプリケーションタスクは削除されます。
--   `WARNING` : レプリケーション タスクは警告を返します。回復可能なエラーがいくつかあるため、レプリケーションを続行できません。この状態のチェンジフィードは、状態が`RUNNING`に移行するまで再開を試み続けます。この状態のチェンジフィードは[GC 操作](https://docs.pingcap.com/tidb/stable/garbage-collection-overview)をブロックします。
--   `FAILED` : レプリケーションタスクは失敗します。いくつかの回復不可能なエラーが原因で、レプリケーション タスクを再開できず、回復できません。この状態の変更フィードは GC 操作をブロックしません。
+- `CREATING`：レプリケーションタスクが作成中です。
+- `RUNNING`：レプリケーションタスクが正常に実行され、チェックポイント-tsが正常に進行します。
+- `EDITING`：レプリケーションタスクが編集中です。
+- `PAUSING`：レプリケーションタスクが一時停止中です。
+- `PAUSED`：レプリケーションタスクが一時停止されています。
+- `RESUMING`：レプリケーションタスクが再開中です。
+- `DELETING`：レプリケーションタスクが削除中です。
+- `DELETED`：レプリケーションタスクが削除されました。
+- `WARNING`：レプリケーションタスクが警告を返します。リカバリ可能なエラーのため、レプリケーションを続行できません。この状態のchangefeedは、状態が`RUNNING`に変わるまで再開し続けます。この状態のchangefeedは、[GC操作](https://docs.pingcap.com/tidb/stable/garbage-collection-overview)をブロックします。
+- `FAILED`：レプリケーションタスクが失敗しました。エラーのため、レプリケーションタスクを再開できず、自動的に回復することができません。問題が解決されるまで、増分データのガベージコレクション（GC）が実行される前に、失敗したchangefeedを手動で再開することができます。増分データのデフォルトのTime-To-Live（TTL）期間は24時間であり、これは、changefeedが中断されてから24時間以内にデータが削除されないことを意味します。

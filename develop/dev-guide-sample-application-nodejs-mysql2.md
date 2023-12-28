@@ -3,190 +3,190 @@ title: Connect to TiDB with node-mysql2
 summary: Learn how to connect to TiDB using node-mysql2. This tutorial gives Node.js sample code snippets that work with TiDB using node-mysql2.
 ---
 
-# node-mysql2 を使用して TiDB に接続します {#connect-to-tidb-with-node-mysql2}
+# node-mysql2を使用してTiDBに接続する {#connect-to-tidb-with-node-mysql2}
 
-TiDB は MySQL 互換データベースであり、 [ノードmysql2](https://github.com/sidorares/node-mysql2)は Node.js 用の高速[mysqljs/mysql](https://github.com/mysqljs/mysql)互換 MySQL ドライバーです。
+TiDBはMySQL互換のデータベースであり、[node-mysql2](https://github.com/sidorares/node-mysql2)はNode.js用の高速な[mysqljs/mysql](https://github.com/mysqljs/mysql)互換のMySQLドライバです。
 
-このチュートリアルでは、TiDB と node-mysql2 を使用して次のタスクを実行する方法を学習できます。
+このチュートリアルでは、TiDBとnode-mysql2を使用して次のタスクを実行する方法を学べます。
 
--   環境をセットアップします。
--   node-mysql2 を使用して TiDB クラスターに接続します。
--   アプリケーションをビルドして実行します。オプションで、基本的な CRUD 操作の[サンプルコードスニペット](#sample-code-snippets)を見つけることができます。
+- 環境をセットアップする。
+- node-mysql2を使用してTiDBクラスタに接続する。
+- アプリケーションをビルドして実行する。オプションで、基本的なCRUD操作の[サンプルコードスニペット](#sample-code-snippets)を見つけることができます。
 
-> **注記：**
+> **Note:**
 >
-> このチュートリアルは、TiDB サーバーレス、TiDB 専用、および TiDB セルフホストで動作します。
+> このチュートリアルは、TiDB Serverless、TiDB Dedicated、およびTiDB Self-Hostedで動作します。
 
 ## 前提条件 {#prerequisites}
 
 このチュートリアルを完了するには、次のものが必要です。
 
--   [Node.js](https://nodejs.org/en) &gt;= 16.x がマシンにインストールされている。
--   [ギット](https://git-scm.com/downloads)マシンにインストールされています。
--   TiDB クラスターが実行中です。
+- マシンに[Node.js](https://nodejs.org/en) >= 16.xがインストールされていること。
+- マシンに[Git](https://git-scm.com/downloads)がインストールされていること。
+- 実行中のTiDBクラスタ。
 
-**TiDB クラスターがない場合は、次のように作成できます。**
+**TiDBクラスタを持っていない場合は、次のように作成できます。**
 
 <CustomContent platform="tidb">
 
--   (推奨) [TiDB サーバーレスクラスターの作成](/develop/dev-guide-build-cluster-in-cloud.md)に従って、独自のTiDB Cloudクラスターを作成します。
--   [ローカル テスト TiDB クラスターをデプロイ](/quick-start-with-tidb.md#deploy-a-local-test-cluster)または[本番TiDB クラスターをデプロイ](/production-deployment-using-tiup.md)に従ってローカル クラスターを作成します。
+- (推奨) [TiDB Serverlessクラスタを作成する](/develop/dev-guide-build-cluster-in-cloud.md)を参照して、独自のTiDB Cloudクラスタを作成する。
+- [ローカルテストTiDBクラスタをデプロイする](/quick-start-with-tidb.md#deploy-a-local-test-cluster)または[本番TiDBクラスタをデプロイする](/production-deployment-using-tiup.md)を参照して、ローカルクラスタを作成する。
 
 </CustomContent>
 <CustomContent platform="tidb-cloud">
 
--   (推奨) [TiDB サーバーレスクラスターの作成](/develop/dev-guide-build-cluster-in-cloud.md)に従って、独自のTiDB Cloudクラスターを作成します。
--   [ローカル テスト TiDB クラスターをデプロイ](https://docs.pingcap.com/tidb/stable/quick-start-with-tidb#deploy-a-local-test-cluster)または[本番TiDB クラスターをデプロイ](https://docs.pingcap.com/tidb/stable/production-deployment-using-tiup)に従ってローカル クラスターを作成します。
+- (推奨) [TiDB Serverlessクラスタを作成する](/develop/dev-guide-build-cluster-in-cloud.md)を参照して、独自のTiDB Cloudクラスタを作成する。
+- [ローカルテストTiDBクラスタをデプロイする](https://docs.pingcap.com/tidb/stable/quick-start-with-tidb#deploy-a-local-test-cluster)または[本番TiDBクラスタをデプロイする](https://docs.pingcap.com/tidb/stable/production-deployment-using-tiup)を参照して、ローカルクラスタを作成する。
 
 </CustomContent>
 
-## サンプル アプリを実行して TiDB に接続する {#run-the-sample-app-to-connect-to-tidb}
+## サンプルアプリを実行してTiDBに接続する {#run-the-sample-app-to-connect-to-tidb}
 
-このセクションでは、サンプル アプリケーション コードを実行して TiDB に接続する方法を説明します。
+このセクションでは、サンプルアプリケーションコードを実行し、TiDBに接続する方法を示します。
 
-### ステップ 1: サンプル アプリ リポジトリのクローンを作成する {#step-1-clone-the-sample-app-repository}
+### ステップ1：サンプルアプリリポジトリをクローンする {#step-1-clone-the-sample-app-repository}
 
-ターミナル ウィンドウで次のコマンドを実行して、サンプル コード リポジトリのクローンを作成します。
+ターミナルウィンドウで次のコマンドを実行して、サンプルコードリポジトリをクローンします：
 
 ```shell
 git clone https://github.com/tidb-samples/tidb-nodejs-mysql2-quickstart.git
 cd tidb-nodejs-mysql2-quickstart
 ```
 
-### ステップ 2: 依存関係をインストールする {#step-2-install-dependencies}
+### ステップ2：依存関係のインストール {#step-2-install-dependencies}
 
-次のコマンドを実行して、サンプル アプリに必要なパッケージ ( `mysql2`と`dotenv`を含む) をインストールします。
+サンプルアプリケーションに必要なパッケージ（`mysql2`と`dotenv`を含む）をインストールするには、次のコマンドを実行してください：
 
 ```shell
 npm install
 ```
 
-<details><summary><b>依存関係を既存のプロジェクトにインストールする</b></summary>
+<details>
+<summary><b>既存のプロジェクトに依存関係をインストールする</b></summary>
 
-既存のプロジェクトの場合は、次のコマンドを実行してパッケージをインストールします。
+既存のプロジェクトに対して、以下のコマンドを実行してパッケージをインストールしてください：
 
 ```shell
 npm install mysql2 dotenv --save
 ```
 
-</details>
+### ステップ3：接続情報を設定する {#step-3-configure-connection-information}
 
-### ステップ 3: 接続情報を構成する {#step-3-configure-connection-information}
-
-選択した TiDB デプロイメント オプションに応じて、TiDB クラスターに接続します。
+TiDBクラスタに接続するには、選択したTiDBデプロイメントオプションに応じて設定を行います。
 
 <SimpleTab>
 <div label="TiDB Serverless">
 
-1.  [**クラスター**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲット クラスターの名前をクリックして、その概要ページに移動します。
+1. [**Clusters**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲットクラスタの名前をクリックして、その概要ページに移動します。
 
-2.  右上隅にある**「接続」**をクリックします。接続ダイアログが表示されます。
+2. 右上の**Connect**をクリックします。接続ダイアログが表示されます。
 
-3.  接続ダイアログの設定が動作環境と一致していることを確認してください。
+3. 接続ダイアログの設定が、実行環境と一致することを確認します。
 
-    -   **エンドポイント タイプは**`Public`に設定されます。
-    -   **[接続先] は**`General`に設定されます。
-    -   **[オペレーティング システム] は、**アプリケーションを実行するオペレーティング システムと一致します。
+   - **Endpoint Type**が`Public`に設定されていること。
+   - **Branch**が`main`に設定されていること。
+   - **Connect With**が`General`に設定されていること。
+   - **Operating System**が、アプリケーションを実行するオペレーティングシステムと一致すること。
 
-4.  パスワードをまだ設定していない場合は、 **「パスワードの作成」**をクリックしてランダムなパスワードを生成します。
+4. パスワードをまだ設定していない場合は、**Generate Password**をクリックしてランダムなパスワードを生成します。
 
-5.  次のコマンドを実行して`.env.example`をコピーし、名前を`.env`に変更します。
+5. 次のコマンドを実行して、`.env.example`をコピーして`.env`にリネームします。
 
-    ```shell
-    cp .env.example .env
-    ```
+   ```shell
+   cp .env.example .env
+   ```
 
-6.  `.env`ファイルを編集し、次のように環境変数を設定し、接続ダイアログ上の対応するプレースホルダー`{}`接続パラメーターに置き換えます。
+6. `.env`ファイルを編集し、環境変数を次のように設定します。対応するプレースホルダ`{}`を接続ダイアログの接続パラメータで置き換えます。
 
-    ```dotenv
-    TIDB_HOST={host}
-    TIDB_PORT=4000
-    TIDB_USER={user}
-    TIDB_PASSWORD={password}
-    TIDB_DATABASE=test
-    TIDB_ENABLE_SSL=true
-    ```
+   ```dotenv
+   TIDB_HOST={host}
+   TIDB_PORT=4000
+   TIDB_USER={user}
+   TIDB_PASSWORD={password}
+   TIDB_DATABASE=test
+   TIDB_ENABLE_SSL=true
+   ```
 
-    > **注記**
-    >
-    > TiDB サーバーレスの場合、パブリック エンドポイントを使用する場合は、TLS 接続を`TIDB_ENABLE_SSL`経由で有効にする**必要があります**。
+   > **Note**
+   >
+   > TiDB Serverlessでは、パブリックエンドポイントを使用する場合、TLS接続を有効にする必要があります。そのためには、`TIDB_ENABLE_SSL`を使用してTLS接続を有効にする必要があります。
 
-7.  `.env`ファイルを保存します。
+7. `.env`ファイルを保存します。
 
 </div>
 <div label="TiDB Dedicated">
 
-1.  [**クラスター**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲット クラスターの名前をクリックして、その概要ページに移動します。
+1. [**Clusters**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲットクラスタの名前をクリックして、その概要ページに移動します。
 
-2.  右上隅にある**「接続」**をクリックします。接続ダイアログが表示されます。
+2. 右上の**Connect**をクリックします。接続ダイアログが表示されます。
 
-3.  **「どこからでもアクセスを許可」**をクリックし、 **「TiDB クラスター CA のダウンロード」**をクリックして CA 証明書をダウンロードします。
+3. **Allow Access from Anywhere**をクリックし、**Download TiDB cluster CA**をクリックしてCA証明書をダウンロードします。
 
-    接続文字列の取得方法の詳細については、 [TiDB専用標準接続](https://docs.pingcap.com/tidbcloud/connect-via-standard-connection)を参照してください。
+   接続文字列を取得する詳細については、[TiDB Dedicated standard connection](https://docs.pingcap.com/tidbcloud/connect-via-standard-connection)を参照してください。
 
-4.  次のコマンドを実行して`.env.example`をコピーし、名前を`.env`に変更します。
+4. 次のコマンドを実行して、`.env.example`をコピーして`.env`にリネームします。
 
-    ```shell
-    cp .env.example .env
-    ```
+   ```shell
+   cp .env.example .env
+   ```
 
-5.  `.env`ファイルを編集し、次のように環境変数を設定し、接続ダイアログ上の対応するプレースホルダー`{}`接続パラメーターに置き換えます。
+5. `.env`ファイルを編集し、環境変数を次のように設定します。対応するプレースホルダ`{}`を接続ダイアログの接続パラメータで置き換えます。
 
-    ```dotenv
-    TIDB_HOST={host}
-    TIDB_PORT=4000
-    TIDB_USER={user}
-    TIDB_PASSWORD={password}
-    TIDB_DATABASE=test
-    TIDB_ENABLE_SSL=true
-    TIDB_CA_PATH={downloaded_ssl_ca_path}
-    ```
+   ```dotenv
+   TIDB_HOST={host}
+   TIDB_PORT=4000
+   TIDB_USER={user}
+   TIDB_PASSWORD={password}
+   TIDB_DATABASE=test
+   TIDB_ENABLE_SSL=true
+   TIDB_CA_PATH={downloaded_ssl_ca_path}
+   ```
 
-    > **注記**
-    >
-    > パブリック エンドポイントを使用して TiDB Dended に接続する場合は、TLS 接続を有効にすることをお勧めします。
-    >
-    > TLS 接続を有効にするには、 `TIDB_ENABLE_SSL`を`true`に変更し、 `TIDB_CA_PATH`使用して接続ダイアログからダウンロードした CA 証明書のファイル パスを指定します。
+   > **Note**
+   >
+   > パブリックエンドポイントを使用してTiDB Dedicatedに接続する場合、TLS接続を有効にすることをお勧めします。
+   >
+   > TLS接続を有効にするには、`TIDB_ENABLE_SSL`を`true`に変更し、`TIDB_CA_PATH`を使用して接続ダイアログからダウンロードしたCA証明書のファイルパスを指定します。
 
-6.  `.env`ファイルを保存します。
+6. `.env`ファイルを保存します。
 
 </div>
 <div label="TiDB Self-Hosted">
 
-1.  次のコマンドを実行して`.env.example`をコピーし、名前を`.env`に変更します。
+1. 次のコマンドを実行して、`.env.example`をコピーして`.env`にリネームします。
 
-    ```shell
-    cp .env.example .env
-    ```
+   ```shell
+   cp .env.example .env
+   ```
 
-2.  `.env`ファイルを編集し、次のように環境変数を設定し、接続ダイアログ上の対応するプレースホルダー`{}`接続パラメーターに置き換えます。
+2. `.env`ファイルを編集し、環境変数を次のように設定します。対応するプレースホルダ`{}`を接続ダイアログの接続パラメータで置き換えます。
 
-    ```dotenv
-    TIDB_HOST={host}
-    TIDB_PORT=4000
-    TIDB_USER=root
-    TIDB_PASSWORD={password}
-    TIDB_DATABASE=test
-    ```
+   ```dotenv
+   TIDB_HOST={host}
+   TIDB_PORT=4000
+   TIDB_USER=root
+   TIDB_PASSWORD={password}
+   TIDB_DATABASE=test
+   ```
 
-    TiDB をローカルで実行している場合、デフォルトのホスト アドレスは`127.0.0.1`で、パスワードは空です。
+   TiDBをローカルで実行している場合、デフォルトのホストアドレスは`127.0.0.1`であり、パスワードは空です。
 
-3.  `.env`ファイルを保存します。
+3. `.env`ファイルを保存します。
 
 </div>
 </SimpleTab>
 
-### ステップ 4: コードを実行して結果を確認する {#step-4-run-the-code-and-check-the-result}
+### ステップ4：コードを実行し、結果を確認する {#step-4-run-the-code-and-check-the-result}
 
-次のコマンドを実行してサンプル コードを実行します。
+次のコマンドを実行して、サンプルコードを実行します。
 
 ```shell
 npm start
 ```
 
-接続が成功すると、コンソールには次のように TiDB クラスターのバージョンが出力されます。
+接続に成功した場合、コンソールには次のようにTiDBクラスタのバージョンが出力されます：
 
-    🔌 Connected to TiDB cluster! (TiDB version: 5.7.25-TiDB-v7.1.0)
+    🔌 Connected to TiDB cluster! (TiDB version: 5.7.25-TiDB-v7.1.3)
     ⏳ Loading sample game data...
     ✅ Loaded sample game data.
 
@@ -195,15 +195,15 @@ npm start
     🔢 Added 50 coins and 50 goods to player 12, updated 1 row.
     🚮 Deleted 1 player data.
 
-## サンプルコードスニペット {#sample-code-snippets}
+## サンプルコードの断片 {#sample-code-snippets}
 
-次のサンプル コード スニペットを参照して、独自のアプリケーション開発を完了できます。
+あなたは、以下のサンプルコードの断片を参考にして、独自のアプリケーション開発を完了させることができます。
 
-完全なサンプル コードとその実行方法については、 [tidb-samples/tidb-nodejs-mysql2-quickstart](https://github.com/tidb-samples/tidb-nodejs-mysql2-quickstart)リポジトリを確認してください。
+完全なサンプルコードとその実行方法については、[tidb-samples/tidb-nodejs-mysql2-quickstart](https://github.com/tidb-samples/tidb-nodejs-mysql2-quickstart) リポジトリをチェックしてください。
 
 ### 接続オプションを使用して接続する {#connect-with-connection-options}
 
-次のコードは、環境変数で定義されたオプションを使用して TiDB への接続を確立します。
+以下のコードは、環境変数で定義されたオプションを使用して、TiDBに接続を確立します。
 
 ```javascript
 // Step 1. Import the 'mysql' and 'dotenv' packages.
@@ -238,35 +238,35 @@ async function main() {
 void main();
 ```
 
-> **注記**
+> **Note:**
 >
-> TiDB サーバーレスの場合、パブリック エンドポイントを使用する場合は`TIDB_ENABLE_SSL`経由の TLS 接続を有効にする**必要があります**。ただし、Node.js はデフォルトで組み込みの[Mozilla CA 証明書](https://wiki.mozilla.org/CA/Included_Certificates)を使用し、TiDB Serverless によって信頼されるため、 `TIDB_CA_PATH`経由で SSL CA 証明書を指定する必要は**ありません**。
+> TiDB Serverlessを使用する場合、パブリックエンドポイントを使用する際には、`TIDB_ENABLE_SSL`を介してTLS接続を有効にする必要があります。ただし、Node.jsはデフォルトでTiDB Serverlessによって信頼されている[Mozilla CA証明書](https://wiki.mozilla.org/CA/Included_Certificates)を使用するため、`TIDB_CA_PATH`を介してSSL CA証明書を指定する必要はありません。
 
 ### データの挿入 {#insert-data}
 
-次のクエリは、単一の`Player`レコードを作成し、 `ResultSetHeader`オブジェクトを返します。
+次のクエリは、単一の`Player`レコードを作成し、`ResultSetHeader`オブジェクトを返します。
 
 ```javascript
 const [rsh] = await conn.query('INSERT INTO players (coins, goods) VALUES (?, ?);', [100, 100]);
 console.log(rsh.insertId);
 ```
 
-詳細については、 [データの挿入](/develop/dev-guide-insert-data.md)を参照してください。
+詳細については、[データの挿入](/develop/dev-guide-insert-data.md)を参照してください。
 
-### クエリデータ {#query-data}
+### データのクエリ {#query-data}
 
-次のクエリは、ID `1`による単一の`Player`レコードを返します。
+次のクエリは、ID `1`の単一の `Player` レコードを返します。
 
 ```javascript
 const [rows] = await conn.query('SELECT id, coins, goods FROM players WHERE id = ?;', [1]);
 console.log(rows[0]);
 ```
 
-詳細については、 [クエリデータ](/develop/dev-guide-get-data-from-single-table.md)を参照してください。
+詳細については、[データのクエリ](/develop/dev-guide-get-data-from-single-table.md)を参照してください。
 
-### データを更新する {#update-data}
+### データの更新 {#update-data}
 
-次のクエリは、ID `1`の`Player`に`50`コインと`50`グッズを追加します。
+次のクエリは、IDが`1`の`Player`に`50`のコインと`50`の商品を追加します：
 
 ```javascript
 const [rsh] = await conn.query(
@@ -276,33 +276,33 @@ const [rsh] = await conn.query(
 console.log(rsh.affectedRows);
 ```
 
-詳細については、 [データを更新する](/develop/dev-guide-update-data.md)を参照してください。
+詳細については、[データの更新](/develop/dev-guide-update-data.md)を参照してください。
 
 ### データの削除 {#delete-data}
 
-次のクエリは、ID `1`の`Player`レコードを削除します。
+次のクエリは、IDが`1`の`Player`レコードを削除します。
 
 ```javascript
 const [rsh] = await conn.query('DELETE FROM players WHERE id = ?;', [1]);
 console.log(rsh.affectedRows);
 ```
 
-詳細については、 [データの削除](/develop/dev-guide-delete-data.md)を参照してください。
+詳細については、[データの削除](/develop/dev-guide-delete-data.md)を参照してください。
 
-## 便利なメモ {#useful-notes}
+## 便利なノート {#useful-notes}
 
--   [接続プール](https://github.com/sidorares/node-mysql2#using-connection-pools)を使用してデータベース接続を管理すると、接続の頻繁な確立と破棄によって生じるパフォーマンスのオーバーヘッドを軽減できます。
--   SQL インジェクションを回避するには、 [準備されたステートメント](https://github.com/sidorares/node-mysql2#using-prepared-statements)を使用することをお勧めします。
--   複雑な SQL ステートメントがあまり含まれないシナリオでは、 [続編](https://sequelize.org/) 、 [TypeORM](https://typeorm.io/) 、または[プリズマ](https://www.prisma.io/)のような ORM フレームワークを使用すると、開発効率が大幅に向上します。
--   データベースで大きな数値 ( `BIGINT`と`DECIMAL`列) を扱う場合は、 `supportBigNumbers: true`オプションを有効にすることをお勧めします。
--   ネットワークの問題によるソケット エラー`read ECONNRESET`を回避するには、 `enableKeepAlive: true`オプションを有効にすることをお勧めします。 (関連問題: [シドラレス/node-mysql2#683](https://github.com/sidorares/node-mysql2/issues/683) )
+- データベース接続を管理するために[接続プール](https://github.com/sidorares/node-mysql2#using-connection-pools)を使用することで、頻繁に接続を確立し破棄することによるパフォーマンスのオーバーヘッドを減らすことができます。
+- SQLインジェクションを避けるために、[プリペアドステートメント](https://github.com/sidorares/node-mysql2#using-prepared-statements)を使用することを推奨します。
+- 複雑なSQL文が多く含まれないシナリオでは、[Sequelize](https://sequelize.org/)、[TypeORM](https://typeorm.io/)、または[Prisma](https://www.prisma.io/)などのORMフレームワークを使用することで、開発効率を大幅に向上させることができます。
+- データベースの大きな数値（`BIGINT`や`DECIMAL`カラム）を扱う場合は、`supportBigNumbers: true`オプションを有効にすることを推奨します。
+- ネットワークの問題によるソケットエラー`read ECONNRESET`を避けるために、`enableKeepAlive: true`オプションを有効にすることを推奨します。（関連する問題：[sidorares/node-mysql2#683](https://github.com/sidorares/node-mysql2/issues/683)）
 
 ## 次のステップ {#next-steps}
 
--   node-mysql2 ドライバーの使用法については[node-mysql2 のドキュメント](https://github.com/sidorares/node-mysql2#readme)から学びましょう。
--   [開発者ガイド](/develop/dev-guide-overview.md) [トランザクション](/develop/dev-guide-transaction-overview.md)章 ( [データの挿入](/develop/dev-guide-insert-data.md) [SQLパフォーマンスの最適化](/develop/dev-guide-optimize-sql-overview.md) ) で TiDB アプリケーション開発[データを更新する](/develop/dev-guide-update-data.md)ベスト プラクティス[クエリデータ](/develop/dev-guide-get-data-from-single-table.md)学習[データの削除](/develop/dev-guide-delete-data.md)ます。
--   プロフェッショナルとして[TiDB 開発者コース](https://www.pingcap.com/education/)を学び、試験合格後に[TiDB 認定](https://www.pingcap.com/education/certification/)獲得します。
+- [node-mysql2のドキュメント](https://github.com/sidorares/node-mysql2#readme)から、node-mysql2ドライバーのより詳細な使用方法を学びます。
+- [開発者ガイド](/develop/dev-guide-overview.md)の章を通じて、[TiDBアプリケーション開発のベストプラクティス](/develop/dev-guide-overview.md)を学びます。例：[データの挿入](/develop/dev-guide-insert-data.md)、[データの更新](/develop/dev-guide-update-data.md)、[データの削除](/develop/dev-guide-delete-data.md)、[データのクエリ](/develop/dev-guide-get-data-from-single-table.md)、[トランザクション](/develop/dev-guide-transaction-overview.md)、[SQLパフォーマンスの最適化](/develop/dev-guide-optimize-sql-overview.md)。
+- 専門の[TiDB開発者コース](https://www.pingcap.com/education/)を通じて学び、試験に合格した後、[TiDB認定](https://www.pingcap.com/education/certification/)を取得します。
 
-## 助けが必要？ {#need-help}
+## ヘルプが必要ですか？ {#need-help}
 
-[不和](https://discord.gg/vYU9h56kAX)または[サポートチケットを作成する](https://support.pingcap.com/)について質問してください。
+[Discord](https://discord.gg/vYU9h56kAX)で質問するか、[サポートチケットを作成](https://support.pingcap.com/)してください。

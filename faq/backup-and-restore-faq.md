@@ -3,76 +3,76 @@ title: Backup & Restore FAQs
 summary: Learn about Frequently Asked Questions (FAQs) and the solutions of backup and restore.
 ---
 
-# バックアップと復元に関するよくある質問 {#backup-x26-restore-faqs}
+# バックアップとリストアのFAQ {#backup-restore-faqs}
 
-このドキュメントには、TiDB バックアップ &amp; リストア (BR) に関するよくある質問 (FAQ) と解決策がリストされています。
+このドキュメントでは、TiDB Backup & Restore（BR）のよくある質問（FAQ）と解決策をリストします。
 
-## 誤ってデータを削除または更新した後、すぐにデータを復元するにはどうすればよいですか? {#what-should-i-do-to-quickly-recover-data-after-mistakenly-deleting-or-updating-data}
+## 誤ってデータを削除または更新した後、データを迅速に復元するにはどうすればよいですか？ {#what-should-i-do-to-quickly-recover-data-after-mistakenly-deleting-or-updating-data}
 
-TiDB v6.4.0 にはフラッシュバック機能が導入されています。この機能を使用すると、GC 時間内で指定した時点までデータを迅速にリカバリできます。したがって、誤操作が発生した場合、この機能を使用してデータを回復できます。詳細は[フラッシュバッククラスタ](/sql-statements/sql-statement-flashback-to-timestamp.md)および[フラッシュバックデータベース](/sql-statements/sql-statement-flashback-database.md)を参照してください。
+TiDB v6.4.0では、フラッシュバック機能が導入されました。この機能を使用すると、GC時間内に指定した時刻までデータを迅速に復元できます。したがって、誤操作が発生した場合は、この機能を使用してデータを復元できます。詳細については、[クラスターのフラッシュバック](/sql-statements/sql-statement-flashback-cluster.md)と[データベースのフラッシュバック](/sql-statements/sql-statement-flashback-database.md)を参照してください。
 
-## TiDB v5.4.0 以降のバージョンでは、負荷の高いクラスターでバックアップ タスクが実行されると、バックアップ タスクの速度が遅くなるのはなぜですか? {#in-tidb-v5-4-0-and-later-versions-when-backup-tasks-are-performed-on-the-cluster-under-a-heavy-workload-why-does-the-speed-of-backup-tasks-become-slow}
+## TiDB v5.4.0以降のバージョンでは、バックアップタスクを重いワークロードのクラスターで実行すると、バックアップタスクの速度が遅くなるのはなぜですか？ {#in-tidb-v5-4-0-and-later-versions-when-backup-tasks-are-performed-on-the-cluster-under-a-heavy-workload-why-does-the-speed-of-backup-tasks-become-slow}
 
-TiDB v5.4.0 以降、 BR にはバックアップ タスクの自動調整機能が導入されています。 v5.4.0 以降のバージョンのクラスターの場合、この機能はデフォルトで有効になっています。クラスターのワークロードが重い場合、この機能はバックアップ タスクで使用されるリソースを制限し、オンライン クラスターへの影響を軽減します。詳細については、 [バックアップの自動調整](/br/br-auto-tune.md)を参照してください。
+TiDB v5.4.0から、BRはバックアップタスクのための自動チューニング機能を導入しました。v5.4.0以降のクラスターでは、この機能がデフォルトで有効になっています。クラスターのワークロードが重い場合、この機能はバックアップタスクに使用されるリソースを制限して、オンラインクラスターへの影響を減らします。詳細については、[バックアップの自動チューニング](/br/br-auto-tune.md)を参照してください。
 
-TiKV は自動調整[動的構成](/tikv-control.md#modify-the-tikv-configuration-dynamically)をサポートしています。クラスターを再起動せずに、次の方法でこの機能を有効または無効にできます。
+TiKVは[動的に設定](/tikv-control.md#modify-the-tikv-configuration-dynamically)することができるため、自動チューニング機能を有効または無効にすることができます。次の方法で機能を有効または無効にします。クラスターを再起動する必要はありません。
 
--   自動調整を無効にする: TiKV 構成項目[`backup.enable-auto-tune`](/tikv-configuration-file.md#enable-auto-tune-new-in-v540)から`false`を設定します。
--   自動調整を有効にする: `backup.enable-auto-tune` ～ `true`を設定します。 v5.3.x から v5.4.0 以降のバージョンにアップグレードされたクラスターの場合、自動調整機能はデフォルトで無効になっています。手動で有効にする必要があります。
+- 自動チューニングを無効にする：TiKVの設定項目[`backup.enable-auto-tune`](/tikv-configuration-file.md#enable-auto-tune-new-in-v540)を`false`に設定します。
+- 自動チューニングを有効にする：`backup.enable-auto-tune`を`true`に設定します。v5.3.xからv5.4.0以降のバージョンにアップグレードしたクラスターでは、自動チューニング機能はデフォルトで無効になっています。手動で有効にする必要があります。
 
-`tikv-ctl`を使用して自動調整を有効または無効にするには、 [自動調整を使用する](/br/br-auto-tune.md#use-auto-tune)を参照してください。
+`tiup-cluster`を使用して自動チューニングを有効または無効にするには、[自動チューニングを使用する](/br/br-auto-tune.md#use-auto-tune)を参照してください。
 
-さらに、自動調整により、バックアップ タスクで使用されるデフォルトのスレッド数が減少します。詳細については、 `backup.num-threads` ](/tikv-configuration-file.md#num-threads-1)」を参照してください。したがって、Grafana ダッシュボードでは、バックアップ タスクによって使用される速度、CPU 使用率、および I/O リソース使用率が v5.4.0 より前のバージョンよりも低くなります。 v5.4.0 より前では、デフォルト値`backup.num-threads`は`CPU * 0.75`でした。つまり、バックアップ タスクによって使用されるスレッドの数が論理 CPU コアの 75% を占めます。その最大値は`32`でした。 v5.4.0 以降、この構成項目のデフォルト値は`CPU * 0.5` 、最大値は`8`です。
+また、自動チューニングはバックアップタスクに使用されるスレッドのデフォルト数を減らします。詳細については、`backup.num-threads`]\(/tikv-configuration-file.md#num-threads-1)を参照してください。そのため、Grafanaダッシュボードでは、バックアップタスクに使用される速度、CPU使用率、およびI/Oリソースの使用率は、v5.4.0より前のバージョンよりも低くなります。v5.4.0より前のバージョンでは、`backup.num-threads`のデフォルト値は`CPU * 0.75`であり、バックアップタスクに使用されるスレッドの数は論理CPUコアの75%を占めます。最大値は`32`でした。v5.4.0から、この設定項目のデフォルト値は`CPU * 0.5`になり、最大値は`8`になりました。
 
-オフライン クラスターでバックアップ タスクを実行する場合、バックアップを高速化するために、 `tikv-ctl`を使用して`backup.num-threads`の値をより大きな数値に変更できます。
+オフラインクラスターでバックアップタスクを実行する場合、バックアップを高速化するために、`tikv-ctl`を使用して`backup.num-threads`の値を大きな数に変更できます。
 
 ## PITRの問題 {#pitr-issues}
 
-### <a href="/br/br-pitr-guide.md">PITR</a>と<a href="/sql-statements/sql-statement-flashback-to-timestamp.md">クラスターフラッシュバック</a>の違いは何ですか? {#what-is-the-difference-between-a-href-br-br-pitr-guide-md-pitr-a-and-a-href-sql-statements-sql-statement-flashback-to-timestamp-md-cluster-flashback-a}
+### [PITR](/br/br-pitr-guide.md)と[クラスターのフラッシュバック](/sql-statements/sql-statement-flashback-cluster.md)の違いは何ですか？ {#what-is-the-difference-between-pitr-br-br-pitr-guide-md-and-cluster-flashback-sql-statements-sql-statement-flashback-cluster-md}
 
-ユースケースの観点から見ると、PITR は通常、クラスターが完全にサービス停止になった場合、またはデータが破損して他のソリューションを使用して回復できない場合に、クラスターのデータを指定された時点に復元するために使用されます。 PITR を使用するには、データ回復用の新しいクラスターが必要です。クラスターのフラッシュバック機能は、ユーザーの誤操作やその他の要因によって引き起こされるデータ エラーのシナリオ向けに特別に設計されており、データ エラーが発生する前の最新のタイムスタンプにクラスターのデータをインプレースで復元できます。
+ユースケースの観点から見ると、PITRは通常、クラスターが完全にサービス外になったり、データが破損して他のソリューションでは回復できない場合に、クラスターのデータを指定した時刻に復元するために使用されます。PITRを使用するには、データ復旧用の新しいクラスターが必要です。クラスターのフラッシュバック機能は、ユーザーの誤操作やその他の要因によって引き起こされるデータエラーのシナリオに特化しており、クラスターのデータを最新のタイムスタンプに戻すことができます。
 
-ほとんどの場合、フラッシュバックは、RPO (ゼロに近い) と RTO がはるかに短いため、人的ミスによって引き起こされたデータ エラーに対しては、PITR よりも優れた回復ソリューションです。ただし、クラスターが完全に使用できない場合、現時点ではフラッシュバックを実行できないため、この場合クラスターを回復する唯一のソリューションは PITR です。したがって、PITR は、フラッシュバックよりも RPO (最大 5 分) と RTO が長いにもかかわらず、データベースのディザスタ リカバリ戦略を策定する際には常に必須のソリューションです。
+ほとんどの場合、フラッシュバックは、人為的なミスによって引き起こされるデータエラーのための回復ソリューションとして、PITRよりも優れています。なぜなら、RPO（ほぼゼロ）とRTOがはるかに短いからです。ただし、クラスターが完全に使用できない場合、フラッシュバックはこの時点で実行できないため、PITRはこの場合、クラスターを回復する唯一の解決策です。そのため、PITRは常にデータベースのディザスタリカバリ戦略を開発する際に必要なソリューションです。フラッシュバックよりもRPO（最大5分）とRTOが長いです。
 
-### アップストリーム データベースが物理インポート モードでTiDB Lightningを使用してデータをインポートすると、ログ バックアップ機能が使用できなくなります。なぜ？ {#when-the-upstream-database-imports-data-using-tidb-lightning-in-the-physical-import-mode-the-log-backup-feature-becomes-unavailable-why}
+### 上流データベースが物理インポートモードでTiDB Lightningを使用してデータをインポートすると、ログバックアップ機能が使用できなくなります。なぜですか？ {#when-the-upstream-database-imports-data-using-tidb-lightning-in-the-physical-import-mode-the-log-backup-feature-becomes-unavailable-why}
 
-現在、ログ バックアップ機能はTiDB Lightningに完全には適合していません。そのため、 TiDB Lightningの物理モードでインポートしたデータはログデータにバックアップできません。
+現在、ログバックアップ機能はTiDB Lightningに完全に適応されていません。そのため、TiDB Lightningの物理モードでインポートされたデータはログデータにバックアップできません。
 
-ログ バックアップ タスクを作成するアップストリーム クラスターでは、データのインポートにTiDB Lightning物理モードを使用しないでください。代わりに、 TiDB Lightning論理モードを使用できます。物理モードを使用する必要がある場合は、インポートの完了後にスナップショット バックアップを実行して、PITR をスナップショット バックアップ後の時点に復元できるようにします。
+アップストリームクラスターでは、ログバックアップタスクを作成する際に、TiDB Lightningの物理モードを使用しないようにしてください。代わりに、TiDB Lightningの論理モードを使用することができます。物理モードを使用する必要がある場合は、インポートが完了した後にスナップショットバックアップを実行し、スナップショットバックアップの後の時点にPITRを復元できるようにしてください。
 
-### インデックス追加の高速化機能が PITR と互換性がないのはなぜですか? {#why-is-the-acceleration-of-adding-indexes-feature-incompatible-with-pitr}
+### インデックス追加機能の高速化は、PITRと互換性がありませんか？ {#why-is-the-acceleration-of-adding-indexes-feature-incompatible-with-pitr}
 
-問題: [#38045](https://github.com/pingcap/tidb/issues/38045)
+問題：[#38045](https://github.com/pingcap/tidb/issues/38045)
 
-現在、 [インデックス加速度](/system-variables.md#tidb_ddl_enable_fast_reorg-new-in-v630)機能で作成されたインデックス データは PITR でバックアップできません。
+現在、[インデックス高速化](/system-variables.md#tidb_ddl_enable_fast_reorg-new-in-v630)機能を使用して作成されたインデックスデータは、PITRによってバックアップすることができません。
 
-したがって、PITR リカバリの完了後、 BR はインデックス アクセラレーションによって作成されたインデックス データを削除し、再作成します。インデックス アクセラレーションによって多数のインデックスが作成された場合、またはログ バックアップ中にインデックス データが大きい場合は、インデックスの作成後にフル バックアップを実行することをお勧めします。
+そのため、PITRの復元が完了した後、BRはインデックス高速化によって作成されたインデックスデータを削除し、再作成します。インデックス高速化によって多数のインデックスが作成された場合や、ログバックアップ中にインデックスデータが大きい場合は、インデックスを作成した後にフルバックアップを実行することをお勧めします。
 
-### クラスターはネットワーク パーティションの障害から回復しましたが、ログ バックアップ タスクの進行状況のチェックポイントはまだ再開されません。なぜ？ {#the-cluster-has-recovered-from-the-network-partition-failure-but-the-checkpoint-of-the-log-backup-task-progress-still-does-not-resume-why}
+### クラスターはネットワーク分割障害から回復しましたが、ログバックアップタスクの進捗のチェックポイントはまだ再開されません。なぜですか？ {#the-cluster-has-recovered-from-the-network-partition-failure-but-the-checkpoint-of-the-log-backup-task-progress-still-does-not-resume-why}
 
-問題: [#13126](https://github.com/tikv/tikv/issues/13126)
+問題：[#13126](https://github.com/tikv/tikv/issues/13126)
 
-クラスター内でネットワーク パーティションに障害が発生すると、バックアップ タスクはログのバックアップを続行できなくなります。一定の再試行時間が経過すると、タスクは`ERROR`状態に設定されます。この時点で、バックアップ タスクは停止しました。
+クラスターでネットワーク分割障害が発生した後、バックアップタスクはログをバックアップし続けることができません。一定のリトライ時間後、タスクは `ERROR` 状態に設定されます。この時点で、バックアップタスクは停止します。
 
-この問題を解決するには、 `br log resume`コマンドを手動で実行してログ バックアップ タスクを再開する必要があります。
+この問題を解決するには、`br log resume` コマンドを手動で実行してログバックアップタスクを再開する必要があります。
 
-### PITR を実行すると、 <code>execute over region id</code>エラーが返された場合はどうすればよいですか? {#what-should-i-do-if-the-error-code-execute-over-region-id-code-is-returned-when-i-perform-pitr}
+### PITRを実行すると、`execute over region id` エラーが返された場合はどうすればよいですか？ {#what-should-i-do-if-the-error-execute-over-region-id-is-returned-when-i-perform-pitr}
 
-問題: [#37207](https://github.com/pingcap/tidb/issues/37207)
+問題：[#37207](https://github.com/pingcap/tidb/issues/37207)
 
-この問題は通常、完全データ インポート中にログ バックアップを有効にし、その後 PITR を実行してデータ インポート中の特定の時点でデータを復元した場合に発生します。
+この問題は、フルデータインポート中にログバックアップを有効にし、その後データインポート中の時点でデータを復元するためにPITRを実行した場合に発生することがあります。
 
-具体的には、長時間 (24 時間など) に大量のホットスポット書き込みがあり、各 TiKV ノードの OPS が 50k/s を超えている場合に、この問題が発生する可能性があります (メトリクスは次のとおりです)。 Grafana: **TiKV-詳細**-&gt;**バックアップ ログ**-&gt;**ハンドル イベント レート**)。
+具体的には、長時間（24時間など）ホットスポットライトが発生し、各TiKVノードのOPSが50k/sを超える場合（Grafanaでメトリクスを表示できます：**TiKV-Details** -> **Backup Log** -> **Handle Event Rate**）、この問題が発生する可能性があります。
 
-データのインポート後にスナップショット バックアップを実行し、このスナップショット バックアップに基づいて PITR を実行することをお勧めします。
+データインポート後にスナップショットバックアップを実行し、このスナップショットバックアップに基づいてPITRを実行することをお勧めします。
 
-## <code>br restore point</code>コマンドを使用してダウンストリーム クラスターを復元した後、 TiFlashからデータにアクセスできなくなります。私は何をすべきか？ {#after-restoring-a-downstream-cluster-using-the-code-br-restore-point-code-command-data-cannot-be-accessed-from-tiflash-what-should-i-do}
+## `br restore point` コマンドを使用してダウンストリームクラスターを復元した後、TiFlashからデータにアクセスできません。どうすればよいですか？ {#after-restoring-a-downstream-cluster-using-the-br-restore-point-command-data-cannot-be-accessed-from-tiflash-what-should-i-do}
 
-現在、PITR は復元フェーズ中にTiFlashにデータを直接書き込むことをサポートしていません。代わりに、br コマンドライン ツールは`ALTER TABLE table_name SET TIFLASH REPLICA ***` DDL を実行してデータを複製します。したがって、 TiFlashレプリカは、PITR がデータの復元を完了した直後には使用できません。代わりに、TiKV ノードからデータがレプリケートされるまで一定期間待機する必要があります。レプリケーションの進行状況を確認するには、 `INFORMATION_SCHEMA.tiflash_replica`表の`progress`情報を確認します。
+現在、PITRは復元フェーズ中にデータを直接TiFlashに書き込むことをサポートしていません。代わりに、brコマンドラインツールは`ALTER TABLE table_name SET TIFLASH REPLICA ***` DDLを実行してデータをレプリケートします。そのため、PITRがデータの復元を完了した後、TiFlashレプリカはすぐには利用できません。代わりに、データがTiKVノードからレプリケートされるまで一定の時間を待つ必要があります。レプリケーションの進捗状況を確認するには、`INFORMATION_SCHEMA.tiflash_replica` テーブルの `progress` 情報を確認してください。
 
-### ログ バックアップ タスクの<code>status</code> <code>ERROR</code>になった場合はどうすればよいですか? {#what-should-i-do-if-the-code-status-code-of-a-log-backup-task-becomes-code-error-code}
+### ログバックアップタスクの `status` が `ERROR` になった場合はどうすればよいですか？ {#what-should-i-do-if-the-status-of-a-log-backup-task-becomes-error}
 
-ログ バックアップ タスク中に失敗し、再試行しても回復できない場合、タスク ステータスは`ERROR`になります。以下は例です。
+ログバックアップタスク中に、タスクが失敗し、リトライしても回復できない場合、タスクのステータスは `ERROR` になります。以下は例です：
 
 ```shell
 br log status --pd x.x.x.x:2379
@@ -91,13 +91,13 @@ error-happen-at[store=1]: 2022-07-25 14:54:44.467 +0000; gap=11h23m35s
   error-message[store=1]: retry time exceeds: and error failed to get initial snapshot: failed to get the snapshot (region_id = 94812): Error during requesting raftstore: message: "read index not ready, reason can not read index due to merge, region 94812" read_index_not_ready { reason: "can not read index due to merge" region_id: 94812 }: failed to get initial snapshot: failed to get the snapshot (region_id = 94812): Error during requesting raftstore: message: "read index not ready, reason can not read index due to merge, region 94812" read_index_not_ready { reason: "can not read index due to merge" region_id: 94812 }: failed to get initial snapshot: failed to get the snapshot (region_id = 94812): Error during requesting raftstore: message: "read index not ready, reason can not read index due to merge, region 94812" read_index_not_ready { reason: "can not read index due to merge" region_id: 94812 }
 ```
 
-この問題を解決するには、エラー メッセージで原因を確認し、指示に従って実行してください。問題が解決されたら、次のコマンドを実行してタスクを再開します。
+この問題を解決するためには、原因を確認し、指示に従って実行してください。問題が解決した後、次のコマンドを実行してタスクを再開してください。
 
 ```shell
 br log resume --task-name=task1 --pd x.x.x.x:2379
 ```
 
-バックアップ タスクが再開された後、 `br log status`使用してステータスを確認できます。タスクのステータスが`NORMAL`になっても、バックアップ タスクは続行されます。
+バックアップタスクが再開されたら、`br log status`を使用してステータスを確認できます。タスクのステータスが`NORMAL`になると、バックアップタスクは継続されます。
 
 ```shell
 ● Total 1 Tasks.
@@ -111,218 +111,206 @@ br log resume --task-name=task1 --pd x.x.x.x:2379
 checkpoint[global]: 2022-07-25 14:46:50.118 +0000; gap=6m28s
 ```
 
-> **ノート：**
+> **注意:**
 >
-> この機能は、複数のバージョンのデータをバックアップします。長時間バックアップ タスクが失敗し、ステータスが`ERROR`になると、このタスクのチェックポイント データは`safe point`に設定され、 `safe point`のデータは 24 時間以内にガベージ コレクションされません。したがって、バックアップ タスクは、エラーが再開された後、最後のチェックポイントから続行されます。タスクが 24 時間以上失敗し、最後のチェックポイント データがガベージ コレクションされている場合、タスクを再開するとエラーが報告されます。この場合、 `br log stop`コマンドを実行して最初にタスクを停止し、次に新しいバックアップ タスクを開始することしかできません。
+> この機能は複数のバージョンのデータをバックアップします。長時間のバックアップタスクが失敗し、ステータスが `ERROR` になると、このタスクのチェックポイントデータが `安全ポイント` として設定され、`安全ポイント` のデータは24時間以内にガベージコレクションされません。そのため、エラーが発生した後、バックアップタスクは最後のチェックポイントから続行されます。タスクが24時間以上失敗し、最後のチェックポイントデータがガベージコレクションされている場合、タスクを再開するとエラーが報告されます。この場合、最初に `br log stop` コマンドを実行してタスクを停止し、次に新しいバックアップタスクを開始する必要があります。
 
-### <code>br log resume</code>コマンドを使用して一時停止されたタスクを再開するときに、エラー メッセージ<code>ErrBackupGCSafepointExceeded</code>が返された場合はどうすればよいですか? {#what-should-i-do-if-the-error-message-code-errbackupgcsafepointexceeded-code-is-returned-when-using-the-code-br-log-resume-code-command-to-resume-a-suspended-task}
+### `br log resume` コマンドを使用して中断されたタスクを再開する際に `ErrBackupGCSafepointExceeded` エラーメッセージが返された場合の対処方法は何ですか？ {#what-should-i-do-if-the-error-message-errbackupgcsafepointexceeded-is-returned-when-using-the-br-log-resume-command-to-resume-a-suspended-task}
 
 ```shell
 Error: failed to check gc safePoint, checkpoint ts 433177834291200000: GC safepoint 433193092308795392 exceed TS 433177834291200000: [BR:Backup:ErrBackupGCSafepointExceeded]backup GC safepoint exceeded
 ```
 
-ログ バックアップ タスクを一時停止した後、MVCC データがガベージ コレクションされるのを防ぐために、一時停止中のタスク プログラムは現在のチェックポイントをサービス セーフポイントとして自動的に設定します。これにより、24 時間以内に生成された MVCC データが確実に保持されます。バックアップ チェックポイントの MVCC データが生成されてから 24 時間以上経過している場合、チェックポイントのデータはガベージ コレクションされ、バックアップ タスクは再開できません。
+ログバックアップタスクを一時停止した後、MVCCデータがガベージコレクションされるのを防ぐために、一時停止タスクプログラムは現在のチェックポイントを自動的にサービスセーフポイントとして設定します。これにより、24時間以内に生成されたMVCCデータが保持されます。バックアップチェックポイントのMVCCデータが24時間以上生成されている場合、チェックポイントのデータはガベージコレクションされ、バックアップタスクを再開することができません。
 
-この問題に対処するには、 `br log stop`使用して現在のタスクを削除し、 `br log start`使用してログ バックアップ タスクを作成します。同時に、後続の PITR 用に完全バックアップを実行できます。
+この問題を解決するには、`br log stop`を使用して現在のタスクを削除し、`br log start`を使用してログバックアップタスクを作成します。同時に、後続のPITRのためにフルバックアップを実行することもできます。
 
 ## 機能の互換性の問題 {#feature-compatibility-issues}
 
-### br コマンドライン ツールを使用して復元されたデータが TiCDC またはDrainerの上流クラスターに複製できないのはなぜですか? {#why-does-data-restored-using-br-command-line-tool-cannot-be-replicated-to-the-upstream-cluster-of-ticdc-or-drainer}
+### なぜ、brコマンドラインツールを使用して復元したデータをTiCDCまたはDrainerの上流クラスタにレプリケートできないのですか？ {#why-does-data-restored-using-br-command-line-tool-cannot-be-replicated-to-the-upstream-cluster-of-ticdc-or-drainer}
 
--   **BRを使用して復元されたデータは、ダウンストリームに複製できません**。これは、 BR がSST ファイルを直接インポートしますが、現在ダウンストリーム クラスターがアップストリームからこれらのファイルを取得できないためです。
+- **BRで復元したデータは、下流にレプリケートできません**。これは、BRがSSTファイルを直接インポートするため、下流クラスタが現在これらのファイルを上流から取得できないためです。
 
--   v4.0.3 より前では、リストア中に生成された DDL ジョブにより、 TiCDC/ Drainerで予期しない DDL 実行が発生する可能性がありました。したがって、 TiCDC/ Drainerの上流クラスターでリストアを実行する必要がある場合は、 br コマンドライン ツールを使用してリストアされたすべてのテーブルを TiCDC/ Drainerブロック リストに追加します。
+- v4.0.3より前のバージョンでは、復元中に生成されたDDLジョブがTiCDC/Drainerで予期しないDDL実行を引き起こす可能性があります。そのため、TiCDC/Drainerの上流クラスタで復元を実行する必要がある場合は、brコマンドラインツールを使用して復元されたすべてのテーブルをTiCDC/Drainerのブロックリストに追加します。
 
-[`filter.rules`](https://github.com/pingcap/tiflow/blob/7c3c2336f98153326912f3cf6ea2fbb7bcc4a20c/cmd/changefeed.toml#L16)を使用して TiCDC のブロック リストを構成し、 [`syncer.ignore-table`](/tidb-binlog/tidb-binlog-configuration-file.md#ignore-table)を使用してDrainerのブロック リストを構成できます。
+TiCDCのブロックリストを設定するには、[`filter.rules`](https://github.com/pingcap/tiflow/blob/7c3c2336f98153326912f3cf6ea2fbb7bcc4a20c/cmd/changefeed.toml#L16)を使用し、Drainerのブロックリストを設定するには[`syncer.ignore-table`](/tidb-binlog/tidb-binlog-configuration-file.md#ignore-table)を使用します。
 
-### リストア中に<code>new_collations_enabled_on_first_bootstrap</code>の不一致が報告されるのはなぜですか? {#why-is-code-new-collations-enabled-on-first-bootstrap-code-mismatch-reported-during-restore}
+### 復元中に`new_collation_enabled`の不一致が報告されるのはなぜですか？ {#why-is-new-collation-enabled-mismatch-reported-during-restore}
 
-TiDB v6.0.0 以降、デフォルト値[`new_collations_enabled_on_first_bootstrap`](/tidb-configuration-file.md#new_collations_enabled_on_first_bootstrap)が`false`から`true`に変更されました。 BR は、上流クラスタの`new_collations_enabled_on_first_bootstrap`設定をバックアップし、この設定の値が上流クラスタと下流クラスタ間で一貫しているかどうかを確認します。値が一貫している場合、 BR は上流クラスターにバックアップされたデータを下流クラスターに安全に復元します。値が矛盾している場合、 BR はデータの復元を実行せず、エラーを報告します。
+TiDB v6.0.0以降、[`new_collations_enabled_on_first_bootstrap`](/tidb-configuration-file.md#new_collations_enabled_on_first_bootstrap)のデフォルト値が`false`から`true`に変更されました。BRは、上流クラスタの`mysql.tidb`テーブルに`new_collation_enabled`構成をバックアップし、この構成の値が上流と下流のクラスタで一致するかどうかをチェックします。値が一致する場合、BRは上流クラスタでバックアップされたデータを下流クラスタに安全に復元します。値が一致しない場合、BRはデータの復元を実行せず、エラーを報告します。
 
-以前のバージョンの v6.0.0 の TiDB クラスターにデータをバックアップしており、このデータを v6.0.0 以降のバージョンの TiDB クラスターに復元するとします。この状況では、値`new_collations_enabled_on_first_bootstrap`がアップストリーム クラスターとダウンストリーム クラスター間で一致しているかどうかを手動で確認する必要があります。
+以前のv6.0.0以前のバージョンのTiDBクラスタでデータをバックアップし、このデータをv6.0.0以降のTiDBクラスタに復元する必要がある場合は、上流と下流のクラスタで`new_collations_enabled_on_first_bootstrap`の値が一致するかどうかを手動で確認する必要があります。
 
--   値が一貫している場合は、restore コマンドに`--check-requirements=false`を追加して、この構成チェックをスキップできます。
--   値に一貫性がない場合、リストアを強制的に実行すると、 BR はデータ検証エラーを報告します。
+- 値が一致する場合、復元コマンドに`--check-requirements=false`を追加して、この構成チェックをスキップできます。
+- 値が一致しない場合、強制的に復元を実行し、BRはデータ検証エラーを報告します。
 
-### 配置ルールをクラスターに復元するとエラーが発生するのはなぜですか? {#why-does-an-error-occur-when-i-restore-placement-rules-to-a-cluster}
+### プレースメントルールをクラスタに復元する際にエラーが発生するのはなぜですか？ {#why-does-an-error-occur-when-i-restore-placement-rules-to-a-cluster}
 
-v6.0.0 より前では、 BR は[配置ルール](/placement-rules-in-sql.md)をサポートしていません。 v6.0.0 以降、 BR は配置ルールをサポートし、配置ルールのバックアップおよび復元モードを制御するコマンド ライン オプション`--with-tidb-placement-mode=strict/ignore`を導入します。デフォルト値`strict`では、 BR は配置ルールをインポートして検証しますが、値が`ignore`の場合はすべての配置ルールを無視します。
+v6.0.0以前では、BRは[プレースメントルール](/placement-rules-in-sql.md)をサポートしていませんでした。v6.0.0以降、BRはプレースメントルールをサポートし、プレースメントルールのバックアップおよび復元モードを制御するためのコマンドラインオプション`--with-tidb-placement-mode=strict/ignore`を導入しました。デフォルト値の`strict`では、BRはプレースメントルールをインポートおよび検証しますが、値が`ignore`の場合はすべてのプレースメントルールを無視します。
 
-## データ復元の問題 {#data-restore-issues}
+## データの復元の問題 {#data-restore-issues}
 
-### <code>Io(Os...)</code>エラーを処理するにはどうすればよいですか? {#what-should-i-do-to-handle-the-code-io-os-code-error}
+### `Io(Os...)`エラーを処理するにはどうすればよいですか？ {#what-should-i-do-to-handle-the-io-os-error}
 
-これらの問題のほとんどは、TiKV がディスクにデータを書き込むときに発生するシステム コール エラーです (たとえば、 `Io(Os {code: 13, kind: PermissionDenied...})`または`Io(Os {code: 2, kind: NotFound...})` )。
+これらの問題のほとんどは、TiKVがデータをディスクに書き込む際に発生するシステムコールエラーです。たとえば、`Io(Os {code: 13, kind: PermissionDenied...})`や`Io(Os {code: 2, kind: NotFound...})`などです。
 
-このような問題に対処するには、まずバックアップ ディレクトリのマウント方法とファイル システムを確認し、別のフォルダまたは別のハードディスクにデータをバックアップしてみてください。
+このような問題を解決するには、まずバックアップディレクトリのマウント方法とファイルシステムを確認し、別のフォルダや別のハードディスクにデータをバックアップしてみてください。
 
-たとえば、 `samba`によって構築されたネットワーク ディスクにデータをバックアップするときに、 `Code: 22(invalid argument)`エラーが発生する可能性があります。
+たとえば、`samba`で構築したネットワークディスクにデータをバックアップすると、`Code: 22(invalid argument)`エラーが発生する可能性があります。
 
-### <code>rpc error: code = Unavailable desc =...</code>復元中にエラーが発生しました。 {#what-should-i-do-to-handle-the-code-rpc-error-code-unavailable-desc-code-error-occurred-in-restore}
+### 復元中に発生した`rpc error: code = Unavailable desc =...`エラーを処理するにはどうすればよいですか？ {#what-should-i-do-to-handle-the-rpc-error-code-unavailable-desc-error-occurred-in-restore}
 
-このエラーは、復元するクラスターの容量が不十分な場合に発生する可能性があります。このクラスターの監視メトリクスまたは TiKV ログを確認することで、原因をさらに確認できます。
+このエラーは、復元するクラスタの容量が不足している場合に発生する可能性があります。このクラスタまたはTiKVログの監視メトリックを確認することで、原因をさらに確認できます。
 
-この問題に対処するには、クラスター リソースをスケールアウトし、復元中の同時実行性を減らし、 `RATE_LIMIT`オプションを有効にしてみてください。
+この問題を処理するには、クラスタリソースをスケールアウトし、復元中の並行性を減らし、`RATE_LIMIT`オプションを有効にすることができます。
 
-### リストアが失敗し<code>the entry too large, the max entry size is 6291456, the size of data is 7690800</code> 」というエラー メッセージが表示された場合はどうすればよいですか? {#what-should-i-do-if-the-restore-fails-with-the-error-message-code-the-entry-too-large-the-max-entry-size-is-6291456-the-size-of-data-is-7690800-code}
+### 復元中にエラーメッセージ`the entry too large, the max entry size is 6291456, the size of data is 7690800`が表示された場合はどうすればよいですか？ {#what-should-i-do-if-the-restore-fails-with-the-error-message-the-entry-too-large-the-max-entry-size-is-6291456-the-size-of-data-is-7690800}
 
-`--ddl-batch-size` ～ `128` 、またはそれより小さい値を設定すると、バッチで作成されるテーブルの数を減らすことができます。
+バッチで作成されるテーブルの数を減らすために、`--ddl-batch-size`を`128`またはそれより小さい値に設定することができます。
 
-BRを使用して`1`より大きい[`--ddl-batch-size`](/br/br-batch-create-table.md#use-batch-create-table)の値を持つバックアップ データを復元すると、TiDB はテーブル作成の DDL ジョブを TiKV によって維持される DDL ジョブ キューに書き込みます。現時点では、ジョブ メッセージの最大値はデフォルトで`6 MB`であるため、TiDB によって一度に送信されるすべてのテーブル スキーマの合計サイズは 6 MB を超えてはなりません (この値を変更することは**お勧めできません**。詳細については、9 と[`txn-entry-size-limit`](/tidb-configuration-file.md#txn-entry-size-limit-new-in-v50)を参照してください)。 [`raft-entry-max-size`](/tikv-configuration-file.md#raft-entry-max-size) ）。したがって、 `--ddl-batch-size`過度に大きな値に設定すると、TiDB によって一度にバッチで送信されるテーブルのスキーマ サイズが指定値を超え、 BRで`entry too large, the max entry size is 6291456, the size of data is 7690800`エラーが報告されます。
+バックアップデータを[`--ddl-batch-size`](/br/br-batch-create-table.md#use-batch-create-table)が`1`より大きい値で使用している場合、TiDBはDDLジョブをTiKVが維持するDDLジョブキューに書き込みます。この時、TiDBが一度に送信するすべてのテーブルスキーマの合計サイズは6MBを超えてはいけません。なぜなら、ジョブメッセージの最大値はデフォルトで`6MB`であるためです（この値を変更することは**推奨されません**。詳細は[`txn-entry-size-limit`](/tidb-configuration-file.md#txn-entry-size-limit-new-in-v50)と[`raft-entry-max-size`](/tikv-configuration-file.md#raft-entry-max-size)を参照してください）。そのため、`--ddl-batch-size`を極端に大きな値に設定すると、一度にTiDBがバッチで送信するテーブルのスキーマサイズが指定された値を超え、BRが`entry too large, the max entry size is 6291456, the size of data is 7690800`エラーを報告することがあります。
 
-### <code>local</code>storageを使用する場合、バックアップ ファイルはどこに保存されますか? {#where-are-the-backed-up-files-stored-when-i-use-code-local-code-storage}
+### `local`ストレージを使用する場合、バックアップされたファイルはどこに保存されますか？ {#where-are-the-backed-up-files-stored-when-i-use-local-storage}
 
-> **ノート：**
+> **Note:**
 >
-> BRまたは TiKV ノードにネットワーク ファイル システム (NFS) がマウントされていない場合、または Amazon S3、GCS、または Azure Blob Storage プロトコルをサポートする外部storageを使用している場合、 BRによってバックアップされたデータは各 TiKV ノードで生成されます。バックアップ データは各ノードのローカル ファイル システムに分散しているため、**これはBRを展開する推奨方法ではないことに注意してください**。バックアップデータを採取すると、データの冗長化や運用保守上の問題が発生する可能性があります。一方、バックアップ データを収集する前にデータを直接復元すると、 `SST file not found`エラーが発生します。
+> BRまたはTiKVノードにネットワークファイルシステム（NFS）がマウントされていない場合、またはAmazon S3、GCS、またはAzure Blob Storageプロトコルをサポートする外部ストレージを使用する場合、BRによってバックアップされたデータは各TiKVノードで生成されます。**BRを展開する推奨される方法ではありません**。なぜなら、バックアップデータが各ノードのローカルファイルシステムに分散しているため、バックアップデータを収集するとデータの冗長性や運用・保守上の問題が発生する可能性があるからです。また、バックアップデータを収集する前に直接データを復元すると、`SST file not found`エラーが発生します。
 
-ローカルstorageを使用すると、 BRが実行されているノードに`backupmeta`が生成され、各リージョンのLeaderノードにバックアップ ファイルが生成されます。
+ローカルストレージを使用する場合、`backupmeta`はBRが実行されているノードで生成され、バックアップファイルは各リージョンのリーダーノードで生成されます。
 
-### データの復元中に<code>could not read local://...:download sst failed</code>エラー メッセージが返された場合はどうすればよいですか? {#what-should-i-do-if-the-error-message-code-could-not-read-local-download-sst-failed-code-is-returned-during-data-restore}
+### データを復元する際に`could not read local://...:download sst failed`エラーメッセージが返された場合、どうすればよいですか？ {#what-should-i-do-if-the-error-message-could-not-read-local-download-sst-failed-is-returned-during-data-restore}
 
-データを復元する場合、各ノードは**すべての**バックアップ ファイル (SST ファイル) にアクセスできる必要があります。デフォルトでは、 `local`storageが使用されている場合、バックアップ ファイルが異なるノードに分散しているため、データを復元できません。したがって、各 TiKV ノードのバックアップ ファイルを他の TiKV ノードにコピーする必要があります。**バックアップ データは、Amazon S3、Google Cloud Storage (GCS)、Azure Blob Storage、または NFS に保存することをお勧めします**。
+データを復元する際、各ノードは**すべての**バックアップファイル（SSTファイル）にアクセスする必要があります。デフォルトでは、`local`ストレージを使用する場合、バックアップファイルが異なるノードに分散しているため、データを復元することはできません。そのため、各TiKVノードのバックアップファイルを他のTiKVノードにコピーする必要があります。**バックアップデータをAmazon S3、Google Cloud Storage（GCS）、Azure Blob Storage、またはNFSに保存することをお勧めします**。
 
-### root を使用して<code>br</code>を実行しようとしても無駄であった場合でも、 <code>Permission denied</code> 」または<code>No such file or directory</code>エラーを処理するにはどうすればよいですか? {#what-should-i-do-to-handle-the-code-permission-denied-code-or-code-no-such-file-or-directory-code-error-even-if-i-have-tried-to-run-code-br-code-using-root-in-vain}
+### `root`で実行しても`Permission denied`または`No such file or directory`エラーが発生する場合はどうすればよいですか？ {#what-should-i-do-to-handle-the-permission-denied-or-no-such-file-or-directory-error-even-if-i-have-tried-to-run-br-using-root-in-vain}
 
-TiKV がバックアップ ディレクトリにアクセスできるかどうかを確認する必要があります。データをバックアップするには、TiKV に書き込み権限があるかどうかを確認してください。データを復元する場合は、読み取り権限があるかどうかを確認してください。
+データをバックアップするには、TiKVが書き込み権限を持っているかどうかを確認する必要があります。データを復元するには、読み取り権限があるかどうかを確認する必要があります。
 
-バックアップ操作中に、storageメディアがローカル ディスクまたはネットワーク ファイル システム (NFS) である場合、 `br`を起動するユーザーと TiKV を起動するユーザーが一致していることを確認してください ( `br`と TiKV が別のマシン上にある場合、ユーザーは&#39; UID は一貫している必要があります)。そうしないと、 `Permission denied`問題が発生する可能性があります。
+バックアップ操作中、ストレージ媒体がローカルディスクまたはネットワークファイルシステム（NFS）の場合、`br`を起動するユーザーとTiKVを起動するユーザーが一致していることを確認してください（`br`とTiKVが異なるマシンにある場合、ユーザーのUIDは一致している必要があります）。そうでないと、`Permission denied`の問題が発生する可能性があります。
 
-バックアップ ファイル (SST ファイル) は TiKV によって保存されるため、 `root`ユーザーとして`br`を実行すると、ディスク権限が原因で失敗する可能性があります。
+`br`を`root`ユーザーとして実行すると、バックアップファイル（SSTファイル）がTiKVによって保存されるため、ディスクの権限の問題で失敗する可能性があります。
 
-> **ノート：**
+> **Note:**
 >
-> データの復元中に同じ問題が発生する可能性があります。 SST ファイルを初めて読み取るときに、読み取り権限が検証されます。 DDL の実行時間は、アクセス許可の確認と`br`の実行の間に長い間隔がある可能性があることを示唆しています。長時間待機すると、エラー メッセージ`Permission denied`表示される場合があります。
+> データを復元する際に同じ問題に遭遇する可能性があります。SSTファイルが最初に読み取られるとき、読み取り権限が確認されます。DDLの実行時間から、権限を確認してから`br`を実行するまでの間隔が長い可能性があります。長時間待っても`Permission denied`エラーメッセージが表示される可能性があります。
 
-したがって、データを復元する前に、次の手順に従って権限を確認することをお勧めします。
+そのため、次の手順に従ってデータを復元する前に権限を確認することをお勧めします：
 
-1.  プロセス クエリの Linux コマンドを実行します。
+1. Linuxコマンドを実行してプロセスをクエリする：
 
-    {{< copyable "" >}}
+   ```bash
+   ps aux | grep tikv-server
+   ```
 
-    ```bash
-    ps aux | grep tikv-server
-    ```
+   出力は次のようになります：
 
-    出力は次のとおりです。
+   ```shell
+   tidb_ouo  9235 10.9  3.8 2019248 622776 ?      Ssl  08:28   1:12 bin/tikv-server --addr 0.0.0.0:20162 --advertise-addr 172.16.6.118:20162 --status-addr 0.0.0.0:20188 --advertise-status-addr 172.16.6.118:20188 --pd 172.16.6.118:2379 --data-dir /home/user1/tidb-data/tikv-20162 --config conf/tikv.toml --log-file /home/user1/tidb-deploy/tikv-20162/log/tikv.log
+   tidb_ouo  9236  9.8  3.8 2048940 631136 ?      Ssl  08:28   1:05 bin/tikv-server --addr 0.0.0.0:20161 --advertise-addr 172.16.6.118:20161 --status-addr 0.0.0.0:20189 --advertise-status-addr 172.16.6.118:20189 --pd 172.16.6.118:2379 --data-dir /home/user1/tidb-data/tikv-20161 --config conf/tikv.toml --log-file /home/user1/tidb-deploy/tikv-20161/log/tikv.log
+   ```
 
-    ```shell
-    tidb_ouo  9235 10.9  3.8 2019248 622776 ?      Ssl  08:28   1:12 bin/tikv-server --addr 0.0.0.0:20162 --advertise-addr 172.16.6.118:20162 --status-addr 0.0.0.0:20188 --advertise-status-addr 172.16.6.118:20188 --pd 172.16.6.118:2379 --data-dir /home/user1/tidb-data/tikv-20162 --config conf/tikv.toml --log-file /home/user1/tidb-deploy/tikv-20162/log/tikv.log
-    tidb_ouo  9236  9.8  3.8 2048940 631136 ?      Ssl  08:28   1:05 bin/tikv-server --addr 0.0.0.0:20161 --advertise-addr 172.16.6.118:20161 --status-addr 0.0.0.0:20189 --advertise-status-addr 172.16.6.118:20189 --pd 172.16.6.118:2379 --data-dir /home/user1/tidb-data/tikv-20161 --config conf/tikv.toml --log-file /home/user1/tidb-deploy/tikv-20161/log/tikv.log
-    ```
+   または、次のコマンドを実行できます：
 
-    または、次のコマンドを実行することもできます。
+   ```bash
+   ps aux | grep tikv-server | awk '{print $1}'
+   ```
 
-    {{< copyable "" >}}
+   出力は次のようになります：
 
-    ```bash
-    ps aux | grep tikv-server | awk '{print $1}'
-    ```
+   ```shell
+   tidb_ouo
+   tidb_ouo
+   ```
 
-    出力は次のとおりです。
+2. `tiup`コマンドを使用してクラスターの起動情報をクエリする：
 
-    ```shell
-    tidb_ouo
-    tidb_ouo
-    ```
+   ```bash
+   tiup cluster list
+   ```
 
-2.  `tiup`コマンドを使用して、クラスターの起動情報を照会します。
+   出力は次のようになります：
 
-    {{< copyable "" >}}
+   ```shell
+   [root@Copy-of-VM-EE-CentOS76-v1 br]# tiup cluster list
+   Starting component `cluster`: /root/.tiup/components/cluster/v1.5.2/tiup-cluster list
+   Name          User      Version  Path                                               PrivateKey
+   ----          ----      -------  ----                                               ----------
+   tidb_cluster  tidb_ouo  v5.0.2   /root/.tiup/storage/cluster/clusters/tidb_cluster  /root/.tiup/storage/cluster/clusters/tidb_cluster/ssh/id_rsa
+   ```
 
-    ```bash
-    tiup cluster list
-    ```
+3. バックアップディレクトリの権限を確認します。たとえば、`backup`はバックアップデータの保存に使用されます：
 
-    出力は次のとおりです。
+   ```bash
+   ls -al backup
+   ```
 
-    ```shell
-    [root@Copy-of-VM-EE-CentOS76-v1 br]# tiup cluster list
-    Starting component `cluster`: /root/.tiup/components/cluster/v1.5.2/tiup-cluster list
-    Name          User      Version  Path                                               PrivateKey
-    ----          ----      -------  ----                                               ----------
-    tidb_cluster  tidb_ouo  v5.0.2   /root/.tiup/storage/cluster/clusters/tidb_cluster  /root/.tiup/storage/cluster/clusters/tidb_cluster/ssh/id_rsa
-    ```
+   出力は次のようになります：
 
-3.  バックアップディレクトリの権限を確認してください。たとえば、 `backup`はバックアップ データstorageの場合です。
+   ```shell
+   [root@Copy-of-VM-EE-CentOS76-v1 user1]# ls -al backup
+   total 0
+   drwxr-xr-x  2 root root   6 Jun 28 17:48 .
+   drwxr-xr-x 11 root root 310 Jul  4 10:35 ..
+   ```
 
-    {{< copyable "" >}}
+   ステップ2の出力から、`tikv-server`インスタンスがユーザー`tidb_ouo`によって起動されていることがわかります。しかし、ユーザー`tidb_ouo`には`backup`への書き込み権限がありません。そのため、バックアップに失敗します。
 
-    ```bash
-    ls -al backup
-    ```
+### `mysql`スキーマのテーブルはなぜ復元されないのですか？ {#why-are-tables-in-the-mysql-schema-not-restored}
 
-    出力は次のとおりです。
+BR v5.1.0以降、フルバックアップを実行すると、BRは\*\*`mysql`スキーマのテーブル**をバックアップします。BR v6.2.0以前では、デフォルトの設定では、BRはユーザーデータのみを復元しますが、**`mysql`スキーマのテーブル\*\*は復元しません。
 
-    ```shell
-    [root@Copy-of-VM-EE-CentOS76-v1 user1]# ls -al backup
-    total 0
-    drwxr-xr-x  2 root root   6 Jun 28 17:48 .
-    drwxr-xr-x 11 root root 310 Jul  4 10:35 ..
-    ```
-
-    ステップ 2 の出力から、 `tikv-server`インスタンスがユーザー`tidb_ouo`によって開始されたことがわかります。しかし、ユーザー`tidb_ouo`は`backup`に対する書き込み権限がありません。したがって、バックアップは失敗します。
-
-### <code>mysql</code>スキーマ内のテーブルが復元されないのはなぜですか? {#why-are-tables-in-the-code-mysql-code-schema-not-restored}
-
-BR v5.1.0 以降、完全バックアップを実行すると、 BR は**`mysql`スキーマ内のテーブル**をバックアップします。 BR v6.2.0 より前のデフォルト設定では、 BR はユーザー データのみを復元し、 **`mysql`スキーマ**内のテーブルは復元しません。
-
-ユーザーが`mysql`スキーマ (システム テーブルではない) で作成したテーブルを復元するには、 [テーブルフィルター](/table-filter.md#syntax)使用してテーブルを明示的に含めます。次の例は、 BR が通常の復元を実行するときに`mysql.usertable`テーブルを復元する方法を示しています。
-
-{{< copyable "" >}}
+`mysql`スキーマ内でユーザーが作成したテーブル（システムテーブルではない）を復元するには、[テーブルフィルター](/table-filter.md#syntax)を使用して明示的にテーブルを含めることができます。次の例は、BRが通常のリストアを実行するときに`mysql.usertable`テーブルを復元する方法を示しています。
 
 ```shell
 br restore full -f '*.*' -f '!mysql.*' -f 'mysql.usertable' -s $external_storage_url --with-sys-table
 ```
 
-前述のコマンドでは、
+前のコマンドでは、
 
--   `-f '*.*'`はデフォルトのルールを上書きするために使用されます
--   `-f '!mysql.*'`特に指定がない限り、 BR に`mysql`テーブルを復元しないよう指示します。
--   `-f 'mysql.usertable'` `mysql.usertable`を復元する必要があることを示します。
+- `-f '*.*'`はデフォルトのルールを上書きするために使用されます
+- `-f '!mysql.*'`は、明示的に指定しない限り、BRが`mysql`内のテーブルをリストアしないように指示します。
+- `-f 'mysql.usertable'`は、`mysql.usertable`をリストアする必要があることを示します。
 
-`mysql.usertable`のみを復元する必要がある場合は、次のコマンドを実行します。
-
-{{< copyable "" >}}
+`mysql.usertable`のみをリストアする必要がある場合は、次のコマンドを実行してください：
 
 ```shell
 br restore full -f 'mysql.usertable' -s $external_storage_url --with-sys-table
 ```
 
-[テーブルフィルター](/table-filter.md#syntax)を設定した場合でも、 **BR は次のシステム テーブルを復元しないこと**に注意してください。
+注意してほしいのは、[テーブルフィルタ](/table-filter.md#syntax)を設定しても、**BRは以下のシステムテーブルをリストアしません**:
 
--   統計テーブル ( `mysql.stat_*` )
--   システム変数テーブル ( `mysql.tidb` 、 `mysql.global_variables` )
--   [その他のシステムテーブル](https://github.com/pingcap/tidb/blob/master/br/pkg/restore/systable_restore.go#L31)
+- 統計テーブル (`mysql.stat_*`)
+- システム変数テーブル (`mysql.tidb`, `mysql.global_variables`)
+- [その他のシステムテーブル](https://github.com/pingcap/tidb/blob/master/br/pkg/restore/systable_restore.go#L31)
 
-## バックアップと復元についてその他知っておきたいこと {#other-things-you-may-want-to-know-about-backup-and-restore}
+## バックアップとリカバリについて知っておくべきその他のこと {#other-things-you-may-want-to-know-about-backup-and-restore}
 
-### バックアップデータのサイズはどのくらいですか?バックアップのレプリカはありますか? {#what-is-the-size-of-the-backup-data-are-there-replicas-of-the-backup}
+### バックアップデータのサイズはどのくらいですか？バックアップのレプリカはありますか？ {#what-is-the-size-of-the-backup-data-are-there-replicas-of-the-backup}
 
-データのバックアップ中に、各リージョンのLeaderノード上にバックアップ ファイルが生成されます。バックアップのサイズはデータ サイズと等しく、冗長レプリカはありません。したがって、合計データ サイズは、TiKV データの合計数をレプリカの数で割ったものとほぼなります。
+データバックアップ中、バックアップファイルは各リージョンのリーダーノードに生成されます。バックアップのサイズはデータサイズと同じで、冗長なレプリカはありません。そのため、合計データサイズは、TiKVデータの合計数をレプリカ数で割ったものになります。
 
-ただし、ローカルstorageからデータを復元する場合は、各 TiKV がすべてのバックアップ ファイルにアクセスできる必要があるため、レプリカの数は TiKV ノードの数と同じになります。
+ただし、ローカルストレージからデータをリカバリする場合、レプリカ数はTiKVノードの数と同じになります。なぜなら、各TiKVはすべてのバックアップファイルにアクセスする必要があるためです。
 
-### BRを使用したバックアップまたは復元後、監視ノードに表示されるディスク使用量が一貫していないのはなぜですか? {#why-is-the-disk-usage-shown-on-the-monitoring-node-inconsistent-after-backup-or-restore-using-br}
+### BRを使用してバックアップまたはリカバリを実行した後、モニタリングノードに表示されるディスク使用量が一致しないのはなぜですか？ {#why-is-the-disk-usage-shown-on-the-monitoring-node-inconsistent-after-backup-or-restore-using-br}
 
-この不一致は、バックアップで使用されるデータ圧縮率がリストアで使用されるデフォルトの圧縮率と異なることが原因で発生します。チェックサムが成功した場合は、この問題を無視してかまいません。
+この不一致は、バックアップで使用されるデータ圧縮率がリカバリで使用されるデフォルトの圧縮率と異なるためです。チェックサムが成功した場合は、この問題を無視できます。
 
-### BR がバックアップ データを復元した後、テーブルに対して<code>ANALYZE</code>ステートメントを実行して、テーブルとインデックス上の TiDB の統計を更新する必要がありますか? {#after-br-restores-the-backup-data-do-i-need-to-execute-the-code-analyze-code-statement-on-the-table-to-update-the-statistics-of-tidb-on-the-tables-and-indexes}
+### BRがバックアップデータをリカバリした後、テーブルの統計情報を更新するために`ANALYZE`ステートメントを実行する必要がありますか？ {#after-br-restores-the-backup-data-do-i-need-to-execute-the-analyze-statement-on-the-table-to-update-the-statistics-of-tidb-on-the-tables-and-indexes}
 
-BR は統計をバックアップしません (v4.0.9 を除く)。したがって、バックアップ データを復元した後、手動で`ANALYZE TABLE`を実行するか、TiDB が自動的に実行する`ANALYZE`を待つ必要があります。
+BRは統計情報をバックアップしません（v4.0.9を除く）。そのため、バックアップデータをリカバリした後、`ANALYZE TABLE`を手動で実行するか、TiDBが自動的に`ANALYZE`を実行するのを待つ必要があります。
 
-v4.0.9 では、 BR はデフォルトで統計をバックアップするため、メモリを大量に消費します。バックアップ プロセスが確実に正常に完了するように、v4.0.10 以降、統計のバックアップはデフォルトで無効になっています。
+v4.0.9では、BRはデフォルトで統計情報をバックアップしますが、これはメモリを多く消費します。バックアッププロセスがうまくいくようにするため、v4.0.10以降では統計情報のバックアップはデフォルトで無効になっています。
 
-テーブルで`ANALYZE`実行しない場合、統計が不正確であるため、TiDB は最適な実行プランを選択できません。クエリのパフォーマンスが重要な問題ではない場合は、 `ANALYZE`無視してかまいません。
+テーブルで`ANALYZE`を実行しない場合、不正確な統計情報のためにTiDBが最適な実行計画を選択できなくなります。クエリのパフォーマンスが重要でない場合は、`ANALYZE`を無視できます。
 
-### 単一クラスターのデータを復元するために、複数の復元タスクを同時に開始できますか? {#can-i-start-multiple-restore-tasks-at-the-same-time-to-restore-the-data-of-a-single-cluster}
+### 単一クラスタのデータをリストアするために複数のリストアタスクを同時に開始できますか？ {#can-i-start-multiple-restore-tasks-at-the-same-time-to-restore-the-data-of-a-single-cluster}
 
-以下の理由により、単一クラスターのデータを復元するために複数の復元タスクを同時に開始すること**は強く推奨されません**。
+単一クラスタのデータをリストアするために複数のリストアタスクを同時に開始することは**強く推奨されません**。その理由は次のとおりです。
 
--   BR がデータを復元すると、PD の一部のグローバル構成が変更されます。したがって、データの復元のために複数の復元タスクを同時に開始すると、これらの構成が誤って上書きされ、クラスターの状態が異常になる可能性があります。
--   BR はデータを復元するために大量のクラスター リソースを消費するため、実際には、復元タスクを並行して実行しても復元速度は限られた範囲でしか向上しません。
--   データの復元のために複数の復元タスクを並行して実行するテストは行われていないため、成功するかどうかは保証されません。
+- BRがデータをリストアする際、PDの一部のグローバル設定を変更します。そのため、データリストアのために同時に複数のリストアタスクを開始すると、これらの設定が誤って上書きされ、クラスタの状態が異常になる可能性があります。
+- BRはデータをリストアするために多くのクラスタリソースを消費するため、実際には並列でリストアタスクを実行しても、リストア速度は限定的にしか向上しません。
+- データリストアのために複数のリストアタスクを並列で実行するテストは行われていないため、成功を保証するものではありません。
 
-### BR はテーブルの<code>SHARD_ROW_ID_BITS</code>および<code>PRE_SPLIT_REGIONS</code>情報をバックアップしますか?復元されたテーブルには複数のリージョンがありますか? {#does-br-back-up-the-code-shard-row-id-bits-code-and-code-pre-split-regions-code-information-of-a-table-does-the-restored-table-have-multiple-regions}
+### BRはテーブルの`SHARD_ROW_ID_BITS`および`PRE_SPLIT_REGIONS`情報をバックアップしますか？リストアされたテーブルには複数のリージョンがありますか？ {#does-br-back-up-the-shard-row-id-bits-and-pre-split-regions-information-of-a-table-does-the-restored-table-have-multiple-regions}
 
-はい。 BRはテーブルの[`SHARD_ROW_ID_BITS`および`PRE_SPLIT_REGIONS`](/sql-statements/sql-statement-split-region.md#pre_split_regions)情報をバックアップします。復元されたテーブルのデータも複数のリージョンに分割されます。
+はい。BRはテーブルの[`SHARD_ROW_ID_BITS`および`PRE_SPLIT_REGIONS`](/sql-statements/sql-statement-split-region.md#pre_split_regions)情報をバックアップします。リストアされたテーブルのデータも複数のリージョンに分割されます。

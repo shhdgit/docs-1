@@ -3,196 +3,197 @@ title: Connect to TiDB with TypeORM
 summary: Learn how to connect to TiDB using TypeORM. This tutorial gives Node.js sample code snippets that work with TiDB using TypeORM.
 ---
 
-# TypeORM で TiDB に接続する {#connect-to-tidb-with-typeorm}
+# TypeORMを使用してTiDBに接続する {#connect-to-tidb-with-typeorm}
 
-TiDB は MySQL 互換データベースであり、 [TypeORM](https://github.com/TypeORM/TypeORM)は Node.js 用の人気のあるオープンソース ORM フレームワークです。
+TiDBはMySQL互換のデータベースであり、[TypeORM](https://github.com/TypeORM/TypeORM)はNode.js向けの人気のあるオープンソースORMフレームワークです。
 
-このチュートリアルでは、TiDB と TypeORM を使用して次のタスクを実行する方法を学習できます。
+このチュートリアルでは、以下のタスクを実行するためにTiDBとTypeORMを使用する方法を学ぶことができます。
 
--   環境をセットアップします。
--   TypeORM を使用して TiDB クラスターに接続します。
--   アプリケーションをビルドして実行します。オプションで、基本的な CRUD 操作の[サンプルコードスニペット](#sample-code-snippets)を見つけることができます。
+- 環境をセットアップする。
+- TypeORMを使用してTiDBクラスタに接続する。
+- アプリケーションをビルドして実行する。オプションで、基本的なCRUD操作の[サンプルコードスニペット](#sample-code-snippets)を見つけることができます。
 
-> **注記**
+> **注意**
 >
-> このチュートリアルは、TiDB サーバーレス、TiDB 専用、および TiDB セルフホストで動作します。
+> このチュートリアルは、TiDB Serverless、TiDB Dedicated、およびTiDB Self-Hostedで動作します。
 
 ## 前提条件 {#prerequisites}
 
 このチュートリアルを完了するには、次のものが必要です。
 
--   [Node.js](https://nodejs.org/en) &gt;= 16.x がマシンにインストールされている。
--   [ギット](https://git-scm.com/downloads)マシンにインストールされています。
--   TiDB クラスターが実行中です。
+- マシンにインストールされている[Node.js](https://nodejs.org/en) >= 16.x。
+- マシンにインストールされている[Git](https://git-scm.com/downloads)。
+- 実行中のTiDBクラスタ。
 
-**TiDB クラスターがない場合は、次のように作成できます。**
+**TiDBクラスタを持っていない場合は、次のように作成できます。**
 
 <CustomContent platform="tidb">
 
--   (推奨) [TiDB サーバーレスクラスターの作成](/develop/dev-guide-build-cluster-in-cloud.md)に従って、独自のTiDB Cloudクラスターを作成します。
--   [ローカル テスト TiDB クラスターをデプロイ](/quick-start-with-tidb.md#deploy-a-local-test-cluster)または[本番TiDB クラスターをデプロイ](/production-deployment-using-tiup.md)に従ってローカル クラスターを作成します。
+- (推奨) [TiDB Serverlessクラスタを作成する](/develop/dev-guide-build-cluster-in-cloud.md)を参照して、独自のTiDB Cloudクラスタを作成します。
+- [ローカルテストTiDBクラスタをデプロイする](/quick-start-with-tidb.md#deploy-a-local-test-cluster)または[本番TiDBクラスタをデプロイする](/production-deployment-using-tiup.md)を参照して、ローカルクラスタを作成します。
 
 </CustomContent>
 <CustomContent platform="tidb-cloud">
 
--   (推奨) [TiDB サーバーレスクラスターの作成](/develop/dev-guide-build-cluster-in-cloud.md)に従って、独自のTiDB Cloudクラスターを作成します。
--   [ローカル テスト TiDB クラスターをデプロイ](https://docs.pingcap.com/tidb/stable/quick-start-with-tidb#deploy-a-local-test-cluster)または[本番TiDB クラスターをデプロイ](https://docs.pingcap.com/tidb/stable/production-deployment-using-tiup)に従ってローカル クラスターを作成します。
+- (推奨) [TiDB Serverlessクラスタを作成する](/develop/dev-guide-build-cluster-in-cloud.md)を参照して、独自のTiDB Cloudクラスタを作成します。
+- [ローカルテストTiDBクラスタをデプロイする](https://docs.pingcap.com/tidb/stable/quick-start-with-tidb#deploy-a-local-test-cluster)または[本番TiDBクラスタをデプロイする](https://docs.pingcap.com/tidb/stable/production-deployment-using-tiup)を参照して、ローカルクラスタを作成します。
 
 </CustomContent>
 
-## サンプル アプリを実行して TiDB に接続する {#run-the-sample-app-to-connect-to-tidb}
+## サンプルアプリを実行してTiDBに接続する {#run-the-sample-app-to-connect-to-tidb}
 
-このセクションでは、サンプル アプリケーション コードを実行して TiDB に接続する方法を説明します。
+このセクションでは、サンプルアプリケーションコードを実行し、TiDBに接続する方法を示します。
 
-### ステップ 1: サンプル アプリ リポジトリのクローンを作成する {#step-1-clone-the-sample-app-repository}
+### ステップ1：サンプルアプリリポジトリをクローンする {#step-1-clone-the-sample-app-repository}
 
-ターミナル ウィンドウで次のコマンドを実行して、サンプル コード リポジトリのクローンを作成します。
+ターミナルウィンドウで次のコマンドを実行して、サンプルコードリポジトリをクローンします：
 
 ```shell
 git clone https://github.com/tidb-samples/tidb-nodejs-typeorm-quickstart.git
 cd tidb-nodejs-typeorm-quickstart
 ```
 
-### ステップ 2: 依存関係をインストールする {#step-2-install-dependencies}
+### ステップ2：依存関係のインストール {#step-2-install-dependencies}
 
-次のコマンドを実行して、サンプル アプリに必要なパッケージ ( `typeorm`と`mysql2`を含む) をインストールします。
+サンプルアプリケーションに必要なパッケージ（`typeorm`および`mysql2`を含む）をインストールするには、次のコマンドを実行してください：
 
 ```shell
 npm install
 ```
 
-<details><summary><b>依存関係を既存のプロジェクトにインストールする</b></summary>
+<details>
+<summary><b>既存のプロジェクトに依存関係をインストールする</b></summary>
 
-既存のプロジェクトの場合は、次のコマンドを実行してパッケージをインストールします。
+既存のプロジェクトに対して、以下のコマンドを実行してパッケージをインストールしてください：
 
--   `typeorm` : Node.js の ORM フレームワーク。
--   `mysql2` : Node.js 用の MySQL ドライバー。 `mysql`ドライバーも使えます。
--   `dotenv` : `.env`ファイルから環境変数をロードします。
--   `typescript` : TypeScript コードを JavaScript にコンパイルします。
--   `ts-node` : TypeScript コードをコンパイルせずに直接実行します。
--   `@types/node` : Node.js の TypeScript 型定義を提供します。
+- `typeorm`：Node.js用のORMフレームワークです。
+- `mysql2`：Node.js用のMySQLドライバーです。`mysql`ドライバーも使用できます。
+- `dotenv`：`.env`ファイルから環境変数を読み込みます。
+- `typescript`：TypeScriptコードをJavaScriptにコンパイルします。
+- `ts-node`：コンパイルせずに直接TypeScriptコードを実行します。
+- `@types/node`：Node.jsのTypeScript型定義を提供します。
 
 ```shell
 npm install typeorm mysql2 dotenv --save
 npm install @types/node ts-node typescript --save-dev
 ```
 
-</details>
+### ステップ3：接続情報を設定する {#step-3-configure-connection-information}
 
-### ステップ 3: 接続情報を構成する {#step-3-configure-connection-information}
-
-選択した TiDB デプロイメント オプションに応じて、TiDB クラスターに接続します。
+TiDBクラスタに接続するには、選択したTiDBデプロイメントオプションに応じて設定を行います。
 
 <SimpleTab>
 <div label="TiDB Serverless">
 
-1.  [**クラスター**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲット クラスターの名前をクリックして、その概要ページに移動します。
+1. [**クラスタ**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲットクラスタの名前をクリックして、概要ページに移動します。
 
-2.  右上隅にある**「接続」**をクリックします。接続ダイアログが表示されます。
+2. 右上の**接続**をクリックします。接続ダイアログが表示されます。
 
-3.  接続ダイアログの設定が動作環境と一致していることを確認してください。
+3. 接続ダイアログの設定が、実行環境に合致することを確認します。
 
-    -   **エンドポイント タイプは**`Public`に設定されます。
-    -   **[接続先] は**`General`に設定されます。
-    -   **[オペレーティング システム] は、**アプリケーションを実行するオペレーティング システムと一致します。
+   - **エンドポイントタイプ**が`Public`に設定されていること。
+   - **Branch**が`main`に設定されていること。
+   - **Connect With**が`General`に設定されていること。
+   - **Operating System**が、アプリケーションを実行するオペレーティングシステムと一致すること。
 
-4.  パスワードをまだ設定していない場合は、 **「パスワードの作成」**をクリックしてランダムなパスワードを生成します。
+4. パスワードを設定していない場合は、ランダムなパスワードを生成するために**Generate Password**をクリックします。
 
-5.  次のコマンドを実行して`.env.example`をコピーし、名前を`.env`に変更します。
+5. 次のコマンドを実行して、`.env.example`をコピーして`.env`にリネームします。
 
-    ```shell
-    cp .env.example .env
-    ```
+   ```shell
+   cp .env.example .env
+   ```
 
-6.  `.env`ファイルを編集し、次のように環境変数を設定し、接続ダイアログ上の対応するプレースホルダー`{}`接続パラメーターに置き換えます。
+6. `.env`ファイルを編集し、次のように環境変数を設定します。対応するプレースホルダ`{}`を接続ダイアログの接続パラメータで置き換えます。
 
-    ```dotenv
-    TIDB_HOST={host}
-    TIDB_PORT=4000
-    TIDB_USER={user}
-    TIDB_PASSWORD={password}
-    TIDB_DATABASE=test
-    TIDB_ENABLE_SSL=true
-    ```
+   ```dotenv
+   TIDB_HOST={host}
+   TIDB_PORT=4000
+   TIDB_USER={user}
+   TIDB_PASSWORD={password}
+   TIDB_DATABASE=test
+   TIDB_ENABLE_SSL=true
+   ```
 
-    > **注記**
-    >
-    > TiDB サーバーレスの場合、パブリック エンドポイントを使用する場合は`TIDB_ENABLE_SSL`経由の TLS 接続を有効にする**必要があります**。
+   > **注意**
+   >
+   > TiDB Serverlessでは、パブリックエンドポイントを使用する場合、`TIDB_ENABLE_SSL`を有効にする必要があります。
 
-7.  `.env`ファイルを保存します。
+7. `.env`ファイルを保存します。
 
 </div>
 <div label="TiDB Dedicated">
 
-1.  [**クラスター**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲット クラスターの名前をクリックして、その概要ページに移動します。
+1. [**クラスタ**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲットクラスタの名前をクリックして、概要ページに移動します。
 
-2.  右上隅にある**「接続」**をクリックします。接続ダイアログが表示されます。
+2. 右上の**接続**をクリックします。接続ダイアログが表示されます。
 
-3.  **「どこからでもアクセスを許可」**をクリックし、 **「TiDB クラスター CA のダウンロード」**をクリックして CA 証明書をダウンロードします。
+3. **Allow Access from Anywhere**をクリックし、**Download TiDB cluster CA**をクリックしてCA証明書をダウンロードします。
 
-    接続文字列の取得方法の詳細については、 [TiDB専用標準接続](https://docs.pingcap.com/tidbcloud/connect-via-standard-connection)を参照してください。
+   接続文字列の取得方法の詳細については、[TiDB Dedicated標準接続](https://docs.pingcap.com/tidbcloud/connect-via-standard-connection)を参照してください。
 
-4.  次のコマンドを実行して`.env.example`をコピーし、名前を`.env`に変更します。
+4. 次のコマンドを実行して、`.env.example`をコピーして`.env`にリネームします。
 
-    ```shell
-    cp .env.example .env
-    ```
+   ```shell
+   cp .env.example .env
+   ```
 
-5.  `.env`ファイルを編集し、次のように環境変数を設定し、接続ダイアログ上の対応するプレースホルダー`{}`接続パラメーターに置き換えます。
+5. `.env`ファイルを編集し、次のように環境変数を設定します。対応するプレースホルダ`{}`を接続ダイアログの接続パラメータで置き換えます。
 
-    ```dotenv
-    TIDB_HOST={host}
-    TIDB_PORT=4000
-    TIDB_USER={user}
-    TIDB_PASSWORD={password}
-    TIDB_DATABASE=test
-    TIDB_ENABLE_SSL=true
-    TIDB_CA_PATH={downloaded_ssl_ca_path}
-    ```
+   ```dotenv
+   TIDB_HOST={host}
+   TIDB_PORT=4000
+   TIDB_USER={user}
+   TIDB_PASSWORD={password}
+   TIDB_DATABASE=test
+   TIDB_ENABLE_SSL=true
+   TIDB_CA_PATH={downloaded_ssl_ca_path}
+   ```
 
-    > **注記**
-    >
-    > TiDB D dedicated の場合、パブリック エンドポイントを使用する場合は`TIDB_ENABLE_SSL`経由の TLS 接続を有効にすることが**推奨され**ます。 `TIDB_ENABLE_SSL=true`を設定する場合は、 `TIDB_CA_PATH=/path/to/ca.pem`を介して接続ダイアログからダウンロードした CA 証明書のパスを指定する**必要があります**。
+   > **注意**
+   >
+   > TiDB Dedicatedでは、パブリックエンドポイントを使用する場合、`TIDB_ENABLE_SSL`を有効にすることをお勧めします。`TIDB_ENABLE_SSL=true`を設定する場合、接続ダイアログからダウンロードしたCA証明書のパスを`TIDB_CA_PATH=/path/to/ca.pem`で指定する必要があります。
 
-6.  `.env`ファイルを保存します。
+6. `.env`ファイルを保存します。
 
 </div>
 <div label="TiDB Self-Hosted">
 
-1.  次のコマンドを実行して`.env.example`をコピーし、名前を`.env`に変更します。
+1. 次のコマンドを実行して、`.env.example`をコピーして`.env`にリネームします。
 
-    ```shell
-    cp .env.example .env
-    ```
+   ```shell
+   cp .env.example .env
+   ```
 
-2.  `.env`ファイルを編集し、次のように環境変数を設定し、対応するプレースホルダー`{}` TiDB クラスターの接続パラメーターに置き換えます。
+2. `.env`ファイルを編集し、次のように環境変数を設定します。TiDBクラスタの接続パラメータで対応するプレースホルダ`{}`を置き換えます。
 
-    ```dotenv
-    TIDB_HOST={host}
-    TIDB_PORT=4000
-    TIDB_USER=root
-    TIDB_PASSWORD={password}
-    TIDB_DATABASE=test
-    ```
+   ```dotenv
+   TIDB_HOST={host}
+   TIDB_PORT=4000
+   TIDB_USER=root
+   TIDB_PASSWORD={password}
+   TIDB_DATABASE=test
+   ```
 
-    TiDB をローカルで実行している場合、デフォルトのホスト アドレスは`127.0.0.1`で、パスワードは空です。
+   TiDBをローカルで実行している場合、デフォルトのホストアドレスは`127.0.0.1`で、パスワードは空です。
 
-3.  `.env`ファイルを保存します。
+3. `.env`ファイルを保存します。
 
 </div>
 </SimpleTab>
 
-### ステップ 4: データベース スキーマを初期化する {#step-4-initialize-the-database-schema}
+### ステップ4：データベーススキーマを初期化する {#step-4-initialize-the-database-schema}
 
-次のコマンドを実行して TypeORM CLI を呼び出し、 `src/migrations`フォルダー内の移行ファイルに書き込まれた SQL ステートメントでデータベースを初期化します。
+次のコマンドを実行して、TypeORM CLIを呼び出し、`src/migrations`フォルダに記述されたマイグレーションファイルのSQLステートメントを使用してデータベースを初期化します。
 
 ```shell
 npm run migration:run
 ```
 
-<details><summary><b>予想される実行出力</b></summary>
+<details>
+<summary><b>実行結果の予想</b></summary>
 
-次の SQL ステートメントは`players`テーブルと`profiles`テーブルを作成し、2 つのテーブルは外部キーを介して関連付けられます。
+以下のSQLステートメントは、`players`テーブルと`profiles`テーブルを作成し、2つのテーブルを外部キーで関連付けます。
 
 ```sql
 query: SELECT VERSION() AS `version`
@@ -213,35 +214,35 @@ query: COMMIT
 
 </details>
 
-移行ファイルは、 `src/entities`フォルダーで定義されたエンティティから生成されます。 TypeORM でエンティティを定義する方法については、 [TypeORM: エンティティ](https://typeorm.io/entities)を参照してください。
+`src/entities`フォルダで定義されたエンティティからマイグレーションファイルが生成されます。TypeORMでエンティティを定義する方法については、[TypeORM: Entities](https://typeorm.io/entities)を参照してください。
 
-### ステップ 5: コードを実行して結果を確認する {#step-5-run-the-code-and-check-the-result}
+### ステップ5：コードを実行して結果を確認する {#step-5-run-the-code-and-check-the-result}
 
-次のコマンドを実行してサンプル コードを実行します。
+次のコマンドを実行して、サンプルコードを実行します：
 
 ```shell
 npm start
 ```
 
-**予想される実行出力:**
+**実行結果の期待値：**
 
-接続が成功すると、ターミナルは次のように TiDB クラスターのバージョンを出力します。
+接続に成功した場合、ターミナルには以下のようにTiDBクラスタのバージョンが出力されます：
 
-    🔌 Connected to TiDB cluster! (TiDB version: 5.7.25-TiDB-v7.1.0)
+    🔌 Connected to TiDB cluster! (TiDB version: 5.7.25-TiDB-v7.1.3)
     🆕 Created a new player with ID 2.
     ℹ️ Got Player 2: Player { id: 2, coins: 100, goods: 100 }
     🔢 Added 50 coins and 50 goods to player 2, now player 2 has 100 coins and 150 goods.
     🚮 Deleted 1 player data.
 
-## サンプルコードスニペット {#sample-code-snippets}
+## サンプルコードの断片 {#sample-code-snippets}
 
-次のサンプル コード スニペットを参照して、独自のアプリケーション開発を完了できます。
+あなたは、以下のサンプルコードの断片を参考にして、独自のアプリケーション開発を完了させることができます。
 
-完全なサンプル コードとその実行方法については、 [tidb-samples/tidb-nodejs-typeorm-quickstart](https://github.com/tidb-samples/tidb-nodejs-typeorm-quickstart)リポジトリを確認してください。
+完全なサンプルコードとその実行方法については、[tidb-samples/tidb-nodejs-typeorm-quickstart](https://github.com/tidb-samples/tidb-nodejs-typeorm-quickstart) リポジトリをチェックしてください。
 
 ### 接続オプションを使用して接続する {#connect-with-connection-options}
 
-次のコードは、環境変数で定義されたオプションを使用して TiDB への接続を確立します。
+以下のコードは、環境変数で定義されたオプションを使用して、TiDBに接続を確立します：
 
 ```typescript
 // src/dataSource.ts
@@ -267,26 +268,26 @@ export const AppDataSource = new DataSource({
 });
 ```
 
-> **注記**
+> **注意**
 >
-> TiDB サーバーレスの場合、パブリック エンドポイントを使用する場合は TLS 接続を有効にする必要があります。このサンプルコードでは、 `.env`ファイルの環境変数`TIDB_ENABLE_SSL` `true`に設定してください。
+> TiDB Serverlessを使用する場合、パブリックエンドポイントを使用する際にはTLS接続を有効にする必要があります。このサンプルコードでは、`.env`ファイルで環境変数`TIDB_ENABLE_SSL`を`true`に設定してください。
 >
-> ただし、Node.js はデフォルトで組み込みの[Mozilla CA 証明書](https://wiki.mozilla.org/CA/Included_Certificates)を使用し、TiDB Serverless によって信頼されるため、 `TIDB_CA_PATH`経由で SSL CA 証明書を指定する必要は**ありません**。
+> ただし、`TIDB_CA_PATH`を使用してSSL CA証明書を指定する必要はありません。なぜなら、Node.jsはデフォルトで組み込みの[Mozilla CA証明書](https://wiki.mozilla.org/CA/Included_Certificates)を使用し、TiDB Serverlessによって信頼されるからです。
 
 ### データの挿入 {#insert-data}
 
-次のクエリは、単一の`Player`レコードを作成し、TiDB によって生成された`id`フィールドを含む、作成された`Player`オブジェクトを返します。
+以下のクエリは単一の`Player`レコードを作成し、TiDBによって生成された`id`フィールドを含む`Player`オブジェクトを返します。
 
 ```typescript
 const player = new Player('Alice', 100, 100);
 await this.dataSource.manager.save(player);
 ```
 
-詳細については、 [データの挿入](/develop/dev-guide-insert-data.md)を参照してください。
+詳細については、[データの挿入](/develop/dev-guide-insert-data.md)を参照してください。
 
-### クエリデータ {#query-data}
+### データのクエリ {#query-data}
 
-次のクエリは、ID 101 の単一の`Player`オブジェクトを返します。レコードが見つからない場合は`null`返します。
+次のクエリは、IDが101の単一の`Player`オブジェクトを返し、レコードが見つからない場合は`null`を返します。
 
 ```typescript
 const player: Player | null = await this.dataSource.manager.findOneBy(Player, {
@@ -294,11 +295,11 @@ const player: Player | null = await this.dataSource.manager.findOneBy(Player, {
 });
 ```
 
-詳細については、 [クエリデータ](/develop/dev-guide-get-data-from-single-table.md)を参照してください。
+詳細については、[データのクエリ](/develop/dev-guide-get-data-from-single-table.md)を参照してください。
 
-### データを更新する {#update-data}
+### データの更新 {#update-data}
 
-次のクエリは、ID `101`の商品`Player`に商品`50`を追加します。
+次のクエリは、ID `101`の`Player`に`50`の商品を追加します。
 
 ```typescript
 const player = await this.dataSource.manager.findOneBy(Player, {
@@ -308,11 +309,11 @@ player.goods += 50;
 await this.dataSource.manager.save(player);
 ```
 
-詳細については、 [データを更新する](/develop/dev-guide-update-data.md)を参照してください。
+詳細については、[データの更新](/develop/dev-guide-update-data.md)を参照してください。
 
 ### データの削除 {#delete-data}
 
-次のクエリは、ID `101`の`Player`削除します。
+次のクエリは、IDが`101`の`Player`を削除します：
 
 ```typescript
 await this.dataSource.manager.delete(Player, {
@@ -320,26 +321,26 @@ await this.dataSource.manager.delete(Player, {
 });
 ```
 
-詳細については、 [データの削除](/develop/dev-guide-delete-data.md)を参照してください。
+詳細については、[データの削除](/develop/dev-guide-delete-data.md)を参照してください。
 
 ### 生のSQLクエリを実行する {#execute-raw-sql-queries}
 
-次のクエリは、生の SQL ステートメント ( `SELECT VERSION() AS tidb_version;` ) を実行し、TiDB クラスターのバージョンを返します。
+次のクエリは生のSQLステートメント（`SELECT VERSION() AS tidb_version;`）を実行し、TiDBクラスタのバージョンを返します：
 
 ```typescript
 const rows = await dataSource.query('SELECT VERSION() AS tidb_version;');
 console.log(rows[0]['tidb_version']);
 ```
 
-詳細については、 [TypeORM: データソース API](https://typeorm.io/data-source-api)を参照してください。
+詳細については、[TypeORM：DataSource API](https://typeorm.io/data-source-api)を参照してください。
 
-## 便利なメモ {#useful-notes}
+## 便利なノート {#useful-notes}
 
 ### 外部キー制約 {#foreign-key-constraints}
 
-[外部キー制約](https://docs.pingcap.com/tidb/stable/foreign-key) (実験的) を使用すると、データベース側でチェックを追加することでデータの[参照整合性](https://en.wikipedia.org/wiki/Referential_integrity)が保証されます。ただし、これにより、データ量が大きいシナリオでは重大なパフォーマンスの問題が発生する可能性があります。
+[外部キー制約](https://docs.pingcap.com/tidb/stable/foreign-key)（実験的）を使用すると、データベース側でチェックを追加することでデータの[参照整合性](https://en.wikipedia.org/wiki/Referential_integrity)を保証できます。ただし、これは大量のデータがある場合に重大なパフォーマンスの問題を引き起こす可能性があります。
 
-`createForeignKeyConstraints`オプション (デフォルト値は`true` ) を使用して、エンティティ間の関係を構築するときに外部キー制約を作成するかどうかを制御できます。
+`createForeignKeyConstraints`オプション（デフォルト値は`true`）を使用することで、エンティティ間の関係を構築する際に外部キー制約を作成するかどうかを制御できます。
 
 ```typescript
 @Entity()
@@ -354,14 +355,14 @@ export class ActionLog {
 }
 ```
 
-詳細については、 [TypeORMFAQ](https://typeorm.io/relations-faq#avoid-foreign-key-constraint-creation)および[外部キー制約](https://docs.pingcap.com/tidbcloud/foreign-key#foreign-key-constraints)を参照してください。
+詳細については、[TypeORM FAQ](https://typeorm.io/relations-faq#avoid-foreign-key-constraint-creation)と[外部キー制約](https://docs.pingcap.com/tidbcloud/foreign-key#foreign-key-constraints)を参照してください。
 
 ## 次のステップ {#next-steps}
 
--   TypeORM の詳しい使い方は[TypeORM のドキュメント](https://typeorm.io/)からご覧ください。
--   [開発者ガイド](/develop/dev-guide-overview.md) [トランザクション](/develop/dev-guide-transaction-overview.md)章 ( [データの挿入](/develop/dev-guide-insert-data.md) [SQLパフォーマンスの最適化](/develop/dev-guide-optimize-sql-overview.md) ) で TiDB アプリケーション開発[データを更新する](/develop/dev-guide-update-data.md)ベスト プラクティス[クエリデータ](/develop/dev-guide-get-data-from-single-table.md)学習[データの削除](/develop/dev-guide-delete-data.md)ます。
--   プロフェッショナルとして[TiDB 開発者コース](https://www.pingcap.com/education/)を学び、試験合格後に[TiDB 認定](https://www.pingcap.com/education/certification/)獲得します。
+- [TypeORMのドキュメント](https://typeorm.io/)からTypeORMの使用方法を学びます。
+- [開発者ガイド](/develop/dev-guide-overview.md)の章を通じて、TiDBアプリケーション開発のベストプラクティスを学びます。例えば、[データの挿入](/develop/dev-guide-insert-data.md)、[データの更新](/develop/dev-guide-update-data.md)、[データの削除](/develop/dev-guide-delete-data.md)、[データのクエリ](/develop/dev-guide-get-data-from-single-table.md)、[トランザクション](/develop/dev-guide-transaction-overview.md)、[SQLパフォーマンスの最適化](/develop/dev-guide-optimize-sql-overview.md)などです。
+- 専門の[TiDB開発者コース](https://www.pingcap.com/education/)を通じて学び、試験に合格した後に[TiDB認定](https://www.pingcap.com/education/certification/)を取得します。
 
-## 助けが必要？ {#need-help}
+## ヘルプが必要ですか？ {#need-help}
 
-[不和](https://discord.gg/vYU9h56kAX)または[サポートチケットを作成する](https://support.pingcap.com/)について質問してください。
+[Discord](https://discord.gg/vYU9h56kAX)で質問するか、[サポートチケットを作成](https://support.pingcap.com/)してください。

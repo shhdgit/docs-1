@@ -3,57 +3,57 @@ title: Import Data into TiDB Cloud via MySQL CLI
 summary: Learn how to import Data into TiDB Cloud via MySQL CLI.
 ---
 
-# MySQL CLI 経由でTiDB Cloudにデータをインポート {#import-data-into-tidb-cloud-via-mysql-cli}
+# TiDB CloudをMySQL CLIを使ってデータをインポートする {#import-data-into-tidb-cloud-via-mysql-cli}
 
-このドキュメントでは、 [MySQL コマンドライン クライアント](https://dev.mysql.com/doc/refman/8.0/en/mysql.html)を介してTiDB Cloudにデータをインポートする方法について説明します。 SQL ファイルまたは CSV ファイルからデータをインポートできます。次のセクションでは、各種類のファイルからデータをインポートするための詳細な手順を説明します。
+このドキュメントでは、[MySQLコマンドラインクライアント](https://dev.mysql.com/doc/refman/8.0/en/mysql.html)を使用して、TiDB Cloudにデータをインポートする方法について説明します。SQLファイルまたはCSVファイルからデータをインポートすることができます。次のセクションでは、それぞれのファイルタイプからデータをインポートするためのステップバイステップの手順を提供します。
 
 ## 前提条件 {#prerequisites}
 
-MySQL CLI を介してデータをTiDB Cloudにインポートするには、次の前提条件が必要です。
+MySQL CLIを使用してTiDB Cloudにデータをインポートする前に、次の前提条件を満たす必要があります。
 
--   TiDB Cloudクラスターにアクセスできるようになりました。 TiDB クラスターがない場合は、 [TiDB サーバーレスクラスタを構築する](/develop/dev-guide-build-cluster-in-cloud.md)の手順に従って作成します。
--   MySQL CLI をローカル コンピューターにインストールします。
+- TiDB Cloudクラスタにアクセスできること。TiDBクラスタを持っていない場合は、[TiDB Serverlessクラスタを構築する](/develop/dev-guide-build-cluster-in-cloud.md)の手順に従って作成してください。
+- ローカルコンピュータにMySQL CLIをインストールしてください。
 
-## ステップ 1. TiDB Cloudクラスターに接続する {#step-1-connect-to-your-tidb-cloud-cluster}
+## ステップ1. TiDB Cloudクラスタに接続する {#step-1-connect-to-your-tidb-cloud-cluster}
 
-選択した TiDB デプロイメント オプションに応じて、TiDB クラスターに接続します。
+TiDBのデプロイオプションに応じて、TiDBクラスタに接続してください。
 
 <SimpleTab>
 <div label="TiDB Serverless">
 
-1.  [**クラスター**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲット クラスターの名前をクリックして、その概要ページに移動します。
+1. [**Clusters**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲットクラスタの名前をクリックして、概要ページに移動します。
 
-2.  右上隅にある**「接続」**をクリックします。接続ダイアログが表示されます。
+2. 右上隅の**Connect**をクリックします。接続ダイアログが表示されます。
 
-3.  接続ダイアログの設定が動作環境と一致していることを確認してください。
+3. 接続ダイアログの設定が操作環境と一致することを確認してください。
 
-    -   **エンドポイント タイプは**`Public`に設定されます。
-    -   **[接続先] は**`MySQL CLI`に設定されます。
-    -   **オペレーティング システムが**環境に一致します。
+   - **Endpoint Type**が`Public`に設定されていること。
+   - **Connect With**が`MySQL CLI`に設定されていること。
+   - **Operating System**が操作環境と一致すること。
 
-4.  **「パスワードの作成」**をクリックしてランダムなパスワードを作成します。
+4. **Generate Password**をクリックして、ランダムなパスワードを作成します。
 
-    > **ヒント：**
-    >
-    > 以前にパスワードを作成したことがある場合は、元のパスワードを使用するか、 **「パスワードのリセット」**をクリックして新しいパスワードを生成します。
+   > **ヒント:**
+   >
+   > 以前にパスワードを作成したことがある場合は、元のパスワードを使用するか、**Reset Password**をクリックして新しいパスワードを生成してください。
 
 </div>
 <div label="TiDB Dedicated">
 
-1.  [**クラスター**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲット クラスターの名前をクリックして、その概要ページに移動します。
+1. [**Clusters**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲットクラスタの名前をクリックして、概要ページに移動します。
 
-2.  右上隅にある**「接続」**をクリックします。接続ダイアログが表示されます。
+2. 右上隅の**Connect**をクリックします。接続ダイアログが表示されます。
 
-3.  **[どこからでもアクセスを許可する]**をクリックします。
+3. **Allow Access from Anywhere**をクリックします。
 
-    接続文字列を取得する方法の詳細については、 [標準接続経由で TiDB 専用に接続する](/tidb-cloud/connect-via-standard-connection.md)を参照してください。
+   接続文字列を取得する詳細については、[標準接続を介してTiDB Dedicatedに接続する](/tidb-cloud/connect-via-standard-connection.md)を参照してください。
 
 </div>
 </SimpleTab>
 
-## ステップ 2. テーブルを定義し、サンプル データを挿入する {#step-2-define-the-table-and-insert-sample-data}
+## ステップ2. テーブルを定義し、サンプルデータを挿入する {#step-2-define-the-table-and-insert-sample-data}
 
-データをインポートする前に、テーブル構造を準備し、そこに実際のサンプル データを挿入する必要があります。以下は、テーブルの作成とサンプル データの挿入に使用できる SQL ファイルの例 ( `product_data.sql` ) です。
+データをインポートする前に、テーブル構造を準備し、実際のサンプルデータを挿入する必要があります。次の例は、テーブルを作成し、サンプルデータを挿入するために使用できるSQLファイル（`product_data.sql`）です：
 
 ```sql
 -- Create a table in your TiDB database
@@ -70,59 +70,59 @@ INSERT INTO products (product_id, product_name, price) VALUES
     (3, 'Tablet', 299.99);
 ```
 
-## ステップ 3. SQL または CSV ファイルからデータをインポートする {#step-3-import-data-from-a-sql-or-csv-file}
+## ステップ3. SQLファイルまたはCSVファイルからデータをインポートする {#step-3-import-data-from-a-sql-or-csv-file}
 
-SQL ファイルまたは CSV ファイルからデータをインポートできます。次のセクションでは、各タイプからデータをインポートするための詳細な手順を説明します。
+SQLファイルまたはCSVファイルからデータをインポートすることができます。以下のセクションでは、それぞれのタイプからデータをインポートするためのステップバイステップの手順を提供します。
 
 <SimpleTab>
-<div label="From an SQL file">
+<div label="SQLファイルから">
 
-SQL ファイルからデータをインポートするには、次の手順を実行します。
+SQLファイルからデータをインポートするには、以下の手順を実行してください。
 
-1.  インポートするデータを含む実際の SQL ファイル (たとえば、 `product_data.sql` ) を指定します。この SQL ファイルには、実際のデータを含む`INSERT`ステートメントが含まれている必要があります。
+1. インポートしたいデータが含まれる実際のSQLファイル（例：`product_data.sql`）を用意します。このSQLファイルには、実際のデータを含む`INSERT`ステートメントが含まれている必要があります。
 
-2.  SQL ファイルからデータをインポートするには、次のコマンドを使用します。
+2. 以下のコマンドを使用して、SQLファイルからデータをインポートします。
 
-    ```bash
-    mysql --comments --connect-timeout 150 -u '<your_username>' -h <your_cluster_host> -P 4000 -D test --ssl-mode=VERIFY_IDENTITY --ssl-ca=<your_ca_path> -p <your_password> < product_data.sql
-    ```
+   ```bash
+   mysql --comments --connect-timeout 150 -u '<your_username>' -h <your_cluster_host> -P 4000 -D test --ssl-mode=VERIFY_IDENTITY --ssl-ca=<your_ca_path> -p <your_password> < product_data.sql
+   ```
 
-> **注記：**
+> **Note:**
 >
-> ここで使用されるデフォルトのデータベース名は`test`で、独自のデータベースを手動で作成することも、SQL ファイルで`CREATE DATABASE`コマンドを使用することもできます。
+> ここで使用されているデフォルトのデータベース名は`test`です。手動でデータベースを作成するか、SQLファイル内の`CREATE DATABASE`コマンドを使用することができます。
 
 </div>
-<div label="From a CSV file">
+<div label="CSVファイルから">
 
-CSV ファイルからデータをインポートするには、次の手順を実行します。
+CSVファイルからデータをインポートするには、以下の手順を実行してください。
 
-1.  データ インポートのニーズに合わせて TiDB にデータベースとスキーマを作成します。
+1. TiDBにデータをインポートするために、データベースとスキーマを作成します。
 
-2.  インポートするデータを含むサンプル CSV ファイル (たとえば、 `product_data.csv` ) を提供します。以下は CSV ファイルの例です。
+2. インポートしたいデータが含まれるサンプルのCSVファイル（例：`product_data.csv`）を用意します。以下はCSVファイルの例です。
 
-    **製品データ.csv:**
+   **product\_data.csv:**
 
-    ```csv
-    product_id,product_name,price
-    4,Laptop,999.99
-    5,Smartphone,499.99
-    6,Tablet,299.99
-    ```
+   ```csv
+   product_id,product_name,price
+   4,Laptop,999.99
+   5,Smartphone,499.99
+   6,Tablet,299.99
+   ```
 
-3.  CSV ファイルからデータをインポートするには、次のコマンドを使用します。
+3. 以下のコマンドを使用して、CSVファイルからデータをインポートします。
 
-    ```bash
-    mysql --comments --connect-timeout 150 -u '<your_username>' -h <your_host> -P 4000 -D test --ssl-mode=VERIFY_IDENTITY --ssl-ca=<your_ca_path> -p<your_password> -e "LOAD DATA LOCAL INFILE '<your_csv_path>' INTO TABLE products
-    FIELDS TERMINATED BY ','
-    LINES TERMINATED BY '\n'
-    IGNORE 1 LINES (product_id, product_name, price);"
-    ```
+   ```bash
+   mysql --comments --connect-timeout 150 -u '<your_username>' -h <your_host> -P 4000 -D test --ssl-mode=VERIFY_IDENTITY --ssl-ca=<your_ca_path> -p<your_password> -e "LOAD DATA LOCAL INFILE '<your_csv_path>' INTO TABLE products
+   FIELDS TERMINATED BY ','
+   LINES TERMINATED BY '\n'
+   IGNORE 1 LINES (product_id, product_name, price);"
+   ```
 
-4.  パス、テーブル名 (この例では`products` )、 `<your_username>` 、 `<your_host>` 、 `<your_password>` 、 `<your_csv_path>` 、 `<your_ca_path>` 、およびその他のプレースホルダーを実際の情報に置き換えてください。必要に応じて、サンプル CSV データを実際のデータセットに置き換えてください。
+4. パス、テーブル名（この例では`products`）、`<your_username>`、`<your_host>`、`<your_password>`、`<your_csv_path>`、`<your_ca_path>`、およびその他のプレースホルダーを実際の情報に置き換え、必要に応じてサンプルのCSVデータを実際のデータセットに置き換えてください。
 
-> **注記：**
+> **Note:**
 >
-> `LOAD DATA LOCAL INFILE`に関する構文の詳細については、 [`LOAD DATA`](/sql-statements/sql-statement-load-data.md)を参照してください。
+> `LOAD DATA LOCAL INFILE`の構文の詳細については、[`LOAD DATA`](/sql-statements/sql-statement-load-data.md)を参照してください。
 
 </div>
 </SimpleTab>

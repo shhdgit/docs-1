@@ -3,50 +3,57 @@ title: TiDB Binlog Tutorial
 summary: Learn to deploy TiDB Binlog with a simple TiDB cluster.
 ---
 
-# TiDBBinlogのチュートリアル {#tidb-binlog-tutorial}
+# TiDB Binlog チュートリアル {#tidb-binlog-tutorial}
 
-このチュートリアルは、MariaDB サーバー インスタンスにデータをプッシュするように設定された、各コンポーネント(Placement Driver、TiKV Server、TiDB Server、 Pump、およびDrainer ) の単一ノードを備えた単純な TiDB Binlogデプロイメントから始まります。
+このチュートリアルでは、各コンポーネント（配置ドライバー、TiKVサーバー、TiDBサーバー、ポンプ、およびドレーナー）の単一ノードを使用して、MariaDBサーバーインスタンスにデータをプッシュするように設定された、単純なTiDB Binlogデプロイメントから始めます。
 
-このチュートリアルは、 [TiDBアーキテクチャ](/tidb-architecture.md)にある程度の知識があり、すでに TiDB クラスターをセットアップしている可能性があり (必須ではありません)、TiDB Binlogの実践的な経験を積みたいと考えているユーザーを対象としています。このチュートリアルは、TiDB Binlogを「試して」、そのアーキテクチャの概念に慣れるための良い方法です。
+このチュートリアルは、[TiDBアーキテクチャ](/tidb-architecture.md)についてある程度の知識を持っているユーザー、すでにTiDBクラスターを設定したことがあるかもしれないユーザー（必須ではありません）、およびTiDB Binlogのハンズオン体験をしたいユーザーを対象としています。このチュートリアルは、TiDB Binlogの「試し蹴り」をするのに最適であり、そのアーキテクチャの概念に慣れるのに役立ちます。
 
 > **警告：**
 >
-> このチュートリアルの TiDB をデプロイする手順は、本番または開発設定で TiDB をデプロイするために使用し**ない**でください。
+> このチュートリアルでTiDBをデプロイするための手順は、本番環境や開発環境にTiDBをデプロイするために使用しては**いけません**。
 
-このチュートリアルは、x86-64 上の最新の Linux ディストリビューションを使用していることを前提としています。このチュートリアルでは例として、VMware で実行されている最小限の CentOS 7 インストールを使用します。既存の環境の癖の影響を受けないよう、クリーン インストールから始めることをお勧めします。ローカル仮想化を使用したくない場合は、クラウド サービスを使用して CentOS 7 VM を簡単に起動できます。
+このチュートリアルでは、x86-64のモダンなLinuxディストリビューションを使用していることを前提としています。このチュートリアルでは、例としてVMwareで実行されている最小限のCentOS 7インストールを使用しています。既存の環境のクセに影響を受けないように、クリーンインストールから始めることをお勧めします。ローカル仮想化を使用したくない場合は、クラウドサービスを使用して簡単にCentOS 7 VMを起動できます。
 
-## TiDBBinlogの概要 {#tidb-binlog-overview}
+## TiDB Binlogの概要 {#tidb-binlog-overview}
 
-TiDB Binlog は、 TiDB からバイナリ ログ データを収集し、リアルタイムのデータ バックアップとレプリケーションを提供するソリューションです。これは、増分データ更新を TiDB サーバー クラスターからダウンストリーム プラットフォームにプッシュします。
+TiDB Binlogは、TiDBからバイナリログデータを収集し、リアルタイムのデータバックアップとレプリケーションを提供するソリューションです。これは、TiDBサーバークラスターから増分データ更新を下流プラットフォームにプッシュします。
 
-TiDB Binlog を増分バックアップに使用したり、ある TiDB クラスターから別の TiDB クラスターにデータをレプリケートしたり、Kafka を介して選択したダウンストリーム プラットフォームに TiDB 更新を送信したりできます。
+TiDB Binlogを使用すると、増分バックアップを行ったり、1つのTiDBクラスターから別のTiDBクラスターにデータをレプリケートしたり、TiDBの更新をKafkaを介して下流プラットフォームに送信したりすることができます。
 
-TiDB Binlog は、MySQL または MariaDB から TiDB にデータを移行する場合に特に便利です。この場合、TiDB DM (データ移行) プラットフォームを使用して MySQL/MariaDB クラスターから TiDB にデータを取得し、TiDB Binlogを使用してTiDB クラスターと同期する別のダウンストリーム MySQL/MariaDB インスタンス/クラスター。 TiDB Binlog を使用すると、TiDB へのアプリケーション トラフィックをダウンストリームの MySQL または MariaDB インスタンス/クラスターにプッシュできるようになります。これにより、ダウンタイムやデータ損失なしにアプリケーションを MySQL または MariaDB に簡単に戻すことができるため、TiDB への移行のリスクが軽減されます。
+TiDB Binlogは、MySQLやMariaDBからTiDBにデータを移行する場合に特に有用です。この場合、TiDB DM（データ移行）プラットフォームを使用して、MySQL/MariaDBクラスターからデータをTiDBに取得し、その後、TiDB Binlogを使用して別の下流MySQL/MariaDBインスタンス/クラスターをTiDBクラスターと同期させることができます。TiDB Binlogにより、TiDBへのアプリケーショントラフィックを下流のMySQLやMariaDBインスタンス/クラスターにプッシュすることができるため、TiDBへの移行のリスクが低くなります。なぜなら、アプリケーションをダウンタイムやデータ損失なしにMySQLやMariaDBに簡単に戻すことができるからです。
 
-詳細については[TiDBBinlogクラスタユーザー ガイド](/tidb-binlog/tidb-binlog-overview.md)参照してください。
+詳細については、[TiDB Binlogクラスターユーザーガイド](/tidb-binlog/tidb-binlog-overview.md)を参照してください。
 
 ## アーキテクチャ {#architecture}
 
-TiDB Binlog は、**Pump**と**Drainerの**2 つのコンポーネントで構成されます。いくつかのPumpノードがポンプ クラスターを構成します。各Pumpノードは TiDB サーバー インスタンスに接続し、クラスター内の各 TiDB サーバー インスタンスに対して行われた更新を受け取ります。 Drainer は、 Pumpクラスターに接続し、受信した更新を特定のダウンストリーム宛先 (たとえば、Kafka、別の TiDBクラスタ、または MySQL/MariaDBサーバー)用の正しい形式に変換します。
+TiDB Binlogには、**ポンプ**と**ドレーナー**の2つのコンポーネントがあります。複数のポンプノードでポンプクラスターを構成します。各ポンプノードはTiDBサーバーインスタンスに接続し、クラスター内の各TiDBサーバーインスタンスで行われた更新を受信します。ドレーナーはポンプクラスターに接続し、受信した更新を特定の下流先（例えば、Kafka、別のTiDBクラスター、またはMySQL/MariaDBサーバー）の正しい形式に変換します。
 
-![TiDB-Binlog architecture](/media/tidb-binlog-cluster-architecture.png)
+![TiDB-Binlogアーキテクチャ](/media/tidb-binlog-cluster-architecture.png)
 
-Pumpのクラスター化アーキテクチャ、新しい TiDB サーバー インスタンスが TiDBクラスタに参加または TiDB クラスターから離脱したり、PumpノードがPumpクラスターに参加または離脱したりしても、更新が失われることはありません。
+ポンプのクラスター化されたアーキテクチャにより、新しいTiDBサーバーインスタンスがTiDBクラスターに参加したり離脱したりするときに更新が失われることはありません。また、ポンプノードがポンプクラスターに参加したり離脱したりするときにも同様です。
 
 ## インストール {#installation}
 
-RHEL/CentOS 7 にはデフォルトのパッケージ リポジトリに MariaDB サーバーが含まれているため、この例では MySQL Server の代わりに MariaDB Server を使用しています。後で使用するためにサーバーだけでなくクライアントも必要になります。今すぐインストールしてみましょう:
+この場合、MySQL Serverの代わりにMariaDB Serverを使用しています。なぜなら、RHEL/CentOS 7にはMariaDB Serverがデフォルトのパッケージリポジトリに含まれているためです。後で使用するために、クライアントとサーバーの両方が必要です。それでは、今すぐインストールしましょう：
 
 ```bash
 sudo yum install -y mariadb-server
 ```
 
 ```bash
-curl -L https://download.pingcap.org/tidb-community-server-v7.1.2-linux-amd64.tar.gz | tar xzf -
+curl -L https://download.pingcap.org/tidb-community-server-v7.1.3-linux-amd64.tar.gz | tar xzf -
 cd tidb-latest-linux-amd64
 ```
 
-期待される出力:
+ここには、翻訳してはいけないK-Vマップがあります。コンテンツ内のキーを翻訳せず、値で置き換える必要があります：
+{"Binlog":"Binlog","component":"コンポーネント","Driver":"Driver","Pump":"Pump","Drainer":"Drainer","Architecture":"アーキテクチャ","architecture":"アーキテクチャ","production":"本番","I":"I","Y":"Y","Cluster":"クラスタ","binlog":"binlog","server":"サーバー","Configuration":"コンフィグレーション","storage":"storage","drainer":"drainer"}
+
+// 入力コンテンツの開始
+
+期待される出力：
+
+// 入力コンテンツの終了
 
     [kolbe@localhost ~]$ curl -LO https://download.pingcap.org/tidb-latest-linux-amd64.tar.gz | tar xzf -
       % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
@@ -57,9 +64,9 @@ cd tidb-latest-linux-amd64
 
 ## コンフィグレーション {#configuration}
 
-次に、 `pd-server` 、 `tikv-server` 、および`tidb-server`のそれぞれに 1 つのインスタンスを持つ単純な TiDB クラスターを開始します。
+今から、単一のインスタンスを持つ `pd-server`、`tikv-server`、`tidb-server` のそれぞれについて、シンプルな TiDB クラスタを開始します。
 
-以下を使用して構成ファイルを設定します。
+次のコマンドを使用して、コンフィグファイルを作成します。
 
 ```bash
 printf > pd.toml %s\\n 'log-file="pd.log"' 'data-dir="pd.data"'
@@ -69,13 +76,20 @@ printf > tidb.toml %s\\n 'store="tikv"' 'path="127.0.0.1:2379"' '[log.file]' 'fi
 printf > drainer.toml %s\\n 'log-file="drainer.log"' '[syncer]' 'db-type="mysql"' '[syncer.to]' 'host="127.0.0.1"' 'user="root"' 'password=""' 'port=3306'
 ```
 
-構成の詳細を確認するには、次のコマンドを使用します。
+以下のコマンドを使用して、構成の詳細を確認してください:
 
 ```bash
 for f in *.toml; do echo "$f:"; cat "$f"; echo; done
 ```
 
-期待される出力:
+ここには、翻訳してはいけないK-Vマップがあります。コンテンツ内のキーを翻訳せず、値で置き換える必要があります：
+{"Binlog":"Binlog","component":"コンポーネント","Driver":"Driver","Pump":"Pump","Drainer":"Drainer","Architecture":"アーキテクチャ","architecture":"アーキテクチャ","production":"本番","I":"I","Y":"Y","Cluster":"クラスタ","binlog":"binlog","server":"サーバー","Configuration":"コンフィグレーション","storage":"storage","drainer":"drainer"}
+
+// 入力コンテンツの開始
+
+期待される出力：
+
+// 入力コンテンツの終了
 
     drainer.toml:
     log-file="drainer.log"
@@ -117,11 +131,11 @@ for f in *.toml; do echo "$f:"; cat "$f"; echo; done
     [raftdb]
     max-open-files=1024
 
-## ブートストラッピング {#bootstrapping}
+## ブートストラップ {#bootstrapping}
 
-これで、各コンポーネントを開始できるようになりました。これは特定の順序で実行するのが最適です。最初に配置Driver(PD)、次に TiKV サーバー、次にPump(TiDB はバイナリ ログを送信するためにPumpサービスに接続する必要があるため)、最後に TiDB サーバーです。
+各コンポーネントを起動することができます。特定の順序で行うのが最適です - まずPlacement Driver（PD）、次にTiKV Server、次にPump（TiDBはバイナリログを送信するためにPumpサービスに接続する必要があるため）、最後にTiDB Serverを起動します。
 
-以下を使用してすべてのサービスを開始します。
+次のコマンドを使用してすべてのサービスを起動します：
 
 ```bash
 ./bin/pd-server --config=pd.toml &>pd.out &
@@ -131,7 +145,14 @@ sleep 3
 ./bin/tidb-server --config=tidb.toml &>tidb.out &
 ```
 
-期待される出力:
+ここには、翻訳してはいけないK-Vマップがあります。コンテンツ内のキーを翻訳せず、値で置き換える必要があります：
+{"Binlog":"Binlog","component":"コンポーネント","Driver":"Driver","Pump":"Pump","Drainer":"Drainer","Architecture":"アーキテクチャ","architecture":"アーキテクチャ","production":"本番","I":"I","Y":"Y","Cluster":"クラスタ","binlog":"binlog","server":"サーバー","Configuration":"コンフィグレーション","storage":"storage","drainer":"drainer"}
+
+// 入力コンテンツの開始
+
+期待される出力：
+
+// 入力コンテンツの終了
 
     [kolbe@localhost tidb-latest-linux-amd64]$ ./bin/pd-server --config=pd.toml &>pd.out &
     [1] 20935
@@ -151,17 +172,24 @@ sleep 3
     [3]-  Running                 ./pump --config=pump.toml &>pump.out &
     [4]+  Running                 ./bin/tidb-server --config=tidb.toml &>tidb.out &
 
-いずれかのサービスの開始に失敗した場合 (たとえば、「 `Running` 」ではなく「 `Exit 1` 」が表示された場合)、その個別のサービスを再起動してみてください。
+もしサービスの1つが起動に失敗した場合（例えば、"`Exit 1`"ではなく"`Running`"が表示される場合）、個々のサービスを再起動してみてください。
 
-## 接続中 {#connecting}
+## 接続 {#connecting}
 
-これで TiDBクラスタの 4 つのコンポーネントがすべて実行され、MariaDB/MySQL コマンドライン クライアントを使用してポート 4000 で TiDB サーバーに接続できるようになりました。
+TiDBクラスターの4つのコンポーネントがすべて起動しているはずで、MariaDB/MySQLのコマンドラインクライアントを使用してポート4000でTiDBサーバーに接続できます。
 
 ```bash
 mysql -h 127.0.0.1 -P 4000 -u root -e 'select tidb_version()\G'
 ```
 
-期待される出力:
+ここには、翻訳してはいけないK-Vマップがあります。コンテンツ内のキーを翻訳せず、値で置き換える必要があります：
+{"Binlog":"Binlog","component":"コンポーネント","Driver":"Driver","Pump":"Pump","Drainer":"Drainer","Architecture":"アーキテクチャ","architecture":"アーキテクチャ","production":"本番","I":"I","Y":"Y","Cluster":"クラスタ","binlog":"binlog","server":"サーバー","Configuration":"コンフィグレーション","storage":"storage","drainer":"drainer"}
+
+// 入力コンテンツの開始
+
+期待される出力：
+
+// 入力コンテンツの終了
 
     [kolbe@localhost tidb-latest-linux-amd64]$ mysql -h 127.0.0.1 -P 4000 -u root -e 'select tidb_version()\G'
     *************************** 1. row ***************************
@@ -174,16 +202,16 @@ mysql -h 127.0.0.1 -P 4000 -u root -e 'select tidb_version()\G'
     TiKV Min Version: 2.1.0-alpha.1-ff3dd160846b7d1aed9079c389fc188f7f5ea13e
     Check Table Before Drop: false
 
-この時点で、TiDBクラスタが実行されており、クラスターから`pump`ログを読み取り、データ ディレクトリにリレー ログとして保存しています。次のステップは、 `drainer`可能な MariaDBサーバーを起動することです。
+この時点では、TiDBクラスターが実行されており、`pump`がクラスターからバイナリログを読み取り、そのデータディレクトリにリレーログとして保存しています。次のステップは、`drainer`が書き込めるようにMariaDBサーバーを起動することです。
 
-以下を使用して`drainer`を開始します。
+次のコマンドを使用して`drainer`を起動します：
 
 ```bash
 sudo systemctl start mariadb
 ./drainer --config=drainer.toml &>drainer.out &
 ```
 
-MySQLサーバーのインストールが容易なオペレーティング システムを使用している場合でも、それは問題ありません。ポート 3306 でリッスンしていること、および空のパスワードを使用してユーザー「root」として接続できること、または必要に応じてdrainer.toml を調整できることを確認してください。
+もしMySQLサーバーをインストールしやすくするためのオペレーティングシステムを使用している場合は、それでも大丈夫です。ただし、ポート3306でリスニングしていることを確認し、ユーザー「root」で空のパスワードで接続できるか、または必要に応じてdrainer.tomlを調整してください。
 
 ```bash
 mysql -h 127.0.0.1 -P 3306 -u root
@@ -193,7 +221,14 @@ mysql -h 127.0.0.1 -P 3306 -u root
 show databases;
 ```
 
-期待される出力:
+ここには、翻訳してはいけないK-Vマップがあります。コンテンツ内のキーを翻訳せず、値で置き換える必要があります：
+{"Binlog":"Binlog","component":"コンポーネント","Driver":"Driver","Pump":"Pump","Drainer":"Drainer","Architecture":"アーキテクチャ","architecture":"アーキテクチャ","production":"本番","I":"I","Y":"Y","Cluster":"クラスタ","binlog":"binlog","server":"サーバー","Configuration":"コンフィグレーション","storage":"storage","drainer":"drainer"}
+
+// 入力コンテンツの開始
+
+期待される出力：
+
+// 入力コンテンツの終了
 
     [kolbe@localhost ~]$ mysql -h 127.0.0.1 -P 3306 -u root
     Welcome to the MariaDB monitor.  Commands end with ; or \g.
@@ -216,7 +251,7 @@ show databases;
     +--------------------+
     5 rows in set (0.01 sec)
 
-ここではすでに`tidb_binlog`データベースが確認できます。このデータベースには、TiDB クラスターからのバイナリ ログが適用された時点までを記録するために`drainer`によって使用される`checkpoint`テーブルが含まれています。
+ここでは、`tidb_binlog`データベースが既に見えます。このデータベースには、`drainer`が使用する`checkpoint`テーブルが含まれており、TiDBクラスタからどのバイナリログが適用されたかを記録しています。
 
 ```sql
 MariaDB [tidb_binlog]> use tidb_binlog;
@@ -230,7 +265,7 @@ MariaDB [tidb_binlog]> select * from checkpoint;
 1 row in set (0.00 sec)
 ```
 
-ここで、TiDBサーバーへの別のクライアント接続を開いて、テーブルを作成してそこにいくつかの行を挿入しましょう。 (複数のクライアントを同時に開いたままにできるように、GNU 画面でこれを実行することをお勧めします。)
+さて、TiDBサーバーにもう一つのクライアント接続を開き、テーブルを作成し、いくつかの行を挿入しましょう。 (同時に複数のクライアントを開いておくために、GNU screenの下でこれを行うことをお勧めします。)
 
 ```bash
 mysql -h 127.0.0.1 -P 4000 --prompt='TiDB [\d]> ' -u root
@@ -244,7 +279,14 @@ insert into t1 () values (),(),(),(),();
 select * from t1;
 ```
 
-期待される出力:
+ここには、翻訳してはいけないK-Vマップがあります。コンテンツ内のキーを翻訳せず、値で置き換える必要があります：
+{"Binlog":"Binlog","component":"コンポーネント","Driver":"Driver","Pump":"Pump","Drainer":"Drainer","Architecture":"アーキテクチャ","architecture":"アーキテクチャ","production":"本番","I":"I","Y":"Y","Cluster":"クラスタ","binlog":"binlog","server":"サーバー","Configuration":"コンフィグレーション","storage":"storage","drainer":"drainer"}
+
+// 入力コンテンツの開始
+
+期待される出力：
+
+// 入力コンテンツの終了
 
     TiDB [(none)]> create database tidbtest;
     Query OK, 0 rows affected (0.12 sec)
@@ -270,7 +312,7 @@ select * from t1;
     +----+
     5 rows in set (0.00 sec)
 
-MariaDB クライアントに戻ると、新しいデータベース、新しいテーブル、および新しく挿入された行が見つかるはずです。
+MariaDBクライアントに切り替えると、新しいデータベース、新しいテーブル、および新しく挿入された行が見つかるはずです。
 
 ```sql
 use tidbtest;
@@ -278,7 +320,14 @@ show tables;
 select * from t1;
 ```
 
-期待される出力:
+ここには、翻訳してはいけないK-Vマップがあります。コンテンツ内のキーを翻訳せず、値で置き換える必要があります：
+{"Binlog":"Binlog","component":"コンポーネント","Driver":"Driver","Pump":"Pump","Drainer":"Drainer","Architecture":"アーキテクチャ","architecture":"アーキテクチャ","production":"本番","I":"I","Y":"Y","Cluster":"クラスタ","binlog":"binlog","server":"サーバー","Configuration":"コンフィグレーション","storage":"storage","drainer":"drainer"}
+
+// 入力コンテンツの開始
+
+期待される出力：
+
+// 入力コンテンツの終了
 
     MariaDB [(none)]> use tidbtest;
     Reading table information for completion of table and column names
@@ -305,20 +354,27 @@ select * from t1;
     +----+
     5 rows in set (0.00 sec)
 
-MariaDBサーバーにクエリを実行するときに、TiDB に挿入したのと同じ行が表示されるはずです。おめでとう！ TiDB Binlog のセットアップが完了しました。
+MariaDBサーバーをクエリすると、TiDBに挿入した同じ行が表示されるはずです。おめでとうございます！TiDB Binlogを設定しました！
 
 ## binlogctl {#binlogctl}
 
-クラスターに参加したポンプとドレーナーの情報は PD に保存されます。 binlogctl ツールのクエリを使用して、それらの状態に関する情報を操作できます。詳細については[binlogctl ガイド](/tidb-binlog/binlog-control.md)参照してください。
+クラスタに参加したPumpとDrainerの情報は、PDに保存されます。binlogctlツールを使用して、それらの状態に関する情報をクエリや操作することができます。詳細は[binlogctlガイド](/tidb-binlog/binlog-control.md)を参照してください。
 
-クラスター内のポンプとドレイナーの現在のステータスを表示するには、 `binlogctl`を使用します。
+`binlogctl`を使用して、クラスタ内のPumpとDrainerの現在の状態を確認します：
 
 ```bash
 ./binlogctl -cmd drainers
 ./binlogctl -cmd pumps
 ```
 
-期待される出力:
+ここには、翻訳してはいけないK-Vマップがあります。コンテンツ内のキーを翻訳せず、値で置き換える必要があります：
+{"Binlog":"Binlog","component":"コンポーネント","Driver":"Driver","Pump":"Pump","Drainer":"Drainer","Architecture":"アーキテクチャ","architecture":"アーキテクチャ","production":"本番","I":"I","Y":"Y","Cluster":"クラスタ","binlog":"binlog","server":"サーバー","Configuration":"コンフィグレーション","storage":"storage","drainer":"drainer"}
+
+// 入力コンテンツの開始
+
+期待される出力：
+
+// 入力コンテンツの終了
 
     [kolbe@localhost tidb-latest-linux-amd64]$ ./binlogctl -cmd drainers
     [2019/04/11 17:44:10.861 -04:00] [INFO] [nodes.go:47] ["query node"] [type=drainer] [node="{NodeID: localhost.localdomain:8249, Addr: 192.168.236.128:8249, State: online, MaxCommitTS: 407638907719778305, UpdateTime: 2019-04-11 17:44:10 -0400 EDT}"]
@@ -326,45 +382,59 @@ MariaDBサーバーにクエリを実行するときに、TiDB に挿入した�
     [kolbe@localhost tidb-latest-linux-amd64]$ ./binlogctl -cmd pumps
     [2019/04/11 17:44:13.904 -04:00] [INFO] [nodes.go:47] ["query node"] [type=pump] [node="{NodeID: localhost.localdomain:8250, Addr: 192.168.236.128:8250, State: online, MaxCommitTS: 407638914024079361, UpdateTime: 2019-04-11 17:44:13 -0400 EDT}"]
 
-Drainer を強制終了すると、クラスターはその Drainer を「一時停止」状態にします。これは、クラスターが Drainer の再参加を期待していることを意味します。
+Drainerを殺すと、クラスターはそれを「一時停止」状態にします。これは、クラスターがそれが再参加することを期待していることを意味します。
 
 ```bash
 pkill drainer
 ./binlogctl -cmd drainers
 ```
 
-期待される出力:
+ここには、翻訳してはいけないK-Vマップがあります。コンテンツ内のキーを翻訳せず、値で置き換える必要があります：
+{"Binlog":"Binlog","component":"コンポーネント","Driver":"Driver","Pump":"Pump","Drainer":"Drainer","Architecture":"アーキテクチャ","architecture":"アーキテクチャ","production":"本番","I":"I","Y":"Y","Cluster":"クラスタ","binlog":"binlog","server":"サーバー","Configuration":"コンフィグレーション","storage":"storage","drainer":"drainer"}
+
+// 入力コンテンツの開始
+
+期待される出力：
+
+// 入力コンテンツの終了
 
     [kolbe@localhost tidb-latest-linux-amd64]$ pkill drainer
     [kolbe@localhost tidb-latest-linux-amd64]$ ./binlogctl -cmd drainers
     [2019/04/11 17:44:22.640 -04:00] [INFO] [nodes.go:47] ["query node"] [type=drainer] [node="{NodeID: localhost.localdomain:8249, Addr: 192.168.236.128:8249, State: paused, MaxCommitTS: 407638915597467649, UpdateTime: 2019-04-11 17:44:18 -0400 EDT}"]
 
-「NodeID」に`binlogctl`を指定すると、個々のノードを制御できます。この場合、drainerの NodeID は「localhost.localdomain:8249」、Pumpの NodeID は「localhost.localdomain:8250」です。
+`binlogctl`を使用して、個々のノードを制御することができます。この場合、DrainerのNodeIDは「localhost.localdomain:8249」であり、PumpのNodeIDは「localhost.localdomain:8250」です。
 
-このチュートリアルでの`binlogctl`の主な使用は、クラスターの再起動の場合に行われる可能性があります。 TiDB クラスター内のすべてのプロセスを終了し、(ダウンストリームの MySQL/MariaDBサーバーまたはDrainerを除く) 再起動しようとすると、 PumpはDrainerに接続できず、 Drainerがまだ「オンライン」であると信じているため、起動を拒否します。
+このチュートリアルでの`binlogctl`の主な使用方法は、クラスターの再起動時に行われる可能性が高いです。TiDBクラスターのすべてのプロセスを終了し、再起動しようとすると（下流のMySQL/MariaDBサーバーまたはDrainerを除く）、PumpはDrainerに連絡できないため起動を拒否し、Drainerがまだ「オンライン」であると考えます。
 
-この問題には 3 つの解決策があります。
+この問題には3つの解決策があります：
 
--   プロセスを強制終了する代わりに`binlogctl`を使用してDrainerを停止します。
+- プロセスを殺す代わりに、`binlogctl`を使用してDrainerを停止する：
 
-        ./binlogctl --pd-urls=http://127.0.0.1:2379 --cmd=drainers
-        ./binlogctl --pd-urls=http://127.0.0.1:2379 --cmd=offline-drainer --node-id=localhost.localdomain:8249
+      ./binlogctl --pd-urls=http://127.0.0.1:2379 --cmd=drainers
+      ./binlogctl --pd-urls=http://127.0.0.1:2379 --cmd=offline-drainer --node-id=localhost.localdomain:8249
 
--   Pumpを始動する*前に*Drainerを始動してください。
+- Pumpを起動する*前に*Drainerを起動する。
 
--   PD の開始後 (ただし、 DrainerとPumpの開始前) に`binlogctl`を使用して、一時停止したDrainerの状態を更新します。
+- PDを起動した後（DrainerとPumpを起動する前）に、一時停止されたDrainerの状態を更新するために`binlogctl`を使用する：
 
-        ./binlogctl --pd-urls=http://127.0.0.1:2379 --cmd=update-drainer --node-id=localhost.localdomain:8249 --state=offline
+      ./binlogctl --pd-urls=http://127.0.0.1:2379 --cmd=update-drainer --node-id=localhost.localdomain:8249 --state=offline
 
-## 掃除 {#cleanup}
+## クリーンアップ {#cleanup}
 
-TiDB クラスターおよび TiDB Binlogプロセスを停止するには、クラスターを形成するすべてのプロセス (pd-server、tikv-server、pump、tidb-server、 drainer) を開始したシェルで`pkill -P $$`を実行します。各コンポーネントを正常にシャットダウンするのに十分な時間を与えるには、特定の順序でコンポーネントを停止すると便利です。
+TiDBクラスターとTiDB Binlogプロセスを停止するには、クラスターを構成するすべてのプロセス（pd-server、tikv-server、pump、tidb-server、drainer）を起動したシェルで`pkill -P $$`を実行することができます。各コンポーネントがきれいにシャットダウンするために十分な時間を与えるために、特定の順序で停止することが役立ちます：
 
 ```bash
 for p in tidb-server drainer pump tikv-server pd-server; do pkill "$p"; sleep 1; done
 ```
 
-期待される出力:
+ここには、翻訳してはいけないK-Vマップがあります。コンテンツ内のキーを翻訳せず、値で置き換える必要があります：
+{"Binlog":"Binlog","component":"コンポーネント","Driver":"Driver","Pump":"Pump","Drainer":"Drainer","Architecture":"アーキテクチャ","architecture":"アーキテクチャ","production":"本番","I":"I","Y":"Y","Cluster":"クラスタ","binlog":"binlog","server":"サーバー","Configuration":"コンフィグレーション","storage":"storage","drainer":"drainer"}
+
+// 入力コンテンツの開始
+
+期待される出力：
+
+// 入力コンテンツの終了
 
     kolbe@localhost tidb-latest-linux-amd64]$ for p in tidb-server drainer pump tikv-server pd-server; do pkill "$p"; sleep 1; done
     [4]-  Done                    ./bin/tidb-server --config=tidb.toml &>tidb.out
@@ -373,7 +443,7 @@ for p in tidb-server drainer pump tikv-server pd-server; do pkill "$p"; sleep 1;
     [2]+  Done                    ./bin/tikv-server --config=tikv.toml &>tikv.out
     [1]+  Done                    ./bin/pd-server --config=pd.toml &>pd.out
 
-すべてのサービスが終了した後にクラスターを再起動する場合は、最初にサービスを開始するために実行したのと同じコマンドを使用します。上記の[`binlogctl`](#binlogctl)セクションで説明したように、 `pump`の前に`drainer`開始し、 `tidb-server`の前に`pump`を開始する必要があります。
+すべてのサービスが終了した後にクラスターを再起動する場合は、最初に実行したコマンドと同じものを使用してサービスを起動してください。[`binlogctl`](#binlogctl)セクションで説明したように、`drainer`を`pump`の前に、`pump`を`tidb-server`の前に起動する必要があります。
 
 ```bash
 ./bin/pd-server --config=pd.toml &>pd.out &
@@ -385,10 +455,10 @@ sleep 3
 ./bin/tidb-server --config=tidb.toml &>tidb.out &
 ```
 
-いずれかのコンポーネントの起動に失敗した場合は、失敗した個々のコンポーネントを再起動してみてください。
+コンポーネントのいずれかが起動しない場合は、失敗した個々のコンポーネントを再起動してみてください。
 
 ## 結論 {#conclusion}
 
-このチュートリアルでは、単一のPumpと単一のDrainerを持つクラスターを使用して、TiDB クラスターからダウンストリームの MariaDBサーバーにレプリケートするように TiDB Binlogをセットアップしました。これまで見てきたように、TiDB Binlog は、TiDB クラスターへの変更をキャプチャして処理するための包括的なプラットフォームです。
+このチュートリアルでは、単一のPumpと単一のDrainerを持つクラスタを使用して、TiDBクラスタから下流のMariaDBサーバーにレプリケーションするために、TiDB Binlogをセットアップしました。TiDB Binlogは、TiDBクラスタの変更をキャプチャして処理するための包括的なプラットフォームであることがわかりました。
 
-より堅牢な開発、テスト、または本番環境では、高可用性とスケーリングを目的として複数の TiDB サーバーを使用し、複数のPumpインスタンスを使用して、TiDBサーバーインスタンスへのアプリケーション トラフィックがPumpの問題の影響を受けないようにします。集まる。追加のDrainerインスタンスを使用して、更新を別のダウンストリーム プラットフォームにプッシュしたり、増分バックアップを実装したりすることもできます。
+より堅牢な開発、テスト、または本番展開では、高可用性とスケーリングの目的で複数のTiDBサーバーを使用し、アプリケーションのトラフィックがPumpクラスターの問題に影響されないように、複数のPumpインスタンスを使用します。また、さまざまな下流プラットフォームに更新をプッシュするために、または増分バックアップを実装するために、追加のDrainerインスタンスを使用することもできます。

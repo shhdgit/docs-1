@@ -3,98 +3,98 @@ title: TiDB Backup and Restore Use Cases
 summary: Learn the use cases of backing up and restoring data using br command-line tool.
 ---
 
-# TiDB のバックアップと復元の使用例 {#tidb-backup-and-restore-use-cases}
+# TiDB バックアップとリストアのユースケース {#tidb-backup-and-restore-use-cases}
 
-[TiDB スナップショットのバックアップおよび復元ガイド](/br/br-snapshot-guide.md)および[TiDB ログのバックアップと PITR ガイド](/br/br-pitr-guide.md) 、TiDB が提供するバックアップおよび復元ソリューション、つまりスナップショット (フル) バックアップおよび復元、ログ バックアップ、およびポイントインタイム リカバリ (PITR) を紹介します。このドキュメントは、特定の使用例で TiDB のバックアップおよび復元ソリューションをすぐに使い始めるのに役立ちます。
+[TiDB スナップショットバックアップとリストアガイド](/br/br-snapshot-guide.md) および [TiDB ログバックアップとPITRガイド](/br/br-pitr-guide.md) は、TiDB が提供するバックアップとリストアソリューション、つまり、スナップショット（フル）バックアップとリストア、ログバックアップとポイントインタイムリカバリ（PITR）を紹介しています。このドキュメントは、TiDB のバックアップとリストアソリューションを特定のユースケースで素早く始めるのに役立ちます。
 
-TiDB本番クラスターを AWS にデプロイしており、ビジネス チームが次の要件を要求していると仮定します。
+AWS に TiDB 本番クラスタをデプロイしており、ビジネスチームから以下の要件が求められていると仮定します。
 
--   データの変更をタイムリーにバックアップします。データベースに障害が発生した場合、データ損失を最小限に抑えてアプリケーションを迅速に回復できます (データ損失は数分間のみ許容されます)。
--   毎月、特定の時期に業務監査を実行します。監査リクエストを受信した場合、リクエストに応じて過去 1 か月の特定の時点のデータをクエリするためのデータベースを提供する必要があります。
+- データの変更をタイムリーにバックアップします。データベースに災害が発生した場合、データ損失を最小限に抑えてアプリケーションを迅速にリカバリできるようにします（数分のデータ損失のみ許容されます）。
+- 特定の時間に毎月ビジネス監査を実行します。監査リクエストが受信された場合、過去の月の特定の時間点でデータをクエリするためのデータベースを提供する必要があります。
 
 PITR を使用すると、前述の要件を満たすことができます。
 
-## TiDB クラスターとBRをデプロイ {#deploy-the-tidb-cluster-and-br}
+## TiDB クラスタと BR をデプロイ {#deploy-the-tidb-cluster-and-br}
 
-PITR を使用するには、TiDB クラスター &gt;= v6.2.0 をデプロイし、 BR をTiDB クラスターと同じバージョンに更新する必要があります。このドキュメントでは例として v7.1.2 を使用します。
+PITR を使用するには、TiDB クラスタを v6.2.0 以上にデプロイし、BR を TiDB クラスタと同じバージョンに更新する必要があります。このドキュメントでは、例として v7.1.3 を使用します。
 
-次の表は、TiDB クラスターで PITR を使用する場合に推奨されるハードウェア リソースを示しています。
+次の表は、TiDB クラスタで PITR を使用するための推奨ハードウェアリソースを示しています。
 
-| 成分   | CPU   | メモリ    | ディスク | AWSインスタンス  | インスタンスの数 |
-| ---- | ----- | ------ | ---- | ---------- | -------- |
-| TiDB | 8コア以上 | 16GB以上 | SAS  | c5.2xlarge | 2        |
-| PD   | 8コア以上 | 16GB以上 | SSD  | c5.2xlarge | 3        |
-| TiKV | 8コア以上 | 32GB以上 | SSD  | m5.2x大     | 3        |
-| BR   | 8コア以上 | 16GB以上 | SAS  | c5.2xlarge | 1        |
-| モニター | 8コア以上 | 16GB以上 | SAS  | c5.2xlarge | 1        |
+| コンポーネント | CPU   | メモリ    | ディスク | AWS インスタンス | インスタンス数 |
+| ------- | ----- | ------ | ---- | ---------- | ------- |
+| TiDB    | 8 コア+ | 16 GB+ | SAS  | c5.2xlarge | 2       |
+| PD      | 8 コア+ | 16 GB+ | SSD  | c5.2xlarge | 3       |
+| TiKV    | 8 コア+ | 32 GB+ | SSD  | m5.2xlarge | 3       |
+| BR      | 8 コア+ | 16 GB+ | SAS  | c5.2xlarge | 1       |
+| Monitor | 8 コア+ | 16 GB+ | SAS  | c5.2xlarge | 1       |
 
-> **注記：**
+> **Note:**
 >
-> -   BR がバックアップおよび復元タスクを実行するときは、PD および TiKV にアクセスする必要があります。 BR がすべての PD および TiKV ノードに接続できることを確認してください。
-> -   BRと PD サーバーは同じタイムゾーンを使用する必要があります。
+> - BR がバックアップおよびリストアタスクを実行するときは、PD および TiKV にアクセスする必要があります。BR がすべての PD および TiKV ノードに接続できるようにしてください。
+> - BR および PD サーバーは同じタイムゾーンを使用する必要があります。
 
-TiUPを使用して TiDB クラスターをデプロイまたはアップグレードします。
+TiUP を使用して TiDB クラスタをデプロイまたはアップグレードします。
 
--   新しい TiDB クラスターをデプロイするには、 [TiDB クラスターをデプロイ](/production-deployment-using-tiup.md)を参照してください。
--   TiDB クラスターが v6.2.0 より前の場合は、 [TiDB クラスターをアップグレードする](/upgrade-tidb-using-tiup.md)を参照してアップグレードします。
+- 新しい TiDB クラスタをデプロイするには、[TiDB クラスタをデプロイ](/production-deployment-using-tiup.md) を参照してください。
+- TiDB クラスタが v6.2.0 より前の場合は、[TiDB クラスタをアップグレード](/upgrade-tidb-using-tiup.md) を参照してアップグレードします。
 
-TiUPを使用してBR をインストールまたはアップグレードします。
+TiUP を使用して BR をインストールまたはアップグレードします。
 
--   インストール：
+- インストール:
 
-    ```shell
-    tiup install br:v7.1.2
-    ```
+  ```shell
+  tiup install br:v7.1.3
+  ```
 
--   アップグレード:
+- アップグレード:
 
-    ```shell
-    tiup update br:v7.1.2
-    ```
+  ```shell
+  tiup update br:v7.1.3
+  ```
 
-## バックアップstorageの構成 (Amazon S3) {#configure-backup-storage-amazon-s3}
+## バックアップストレージの構成（Amazon S3） {#configure-backup-storage-amazon-s3}
 
-バックアップ タスクを開始する前に、次の点を含めてバックアップstorageを準備します。
+バックアップタスクを開始する前に、次の側面を含むバックアップストレージを準備してください。
 
-1.  バックアップデータを格納するS3バケットとディレクトリを準備します。
-2.  S3 バケットにアクセスするための権限を構成します。
-3.  各バックアップ データを保存するサブディレクトリを計画します。
+1. バックアップデータを保存するS3バケットとディレクトリを準備します。
+2. S3バケットへのアクセス権を構成します。
+3. 各バックアップデータを保存するサブディレクトリを計画します。
 
 詳細な手順は次のとおりです。
 
-1.  S3にバックアップデータを保存するディレクトリを作成します。この例のディレクトリは`s3://tidb-pitr-bucket/backup-data`です。
+1. S3にディレクトリを作成してバックアップデータを保存します。この例では、ディレクトリは`s3://tidb-pitr-bucket/backup-data`です。
 
-    1.  バケットを作成します。バックアップ データを保存するために既存の S3 を選択できます。存在しない場合は、 [AWS ドキュメント: バケットの作成](https://docs.aws.amazon.com/AmazonS3/latest/userguide/create-bucket-overview.html)を参照してS3バケットを作成してください。この例では、バケット名は`tidb-pitr-bucket`です。
-    2.  バックアップ データ用のディレクトリを作成します。バケット ( `tidb-pitr-bucket` ) に、 `backup-data`という名前のディレクトリを作成します。詳細な手順については、 [AWS ドキュメント: フォルダーを使用した Amazon S3 コンソール内のオブジェクトの整理](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-folders.html)を参照してください。
+   1. バケットを作成します。バックアップデータを保存する既存のS3を選択できます。ない場合は、[AWSドキュメント：バケットの作成](https://docs.aws.amazon.com/AmazonS3/latest/userguide/create-bucket-overview.html)を参照してS3バケットを作成します。この例では、バケット名は`tidb-pitr-bucket`です。
+   2. バックアップデータ用のディレクトリを作成します。バケット（`tidb-pitr-bucket`）で、`backup-data`という名前のディレクトリを作成します。詳細な手順については、[AWSドキュメント：Amazon S3コンソールでオブジェクトをフォルダで整理する](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-folders.html)を参照してください。
 
-2.  BRおよび TiKV が S3 ディレクトリにアクセスするための権限を設定します。 S3 バケットにアクセスする最も安全な方法であるIAMメソッドを使用して権限を付与することをお勧めします。詳細な手順については、 [AWS ドキュメント: ユーザー ポリシーによるバケットへのアクセスの制御](https://docs.aws.amazon.com/AmazonS3/latest/userguide/walkthrough1.html)を参照してください。必要な権限は次のとおりです。
+2. BRとTiKVがS3ディレクトリにアクセスするための権限を構成します。S3バケットにアクセスする最も安全な方法であるIAMメソッドを使用して権限を付与することをお勧めします。詳細な手順については、[AWSドキュメント：ユーザーポリシーでバケットへのアクセスを制御する](https://docs.aws.amazon.com/AmazonS3/latest/userguide/walkthrough1.html)を参照してください。必要な権限は次のとおりです。
 
-    -   バックアップ クラスター内の TiKV とBRには、 `s3://tidb-pitr-bucket/backup-data`ディレクトリの`s3:ListBucket` 、 `s3:PutObject` 、および`s3:AbortMultipartUpload`アクセス許可が必要です。
-    -   復元クラスター内の TiKV とBRには、 `s3://tidb-pitr-bucket/backup-data`ディレクトリの`s3:ListBucket` 、 `s3:GetObject` 、および`s3:PutObject`アクセス許可が必要です。
+   - バックアップクラスターのTiKVとBRには、`s3://tidb-pitr-bucket/backup-data`ディレクトリの`s3:ListBucket`、`s3:PutObject`、`s3:AbortMultipartUpload`の権限が必要です。
+   - リストアクラスターのTiKVとBRには、`s3://tidb-pitr-bucket/backup-data`ディレクトリの`s3:ListBucket`、`s3:GetObject`、`s3:PutObject`の権限が必要です。
 
-3.  スナップショット (フル) バックアップやログ バックアップなどのバックアップ データを保存するディレクトリ構造を計画します。
+3. スナップショット（フル）バックアップとログバックアップを保存するディレクトリ構造を計画します。
 
-    -   すべてのスナップショット バックアップ データは`s3://tidb-pitr-bucket/backup-data/snapshot-${date}`ディレクトリに保存されます。 `${date}`はスナップショット バックアップの開始時刻です。たとえば、2022/05/12 00:01:30 から始まるスナップショット バックアップは`s3://tidb-pitr-bucket/backup-data/snapshot-20220512000130`に保存されます。
-    -   ログのバックアップデータは`s3://tidb-pitr-bucket/backup-data/log-backup/`ディレクトリに保存されます。
+   - すべてのスナップショットバックアップデータは、`s3://tidb-pitr-bucket/backup-data/snapshot-${date}`ディレクトリに保存されます。`${date}`はスナップショットバックアップの開始時刻です。例えば、2022/05/12 00:01:30に開始されたスナップショットバックアップは、`s3://tidb-pitr-bucket/backup-data/snapshot-20220512000130`に保存されます。
+   - ログバックアップデータは、`s3://tidb-pitr-bucket/backup-data/log-backup/`ディレクトリに保存されます。
 
-## バックアップポリシーを決定する {#determine-the-backup-policy}
+## バックアップポリシーの決定 {#determine-the-backup-policy}
 
-データ損失の最小化、迅速なリカバリ、および 1 か月以内のビジネス監査の要件を満たすために、次のようにバックアップ ポリシーを設定できます。
+最小限のデータ損失、迅速なリカバリ、および1か月以内のビジネス監査の要件を満たすために、次のようにバックアップポリシーを設定できます。
 
--   ログ バックアップを実行して、データベース内のデータ変更を継続的にバックアップします。
--   スナップショット バックアップを 2 日ごとの午前 00:00 に実行します。
--   スナップショット バックアップ データとログ バックアップ データは 30 日以内に保持し、30 日より古いバックアップ データはクリーンアップします。
+- データベースのデータ変更を連続的にバックアップするためにログバックアップを実行します。
+- 2日ごとに00:00 AMにスナップショットバックアップを実行します。
+- スナップショットバックアップデータとログバックアップデータを30日以内に保持し、30日より古いバックアップデータをクリーンアップします。
 
-## ログバックアップを実行する {#run-log-backup}
+## ログバックアップの実行 {#run-log-backup}
 
-ログ バックアップ タスクが開始されると、ログ バックアップ プロセスが TiKV クラスター内で実行され、データベース内のデータ変更が S3storageに継続的に送信されます。ログ バックアップ タスクを開始するには、次のコマンドを実行します。
+ログバックアップタスクが開始されると、ログバックアッププロセスがTiKVクラスターでデータベースのデータ変更を連続的にS3ストレージに送信します。ログバックアップタスクを開始するには、次のコマンドを実行します：
 
 ```shell
 tiup br log start --task-name=pitr --pd="${PD_IP}:2379" \
 --storage='s3://tidb-pitr-bucket/backup-data/log-backup'
 ```
 
-ログ バックアップ タスクの実行中に、バックアップ ステータスをクエリできます。
+ログバックアップタスクが実行されている間、バックアップの状態をクエリできます。
 
 ```shell
 tiup br log status --task-name=pitr --pd="${PD_IP}:2379"
@@ -110,33 +110,33 @@ tiup br log status --task-name=pitr --pd="${PD_IP}:2379"
 checkpoint[global]: 2022-05-13 11:31:47.2 +0800; gap=4m53s
 ```
 
-## スナップショットバックアップを実行する {#run-snapshot-backup}
+## スナップショットバックアップの実行 {#run-snapshot-backup}
 
-crontab などの自動ツールを使用して、スナップショット バックアップ タスクを定期的に実行できます。たとえば、スナップショット バックアップを 2 日ごとの 00:00 に実行します。
+crontabなどの自動ツールを使用して定期的にスナップショットバックアップタスクを実行できます。たとえば、2日ごとに00:00にスナップショットバックアップを実行します。
 
-次に、スナップショット バックアップの 2 つの例を示します。
+以下は2つのスナップショットバックアップの例です。
 
--   2022/05/14 00:00:00 にスナップショット バックアップを実行します。
+- 2022/05/14 00:00:00にスナップショットバックアップを実行
 
-    ```shell
-    tiup br backup full --pd="${PD_IP}:2379" \
-    --storage='s3://tidb-pitr-bucket/backup-data/snapshot-20220514000000' \
-    --backupts='2022/05/14 00:00:00'
-    ```
+  ```shell
+  tiup BR backup full --pd="${PD_IP}:2379" \
+  --storage='s3://tidb-pitr-bucket/backup-data/snapshot-20220514000000' \
+  --backupts='2022/05/14 00:00:00'
+  ```
 
--   2022/05/16 00:00:00 にスナップショット バックアップを実行します。
+- 2022/05/16 00:00:00にスナップショットバックアップを実行
 
-    ```shell
-    tiup br backup full --pd="${PD_IP}:2379" \
-    --storage='s3://tidb-pitr-bucket/backup-data/snapshot-20220516000000' \
-    --backupts='2022/05/16 00:00:00'
-    ```
+  ```shell
+  tiup BR backup full --pd="${PD_IP}:2379" \
+  --storage='s3://tidb-pitr-bucket/backup-data/snapshot-20220516000000' \
+  --backupts='2022/05/16 00:00:00'
+  ```
 
-## PITRを実行する {#run-pitr}
+## PITRの実行 {#run-pitr}
 
-2022/05/15 18:00:00 にデータをクエリする必要があると仮定します。 PITR を使用して、2022/05/14 に作成されたスナップショット バックアップと、スナップショットと 2022/05/15 18:00:00 の間のログ バックアップ データを復元することで、クラスターをその時点に復元できます。
+2022/05/15 18:00:00のデータをクエリする必要があるとします。PITRを使用して、2022/05/14に取得したスナップショットバックアップとその後のスナップショットと2022/05/15 18:00:00の間のログバックアップデータを復元して、クラスターをその時点に復元できます。
 
-コマンドは次のとおりです。
+コマンドは次のとおりです：
 
 ```shell
 tiup br restore point --pd="${PD_IP}:2379" \
@@ -151,26 +151,26 @@ Restore KV Files <--------------------------------------------------------------
 [2022/05/29 18:15:39.325 +08:00] [INFO] [collector.go:69] ["restore log success summary"] [total-take=xxx.xx] [restore-from={TS}] [restore-to={TS}] [total-kv-count=xxx] [total-size=xxx]
 ```
 
-## 古いデータをクリーンアップする {#clean-up-outdated-data}
+## 過去のデータをクリーンアップ {#clean-up-outdated-data}
 
-crontab などの自動ツールを使用して、古いデータを 2 日ごとにクリーンアップできます。
+自動ツール（crontabなど）を使用して、2日ごとに古いデータをクリーンアップできます。
 
-たとえば、次のコマンドを実行して古いデータをクリーンアップできます。
+例えば、次のコマンドを実行して古いデータをクリーンアップできます。
 
--   2022/05/14 00:00:00より前のスナップショットデータを削除します
+- 2022/05/14 00:00:00より前のスナップショットデータを削除
 
-    ```shell
-    rm s3://tidb-pitr-bucket/backup-data/snapshot-20220514000000
-    ```
+  ```shell
+  rm s3://tidb-pitr-bucket/backup-data/snapshot-20220514000000
+  ```
 
--   2022/05/14 00:00:00より前のログバックアップデータを削除します
+- 2022/05/14 00:00:00より前のログバックアップデータを削除
 
-    ```shell
-    tiup br log truncate --until='2022-05-14 00:00:00 +0800' --storage='s3://tidb-pitr-bucket/backup-data/log-backup'
-    ```
+  ```shell
+  tiup br log truncate --until='2022-05-14 00:00:00 +0800' --storage='s3://tidb-pitr-bucket/backup-data/log-backup'
+  ```
 
-## こちらも参照 {#see-also}
+## 関連情報 {#see-also}
 
--   [バックアップストレージ](/br/backup-and-restore-storages.md)
--   [スナップショットバックアップおよびリストアコマンドマニュアル](/br/br-snapshot-manual.md)
--   [ログバックアップとPITRコマンドマニュアル](/br/br-pitr-manual.md)
+- [バックアップストレージ](/br/backup-and-restore-storages.md)
+- [スナップショットのバックアップとリストアコマンドマニュアル](/br/br-snapshot-manual.md)
+- [ログバックアップとPITRコマンドマニュアル](/br/br-pitr-manual.md)

@@ -3,188 +3,191 @@ title: Connect to TiDB with Sequelize
 summary: Learn how to connect to TiDB using Sequelize. This tutorial gives Node.js sample code snippets that work with TiDB using Sequelize.
 ---
 
-# Sequelize で TiDB に接続する {#connect-to-tidb-with-sequelize}
+# Sequelizeを使用してTiDBに接続 {#connect-to-tidb-with-sequelize}
 
-TiDB は MySQL 互換データベースであり、 [続編](https://sequelize.org/)は Node.js の人気のある ORM フレームワークです。
+TiDBはMySQL互換のデータベースであり、[Sequelize](https://sequelize.org/)はNode.js向けの人気のあるORMフレームワークです。
 
-このチュートリアルでは、TiDB と Sequelize を使用して次のタスクを実行する方法を学習できます。
+このチュートリアルでは、TiDBとSequelizeを使用して次のタスクを実行する方法を学ぶことができます。
 
--   環境をセットアップします。
--   Sequelize を使用して TiDB クラスターに接続します。
--   アプリケーションをビルドして実行します。オプションで、基本的な CRUD 操作の[サンプルコードスニペット](#sample-code-snippets)を見つけることができます。
+- 環境をセットアップします。
+- Sequelizeを使用してTiDBクラスタに接続します。
+- アプリケーションをビルドして実行します。オプションで、基本的なCRUD操作の[サンプルコードスニペット](#sample-code-snippets)を見つけることができます。
 
-> **注記**
+> **注意**
 >
-> このチュートリアルは、TiDB サーバーレス、TiDB 専用、および TiDB セルフホストで動作します。
+> このチュートリアルは、TiDB Serverless、TiDB Dedicated、およびTiDB Self-Hostedと互換性があります。
 
 ## 前提条件 {#prerequisites}
 
 このチュートリアルを完了するには、次のものが必要です。
 
--   [Node.js **18**](https://nodejs.org/en/download/)以降。
--   [ギット](https://git-scm.com/downloads) 。
--   TiDB クラスター。
+- [Node.js **18**](https://nodejs.org/en/download/) またはそれ以降。
+- [Git](https://git-scm.com/downloads)。
+- TiDBクラスタ。
 
 <CustomContent platform="tidb">
 
-**TiDB クラスターがない場合は、次のように作成できます。**
+**TiDBクラスタを持っていない場合は、次のように作成できます。**
 
--   (推奨) [TiDB サーバーレスクラスターの作成](/develop/dev-guide-build-cluster-in-cloud.md)に従って、独自のTiDB Cloudクラスターを作成します。
--   [ローカル テスト TiDB クラスターをデプロイ](/quick-start-with-tidb.md#deploy-a-local-test-cluster)または[本番TiDB クラスターをデプロイ](/production-deployment-using-tiup.md)に従ってローカル クラスターを作成します。
+- (推奨) [TiDB Serverlessクラスタの作成](/develop/dev-guide-build-cluster-in-cloud.md)に従って、独自のTiDB Cloudクラスタを作成します。
+- [ローカルテストTiDBクラスタのデプロイ](/quick-start-with-tidb.md#deploy-a-local-test-cluster)または[本番TiDBクラスタのデプロイ](/production-deployment-using-tiup.md)に従って、ローカルクラスタを作成します。
 
 </CustomContent>
 <CustomContent platform="tidb-cloud">
 
-**TiDB クラスターがない場合は、次のように作成できます。**
+**TiDBクラスタを持っていない場合は、次のように作成できます。**
 
--   (推奨) [TiDB サーバーレスクラスターの作成](/develop/dev-guide-build-cluster-in-cloud.md)に従って、独自のTiDB Cloudクラスターを作成します。
--   [ローカル テスト TiDB クラスターをデプロイ](https://docs.pingcap.com/tidb/stable/quick-start-with-tidb#deploy-a-local-test-cluster)または[本番TiDB クラスターをデプロイ](https://docs.pingcap.com/tidb/stable/production-deployment-using-tiup)に従ってローカル クラスターを作成します。
+- (推奨) [TiDB Serverlessクラスタの作成](/develop/dev-guide-build-cluster-in-cloud.md)に従って、独自のTiDB Cloudクラスタを作成します。
+- [ローカルテストTiDBクラスタのデプロイ](https://docs.pingcap.com/tidb/stable/quick-start-with-tidb#deploy-a-local-test-cluster)または[本番TiDBクラスタのデプロイ](https://docs.pingcap.com/tidb/stable/production-deployment-using-tiup)に従って、ローカルクラスタを作成します。
 
 </CustomContent>
 
-## サンプル アプリを実行して TiDB に接続する {#run-the-sample-app-to-connect-to-tidb}
+## サンプルアプリを実行してTiDBに接続 {#run-the-sample-app-to-connect-to-tidb}
 
-このセクションでは、サンプル アプリケーション コードを実行して TiDB に接続する方法を説明します。
+このセクションでは、サンプルアプリケーションコードを実行し、TiDBに接続する方法を示します。
 
-> **注記**
+> **注意**
 >
-> 完全なコード スニペットと実行手順については、 [tidb-samples/tidb-nodejs-sequelize-quickstart](https://github.com/tidb-samples/tidb-nodejs-sequelize-quickstart) GitHub リポジトリを参照してください。
+> 完全なコードスニペットと実行手順については、[tidb-samples/tidb-nodejs-sequelize-quickstart](https://github.com/tidb-samples/tidb-nodejs-sequelize-quickstart) GitHubリポジトリを参照してください。
 
-### ステップ 1: サンプル アプリ リポジトリのクローンを作成する {#step-1-clone-the-sample-app-repository}
+### ステップ1：サンプルアプリのリポジトリをクローンする {#step-1-clone-the-sample-app-repository}
 
-ターミナル ウィンドウで次のコマンドを実行して、サンプル コード リポジトリのクローンを作成します。
+ターミナルウィンドウで次のコマンドを実行して、サンプルコードリポジトリをクローンします：
 
 ```bash
 git clone git@github.com:tidb-samples/tidb-nodejs-sequelize-quickstart.git
 cd tidb-nodejs-sequelize-quickstart
 ```
 
-### ステップ 2: 依存関係をインストールする {#step-2-install-dependencies}
+### ステップ2：依存関係のインストール {#step-2-install-dependencies}
 
-次のコマンドを実行して、サンプル アプリに必要なパッケージ ( `sequelize`を含む) をインストールします。
+次のコマンドを実行して、サンプルアプリケーションに必要なパッケージ（`sequelize`を含む）をインストールします：
 
 ```bash
 npm install
 ```
 
-### ステップ 3: 接続情報を構成する {#step-3-configure-connection-information}
+### ステップ3：接続情報の設定 {#step-3-configure-connection-information}
 
-選択した TiDB デプロイメント オプションに応じて、TiDB クラスターに接続します。
+選択したTiDBデプロイメントオプションに応じてTiDBクラスタに接続します。
 
 <SimpleTab>
 
 <div label="TiDB Serverless">
 
-1.  [**クラスター**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲット クラスターの名前をクリックして、その概要ページに移動します。
+1. [**Clusters**](https://tidbcloud.com/console/clusters) ページに移動し、ターゲットクラスタの名前をクリックして概要ページに移動します。
 
-2.  右上隅にある**「接続」**をクリックします。接続ダイアログが表示されます。
+2. 右上隅の **Connect** をクリックします。接続ダイアログが表示されます。
 
-3.  接続ダイアログの設定が動作環境と一致していることを確認してください。
+3. 接続ダイアログの構成が操作環境に一致していることを確認します。
 
-    -   **エンドポイント タイプは**`Public`に設定されます
+   - **エンドポイントタイプ** が `Public` に設定されていること
 
-    -   **[接続先] は**`General`に設定されています
+   - **Branch** が `main` に設定されていること
 
-    -   **オペレーティング システムが**環境に一致します。
+   - **Connect With** が `General` に設定されていること
 
-    > **注記**
-    >
-    > Node.js アプリケーションでは、TLS (SSL) 接続を確立するときにデフォルトで組み込みの[Mozilla CA 証明書](https://wiki.mozilla.org/CA/Included_Certificates)を使用するため、SSL CA 証明書を提供する必要はありません。
+   - **Operating System** が環境に一致していること
 
-4.  **「パスワードの作成」**をクリックしてランダムなパスワードを作成します。
+   > **注意**
+   >
+   > Node.jsアプリケーションでは、TLS（SSL）接続を確立する際にデフォルトでNode.jsが組み込みの[Mozilla CA証明書](https://wiki.mozilla.org/CA/Included_Certificates)を使用するため、SSL CA証明書を提供する必要はありません。
 
-    > **ヒント**
-    >
-    > 以前にパスワードを生成したことがある場合は、元のパスワードを使用するか、 **「パスワードのリセット」**をクリックして新しいパスワードを生成できます。
+4. **Generate Password** をクリックしてランダムなパスワードを作成します。
 
-5.  次のコマンドを実行して`.env.example`をコピーし、名前を`.env`に変更します。
+   > **ヒント**
+   >
+   > 以前にパスワードを生成した場合、元のパスワードを使用するか、**Reset Password** をクリックして新しいパスワードを生成できます。
 
-    ```shell
-    cp .env.example .env
-    ```
+5. 次のコマンドを実行して `.env.example` をコピーし、`.env` に名前を変更します：
 
-6.  `.env`ファイルを編集し、次のように環境変数を設定し、接続ダイアログ上の対応するプレースホルダー`{}`接続パラメーターに置き換えます。
+   ```shell
+   cp .env.example .env
+   ```
 
-    ```dotenv
-    TIDB_HOST='{host}'
-    TIDB_PORT='4000'
-    TIDB_USER='{user}'
-    TIDB_PASSWORD='{password}'
-    TIDB_DB_NAME='test'
-    TIDB_ENABLE_SSL='true'
-    ```
+6. `.env` ファイルを編集し、接続ダイアログの対応するプレースホルダ `{}` を接続パラメータで置き換えて、環境変数を次のように設定します：
 
-7.  `.env`ファイルを保存します。
+   ```dotenv
+   TIDB_HOST='{host}'
+   TIDB_PORT='4000'
+   TIDB_USER='{user}'
+   TIDB_PASSWORD='{password}'
+   TIDB_DB_NAME='test'
+   TIDB_ENABLE_SSL='true'
+   ```
+
+7. `.env` ファイルを保存します。
 
 </div>
 
 <div label="TiDB Dedicated">
 
-1.  [**クラスター**](https://tidbcloud.com/console/clusters)ページに移動し、ターゲット クラスターの名前をクリックして、その概要ページに移動します。
+1. [**Clusters**](https://tidbcloud.com/console/clusters) ページに移動し、ターゲットクラスタの名前をクリックして概要ページに移動します。
 
-2.  右上隅にある**「接続」**をクリックします。接続ダイアログが表示されます。
+2. 右上隅の **Connect** をクリックします。接続ダイアログが表示されます。
 
-3.  **「どこからでもアクセスを許可」**をクリックし、 **「TiDB クラスター CA のダウンロード」**をクリックして CA 証明書をダウンロードします。
+3. **どこからでもアクセスを許可** をクリックし、次に **TiDBクラスタCAをダウンロード** をクリックしてCA証明書をダウンロードします。
 
-    接続文字列の取得方法の詳細については、 [TiDB専用標準接続](https://docs.pingcap.com/tidbcloud/connect-via-standard-connection)を参照してください。
+   接続文字列の取得方法の詳細については、[TiDB Dedicated標準接続](https://docs.pingcap.com/tidbcloud/connect-via-standard-connection)を参照してください。
 
-4.  次のコマンドを実行して`.env.example`をコピーし、名前を`.env`に変更します。
+4. 次のコマンドを実行して `.env.example` をコピーし、`.env` に名前を変更します：
 
-    ```shell
-    cp .env.example .env
-    ```
+   ```shell
+   cp .env.example .env
+   ```
 
-5.  `.env`ファイルを編集し、次のように環境変数を設定し、接続ダイアログ上の対応するプレースホルダー`{}`接続パラメーターに置き換えます。
+5. `.env` ファイルを編集し、接続ダイアログの対応するプレースホルダ `{}` を接続パラメータで置き換えて、環境変数を次のように設定します：
 
-    ```shell
-    TIDB_HOST='{host}'
-    TIDB_PORT='4000'
-    TIDB_USER='{user}'
-    TIDB_PASSWORD='{password}'
-    TIDB_DB_NAME='test'
-    TIDB_ENABLE_SSL='true'
-    TIDB_CA_PATH='{path/to/ca}'
-    ```
+   ```shell
+   TIDB_HOST='{host}'
+   TIDB_PORT='4000'
+   TIDB_USER='{user}'
+   TIDB_PASSWORD='{password}'
+   TIDB_DB_NAME='test'
+   TIDB_ENABLE_SSL='true'
+   TIDB_CA_PATH='{path/to/ca}'
+   ```
 
-6.  `.env`ファイルを保存します。
+6. `.env` ファイルを保存します。
 
 </div>
 
 <div label="TiDB Self-Hosted">
 
-1.  次のコマンドを実行して`.env.example`をコピーし、名前を`.env`に変更します。
+1. 次のコマンドを実行して `.env.example` をコピーし、`.env` に名前を変更します：
 
-    ```shell
-    cp .env.example .env
-    ```
+   ```shell
+   cp .env.example .env
+   ```
 
-2.  `.env`ファイルを編集し、次のように環境変数を設定し、接続ダイアログ上の対応するプレースホルダー`{}`接続パラメーターに置き換えます。
+2. `.env` ファイルを編集し、接続ダイアログの対応するプレースホルダ `{}` を接続パラメータで置き換えて、環境変数を次のように設定します：
 
-    ```shell
-    TIDB_HOST='{host}'
-    TIDB_PORT='4000'
-    TIDB_USER='root'
-    TIDB_PASSWORD='{password}'
-    TIDB_DB_NAME='test'
-    ```
+   ```shell
+   TIDB_HOST='{host}'
+   TIDB_PORT='4000'
+   TIDB_USER='root'
+   TIDB_PASSWORD='{password}'
+   TIDB_DB_NAME='test'
+   ```
 
-    TiDB をローカルで実行している場合、デフォルトのホスト アドレスは`127.0.0.1`で、パスワードは空です。
+   TiDBをローカルで実行している場合、デフォルトのホストアドレスは `127.0.0.1` であり、パスワードは空です。
 
-3.  `.env`ファイルを保存します。
+3. `.env` ファイルを保存します。
 
 </div>
 
 </SimpleTab>
 
-### ステップ 4: サンプル アプリを実行する {#step-4-run-the-sample-app}
+### ステップ4：サンプルアプリを実行 {#step-4-run-the-sample-app}
 
-次のコマンドを実行してサンプル コードを実行します。
+次のコマンドを実行してサンプルコードを実行します：
 
 ```shell
 npm start
 ```
 
-<details><summary>**期待される出力(部分):**</summary>
+<details>
+<summary>**期待される出力（一部）：**</summary>
 
 ```shell
 INFO (app/10117): Getting sequelize instance...
@@ -202,13 +205,13 @@ Executing (default): DELETE FROM `players` WHERE `id` = 6
 
 ## サンプルコードスニペット {#sample-code-snippets}
 
-次のサンプル コード スニペットを参照して、独自のアプリケーション開発を完了できます。
+次のサンプルコードスニペットを参照して、独自のアプリケーション開発を完了させることができます。
 
-完全なサンプル コードとその実行方法については、 [tidb-samples/tidb-nodejs-sequelize-quickstart](https://github.com/tidb-samples/tidb-nodejs-sequelize-quickstart)リポジトリを確認してください。
+完全なサンプルコードとその実行方法については、[tidb-samples/tidb-nodejs-sequelize-quickstart](https://github.com/tidb-samples/tidb-nodejs-sequelize-quickstart) リポジトリをチェックしてください。
 
-### TiDB に接続する {#connect-to-tidb}
+### TiDBへの接続 {#connect-to-tidb}
 
-次のコードは、環境変数で定義されたオプションを使用して TiDB への接続を確立します。
+次のコードは、環境変数で定義されたオプションを使用して、TiDBへの接続を確立します。
 
 ```typescript
 // src/lib/tidb.ts
@@ -254,7 +257,7 @@ export async function getSequelize() {
 
 ### データの挿入 {#insert-data}
 
-次のクエリは、単一の`Players`レコードを作成し、 `Players`オブジェクトを返します。
+次のクエリは単一の `Players` レコードを作成し、`Players` オブジェクトを返します：
 
 ```typescript
 logger.info('Creating a new player...');
@@ -267,11 +270,11 @@ logger.info('Created a new player.');
 logger.info(newPlayer.toJSON());
 ```
 
-詳細については、 [データの挿入](/develop/dev-guide-insert-data.md)を参照してください。
+For more information, refer to [データの挿入](/develop/dev-guide-insert-data.md).
 
-### クエリデータ {#query-data}
+### データのクエリ {#query-data}
 
-次のクエリは、コインが`300`より大きい単一の`Players`レコードを返します。
+次のクエリは、コインが `300` よりも多い単一の `Players` レコードを返します。
 
 ```typescript
 logger.info('Reading all players with coins > 300...');
@@ -286,11 +289,11 @@ logger.info('Read all players with coins > 300.');
 logger.info(allPlayersWithCoinsGreaterThan300.map((p) => p.toJSON()));
 ```
 
-詳細については、 [クエリデータ](/develop/dev-guide-get-data-from-single-table.md)を参照してください。
+For more information, refer to [Query data](/develop/dev-guide-get-data-from-single-table.md).
 
-### データを更新する {#update-data}
+### データの更新 {#update-data}
 
-次のクエリは、 [データの挿入](#insert-data)セクションで作成した ID `6`の`Players`に`700`コインと`700`グッズを設定します。
+次のクエリセットは、IDが「6」の「Players」に700コインと700個の商品を設定します。これは[データの挿入](#insert-data)セクションで作成されました。
 
 ```typescript
 logger.info('Updating the new player...');
@@ -299,11 +302,11 @@ logger.info('Updated the new player.');
 logger.info(newPlayer.toJSON());
 ```
 
-詳細については、 [データを更新する](/develop/dev-guide-update-data.md)を参照してください。
+For more information, refer to [データの更新](/develop/dev-guide-update-data.md).
 
 ### データの削除 {#delete-data}
 
-次のクエリは、 [データの挿入](#insert-data)セクションで作成された ID `6`の`Player`レコードを削除します。
+次のクエリは、[データの挿入](#insert-data)セクションで作成されたID `6`の`Player`レコードを削除します。
 
 ```typescript
 logger.info('Deleting the new player...');
@@ -313,14 +316,14 @@ logger.info('Deleted the new player.');
 logger.info(deletedNewPlayer?.toJSON());
 ```
 
-詳細については、 [データの削除](/develop/dev-guide-delete-data.md)を参照してください。
+For more information, refer to [Delete data](/develop/dev-guide-delete-data.md).
 
-## 次のステップ {#next-steps}
+## Next steps {#next-steps}
 
--   ORM フレームワーク Sequelize ドライバーの使用法を[Sequelize のドキュメント](https://sequelize.org/)から詳しく学びます。
--   TiDB アプリケーション[データの削除](/develop/dev-guide-delete-data.md) [単一テーブルの読み取り](/develop/dev-guide-get-data-from-single-table.md)ベスト プラクティス[SQLパフォーマンスの最適化](/develop/dev-guide-optimize-sql-overview.md)は、 [開発者ガイド](/develop/dev-guide-overview.md)の章 ( [データの挿入](/develop/dev-guide-insert-data.md)など) [データを更新する](/develop/dev-guide-update-data.md)参照[トランザクション](/develop/dev-guide-transaction-overview.md)てください。
--   プロフェッショナルとして[TiDB 開発者コース](https://www.pingcap.com/education/)を学び、試験合格後に[TiDB 認定](https://www.pingcap.com/education/certification/)獲得します。
+- Learn more usage of the ORM framework Sequelize driver from [the documentation of Sequelize](https://sequelize.org/).
+- Learn the best practices for TiDB application development with the chapters in the [Developer guide](/develop/dev-guide-overview.md), such as [Insert data](/develop/dev-guide-insert-data.md), [Update data](/develop/dev-guide-update-data.md), [Delete data](/develop/dev-guide-delete-data.md), [Single table reading](/develop/dev-guide-get-data-from-single-table.md), [Transactions](/develop/dev-guide-transaction-overview.md), and [SQL performance optimization](/develop/dev-guide-optimize-sql-overview.md).
+- Learn through the professional [TiDB developer courses](https://www.pingcap.com/education/) and earn [TiDB certifications](https://www.pingcap.com/education/certification/) after passing the exam.
 
-## 助けが必要？ {#need-help}
+## Need help? {#need-help}
 
-[不和](https://discord.gg/DQZ2dy3cuc?utm_source=doc)または[サポートチケットを作成する](https://support.pingcap.com/)について質問してください。
+Ask questions on the [Discord](https://discord.gg/DQZ2dy3cuc?utm_source=doc), or [create a support ticket](https://support.pingcap.com/).

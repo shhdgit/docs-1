@@ -3,184 +3,184 @@ title: TiCDC Alert Rules
 summary: Learn about TiCDC alert rules and how to handle the alerts.
 ---
 
-# TiCDC アラート ルール {#ticdc-alert-rules}
+# TiCDC アラートルール {#ticdc-alert-rules}
 
-この文書では、TiCDC アラート ルールと対応するソリューションについて説明します。重大度レベルは降順で、 **Critical** 、 **Warning**になります。
+このドキュメントでは、TiCDCのアラートルールとそれに対応する解決策について説明します。深刻度のレベルは、降順で **Critical**、**Warning** です。
 
-## 重大なアラート {#critical-alerts}
+## Critical alerts {#critical-alerts}
 
-このセクションでは、重要なアラートと解決策を紹介します。
+このセクションでは、深刻なアラートとその解決策について紹介します。
 
-### <code>cdc_checkpoint_high_delay</code> {#code-cdc-checkpoint-high-delay-code}
+### `cdc_checkpoint_high_delay` {#cdc-checkpoint-high-delay}
 
-重要なアラートの場合は、異常な監視メトリクスに細心の注意を払う必要があります。
+深刻なアラートでは、異常な監視メトリクスに注意を払う必要があります。
 
--   アラート ルール:
+- アラートルール：
 
-    (time() - ticdc_owner_checkpoint_ts / 1000) &gt; 600
+  (time() - ticdc\_owner\_checkpoint\_ts / 1000) > 600
 
--   説明：
+- 説明：
 
-    レプリケーション タスクが 10 分以上遅延しています。
+  レプリケーションタスクが10分以上遅れています。
 
--   解決：
+- 解決策：
 
-    [TiCDC ハンドル レプリケーションの中断](/ticdc/troubleshoot-ticdc.md#how-do-i-handle-replication-interruptions)を参照してください。
+  [TiCDC レプリケーションの中断を処理する](/ticdc/troubleshoot-ticdc.md#how-do-i-handle-replication-interruptions)を参照してください。
 
-## <code>cdc_resolvedts_high_delay</code> {#code-cdc-resolvedts-high-delay-code}
+### `cdc_resolvedts_high_delay` {#cdc-resolvedts-high-delay}
 
--   アラート ルール:
+- アラートルール：
 
-    (time() - ticdc_owner_resolved_ts / 1000) &gt; 300
+  (time() - ticdc\_owner\_resolved\_ts / 1000) > 300
 
--   説明：
+- 説明：
 
-    レプリケーション タスクの解決された TS が 5 分以上遅れています。
+  レプリケーションタスクの Resolved TS が5分以上遅れています。
 
--   解決：
+- 解決策：
 
-    [TiCDC ハンドル レプリケーションの中断](/ticdc/troubleshoot-ticdc.md#how-do-i-handle-replication-interruptions)を参照してください。
+  [TiCDC レプリケーションの中断を処理する](/ticdc/troubleshoot-ticdc.md#how-do-i-handle-replication-interruptions)を参照してください。
 
-### <code>ticdc_processor_exit_with_error_count</code> {#code-ticdc-processor-exit-with-error-count-code}
+### `ticdc_processor_exit_with_error_count` {#ticdc-processor-exit-with-error-count}
 
--   アラート ルール:
+- アラートルール：
 
-    `changes(ticdc_processor_exit_with_error_count[1m]) > 0`
+  `changes(ticdc_processor_exit_with_error_count[1m]) > 0`
 
--   説明：
+- 説明：
 
-    レプリケーションタスクはエラーを報告して終了します。
+  レプリケーションタスクがエラーを報告して終了しました。
 
--   解決：
+- 解決策：
 
-    [TiCDC ハンドル レプリケーションの中断](/ticdc/troubleshoot-ticdc.md#how-do-i-handle-replication-interruptions)を参照してください。
+  [TiCDC レプリケーションの中断を処理する](/ticdc/troubleshoot-ticdc.md#how-do-i-handle-replication-interruptions)を参照してください。
 
-## 警告アラート {#warning-alerts}
+## Warning alerts {#warning-alerts}
 
-警告アラートは、問題またはエラーを通知するものです。
+警告アラートは、問題やエラーのリマインダーです。
 
-### <code>cdc_multiple_owners</code> {#code-cdc-multiple-owners-code}
+### `cdc_multiple_owners` {#cdc-multiple-owners}
 
--   アラート ルール:
+- アラートルール：
 
-    `sum(rate(ticdc_owner_ownership_counter[30s])) >= 2`
+  `sum(rate(ticdc_owner_ownership_counter[30s])) >= 2`
 
--   説明：
+- 説明：
 
-    TiCDC クラスターには複数の所有者がいます。
+  TiCDC クラスタに複数の所有者がいます。
 
--   解決：
+- 解決策：
 
-    TiCDC ログを収集して根本原因を特定します。
+  ルート原因を特定するために TiCDC ログを収集してください。
 
-### <code>cdc_sink_flush_duration_time_more_than_10s</code> {#code-cdc-sink-flush-duration-time-more-than-10s-code}
+### `cdc_sink_flush_duration_time_more_than_10s` {#cdc-sink-flush-duration-time-more-than-10s}
 
--   アラート ルール:
+- アラートルール：
 
-    `histogram_quantile(0.9, rate(ticdc_sink_txn_worker_flush_duration[1m])) > 10`
+  `histogram_quantile(0.9, rate(ticdc_sink_txn_worker_flush_duration[1m])) > 10`
 
--   説明：
+- 説明：
 
-    レプリケーション タスクでは、ダウンストリーム データベースにデータを書き込むのに 10 秒以上かかります。
+  レプリケーションタスクが下流データベースにデータを書き込むのに10秒以上かかります。
 
--   解決：
+- 解決策：
 
-    下流データベースに問題がないか確認してください。
+  下流データベースに問題があるかどうかを確認してください。
 
-### <code>cdc_processor_checkpoint_tso_no_change_for_1m</code> {#code-cdc-processor-checkpoint-tso-no-change-for-1m-code}
+### `cdc_processor_checkpoint_tso_no_change_for_1m` {#cdc-processor-checkpoint-tso-no-change-for-1m}
 
--   アラート ルール:
+- アラートルール：
 
-    `changes(ticdc_processor_checkpoint_ts[1m]) < 1`
+  `changes(ticdc_processor_checkpoint_ts[1m]) < 1`
 
--   説明：
+- 説明：
 
-    レプリケーション タスクが 1 分以上進んでいません。
+  レプリケーションタスクが1分以上進んでいません。
 
--   解決：
+- 解決策：
 
-    [TiCDC ハンドル レプリケーションの中断](/ticdc/troubleshoot-ticdc.md#how-do-i-handle-replication-interruptions)を参照してください。
+  [TiCDC レプリケーションの中断を処理する](/ticdc/troubleshoot-ticdc.md#how-do-i-handle-replication-interruptions)を参照してください。
 
-### <code>ticdc_puller_entry_sorter_sort_bucket</code> {#code-ticdc-puller-entry-sorter-sort-bucket-code}
+### `ticdc_puller_entry_sorter_sort_bucket` {#ticdc-puller-entry-sorter-sort-bucket}
 
--   アラート ルール:
+- アラートルール：
 
-    `histogram_quantile(0.9, rate(ticdc_puller_entry_sorter_sort_bucket{}[1m])) > 1`
+  `histogram_quantile(0.9, rate(ticdc_puller_entry_sorter_sort_bucket{}[1m])) > 1`
 
--   説明：
+- 説明：
 
-    TiCDC プラー エントリ ソーターの遅延が長すぎます。
+  TiCDC プーラーエントリーソーターの遅延が大きすぎます。
 
--   解決：
+- 解決策：
 
-    TiCDC ログを収集して根本原因を特定します。
+  ルート原因を特定するために TiCDC ログを収集してください。
 
-### <code>ticdc_puller_entry_sorter_merge_bucket</code> {#code-ticdc-puller-entry-sorter-merge-bucket-code}
+### `ticdc_puller_entry_sorter_merge_bucket` {#ticdc-puller-entry-sorter-merge-bucket}
 
--   アラート ルール:
+- アラートルール：
 
-    `histogram_quantile(0.9, rate(ticdc_puller_entry_sorter_merge_bucket{}[1m])) > 1`
+  `histogram_quantile(0.9, rate(ticdc_puller_entry_sorter_merge_bucket{}[1m])) > 1`
 
--   説明：
+- 説明：
 
-    TiCDC プラーのエントリー・ソーターのマージの遅延が長すぎます。
+  TiCDC プーラーエントリーソーターマージの遅延が大きすぎます。
 
--   解決：
+- 解決策：
 
-    TiCDC ログを収集して根本原因を特定します。
+  ルート原因を特定するために TiCDC ログを収集してください。
 
-### <code>tikv_cdc_min_resolved_ts_no_change_for_1m</code> {#code-tikv-cdc-min-resolved-ts-no-change-for-1m-code}
+### `tikv_cdc_min_resolved_ts_no_change_for_1m` {#tikv-cdc-min-resolved-ts-no-change-for-1m}
 
--   アラート ルール:
+- アラートルール：
 
-    `changes(tikv_cdc_min_resolved_ts[1m]) < 1 and ON (instance) tikv_cdc_region_resolve_status{status="resolved"} > 0`
+  `changes(tikv_cdc_min_resolved_ts[1m]) < 1 and ON (instance) tikv_cdc_region_resolve_status{status="resolved"} > 0`
 
--   説明：
+- 説明：
 
-    TiKV CDC の最小解決済み TS 1 は 1 分間進んでいません。
+  TiKV CDC の最小 Resolved TS 1 が1分以上進んでいません。
 
--   解決：
+- 解決策：
 
-    TiKV ログを収集して根本原因を特定します。
+  ルート原因を特定するために TiKV ログを収集してください。
 
-### <code>tikv_cdc_scan_duration_seconds_more_than_10min</code> {#code-tikv-cdc-scan-duration-seconds-more-than-10min-code}
+### `tikv_cdc_scan_duration_seconds_more_than_10min` {#tikv-cdc-scan-duration-seconds-more-than-10min}
 
--   アラート ルール:
+- アラートルール：
 
-    `histogram_quantile(0.9, rate(tikv_cdc_scan_duration_seconds_bucket{}[1m])) > 600`
+  `histogram_quantile(0.9, rate(tikv_cdc_scan_duration_seconds_bucket{}[1m])) > 600`
 
--   説明：
+- 説明：
 
-    TiKV CDC モジュールは、増分レプリケーションを 10 分以上スキャンしました。
+  TiKV CDC モジュールが増分レプリケーションを10分以上スキャンしました。
 
--   解決：
+- 解決策：
 
-    TiCDC モニタリング メトリックと TiKV ログを収集して、根本原因を特定します。
+  ルート原因を特定するために TiCDC 監視メトリクスと TiKV ログを収集してください。
 
-### <code>ticdc_sink_mysql_execution_error</code> {#code-ticdc-sink-mysql-execution-error-code}
+### `ticdc_sink_mysql_execution_error` {#ticdc-sink-mysql-execution-error}
 
--   アラート ルール:
+- アラートルール：
 
-    `changes(ticdc_sink_mysql_execution_error[1m]) > 0`
+  `changes(ticdc_sink_mysql_execution_error[1m]) > 0`
 
--   説明：
+- 説明：
 
-    レプリケーション タスクがダウンストリーム MySQL にデータを書き込むときにエラーが発生します。
+  レプリケーションタスクが下流の MySQL にデータを書き込む際にエラーが発生しました。
 
--   解決：
+- 解決策：
 
-    考えられる根本原因は多数あります。 [TiCDC のトラブルシューティング](/ticdc/troubleshoot-ticdc.md)を参照してください。
+  多くの可能性が考えられます。[TiCDC のトラブルシューティング](/ticdc/troubleshoot-ticdc.md)を参照してください。
 
-### <code>ticdc_memory_abnormal</code> {#code-ticdc-memory-abnormal-code}
+### `ticdc_memory_abnormal` {#ticdc-memory-abnormal}
 
--   アラート ルール:
+- アラートルール：
 
-    `go_memstats_heap_alloc_bytes{job="ticdc"} > 1e+10`
+  `go_memstats_heap_alloc_bytes{job="ticdc"} > 1e+10`
 
--   説明：
+- 説明：
 
-    TiCDC ヒープメモリの使用量が 10 GiB を超えています。
+  TiCDC ヒープメモリの使用量が10 GiB を超えています。
 
--   解決：
+- 解決策：
 
-    TiCDC ログを収集して根本原因を特定します。
+  ルート原因を特定するために TiCDC ログを収集してください。

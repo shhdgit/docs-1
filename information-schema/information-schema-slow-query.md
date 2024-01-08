@@ -3,17 +3,17 @@ title: SLOW_QUERY
 summary: Learn the `SLOW_QUERY` INFORMATION_SCHEMA table.
 ---
 
-# SLOW_QUERY {#slow-query}
+# SLOW\_QUERY {#slow-query}
 
-`SLOW_QUERY`テーブルは、TiDB スロー ログ ファイルの解析結果である、現在のノードのスロー クエリ情報を提供します。テーブル内の列名は、スロー ログ内のフィールド名に対応しています。
+`SLOW_QUERY` テーブルは、現在のノードの遅いクエリ情報を提供します。これは TiDB 遅いクエリログファイルの解析結果です。テーブル内の列名は、遅いクエリログのフィールド名に対応しています。
 
-> **注記：**
+> **Note:**
 >
-> このテーブルは[TiDB サーバーレス](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-serverless)クラスターでは使用できません。
+> このテーブルは [TiDB Serverless](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-serverless) クラスターでは利用できません。
 
 <CustomContent platform="tidb">
 
-このテーブルを使用して問題のあるステートメントを特定し、クエリのパフォーマンスを向上させる方法については、 [スロークエリログドキュメント](/identify-slow-queries.md)を参照してください。
+このテーブルを使用して問題のあるステートメントを特定し、クエリのパフォーマンスを向上させる方法については、[遅いクエリログドキュメント](/identify-slow-queries.md) を参照してください。
 
 </CustomContent>
 
@@ -22,7 +22,7 @@ USE INFORMATION_SCHEMA;
 DESC SLOW_QUERY;
 ```
 
-出力は次のとおりです。
+出力は次のとおりです：
 
 ```sqlsql
 +-------------------------------+---------------------+------+------+---------+-------+
@@ -106,17 +106,19 @@ DESC SLOW_QUERY;
 74 rows in set (0.001 sec)
 ```
 
-## CLUSTER_SLOW_QUERY テーブル {#cluster-slow-query-table}
+`Query` カラムの最大ステートメント長は [`tidb_stmt_summary_max_sql_length`](/system-variables.md#tidb_stmt_summary_max_sql_length-new-in-v40) システム変数によって制限されています。
 
-`CLUSTER_SLOW_QUERY`テーブルは、クラスター内のすべてのノードのスロー クエリ情報を提供します。これは、TiDB スロー ログ ファイルの解析結果です。 `CLUSTER_SLOW_QUERY`テーブルは`SLOW_QUERY`と同じように使用できます。 `CLUSTER_SLOW_QUERY`テーブルのテーブル スキーマは、 `INSTANCE`列が`CLUSTER_SLOW_QUERY`に追加されるという点で`SLOW_QUERY`テーブルのテーブル スキーマと異なります。 `INSTANCE`列は、スロー クエリの行情報の TiDB ノード アドレスを表します。
+## CLUSTER\_SLOW\_QUERY テーブル {#cluster-slow-query-table}
 
-> **注記：**
+`CLUSTER_SLOW_QUERY` テーブルは、クラスター内のすべてのノードの遅いクエリ情報を提供します。これは TiDB 遅いログファイルの解析結果です。`CLUSTER_SLOW_QUERY` テーブルは `SLOW_QUERY` と同じように使用できます。`CLUSTER_SLOW_QUERY` テーブルのテーブルスキーマは、`SLOW_QUERY` テーブルと異なり、`INSTANCE` カラムが `CLUSTER_SLOW_QUERY` に追加されています。`INSTANCE` カラムは、遅いクエリの行情報の TiDB ノードアドレスを表します。
+
+> **Note:**
 >
-> このテーブルは[TiDB サーバーレス](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-serverless)クラスターでは使用できません。
+> このテーブルは [TiDB Serverless](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-serverless) クラスターでは利用できません。
 
 <CustomContent platform="tidb">
 
-このテーブルを使用して問題のあるステートメントを特定し、クエリのパフォーマンスを向上させる方法については、 [スロークエリログドキュメント](/identify-slow-queries.md)を参照してください。
+このテーブルを使用して問題のあるステートメントを特定し、クエリのパフォーマンスを向上させる方法については、[遅いクエリログドキュメント](/identify-slow-queries.md) を参照してください。
 
 </CustomContent>
 
@@ -124,7 +126,7 @@ DESC SLOW_QUERY;
 DESC CLUSTER_SLOW_QUERY;
 ```
 
-出力は次のとおりです。
+出力は次のようになります：
 
 ```sql
 +-------------------------------+---------------------+------+------+---------+-------+
@@ -209,29 +211,29 @@ DESC CLUSTER_SLOW_QUERY;
 75 rows in set (0.001 sec)
 ```
 
-クラスター システム テーブルがクエリされると、TiDB はすべてのノードからデータを取得するのではなく、関連する計算を他のノードにプッシュ ダウンします。実行計画は次のとおりです。
+クラスターシステムテーブルがクエリされると、TiDBはすべてのノードからデータを取得せず、関連する計算を他のノードにプッシュダウンします。実行計画は次のようになります:
 
 ```sql
 DESC SELECT COUNT(*) FROM CLUSTER_SLOW_QUERY WHERE user = 'u1';
 ```
 
-出力は次のとおりです。
+出力は次のとおりです：
 
 ```sql
 +----------------------------+----------+-----------+--------------------------+------------------------------------------------------+
 | id                         | estRows  | task      | access object            | operator info                                        |
 +----------------------------+----------+-----------+--------------------------+------------------------------------------------------+
 | StreamAgg_7                | 1.00     | root      |                          | funcs:count(1)->Column#75                            |
-| └─TableReader_13       | 10.00    | root      |                          | data:Selection_12                                    |
-|   └─Selection_12       | 10.00    | cop[tidb] |                          | eq(INFORMATION_SCHEMA.cluster_slow_query.user, "u1") |
-|     └─TableFullScan_11 | 10000.00 | cop[tidb] | table:CLUSTER_SLOW_QUERY | keep order:false, stats:pseudo                       |
+| └─TableReader_13           | 10.00    | root      |                          | data:Selection_12                                    |
+|   └─Selection_12           | 10.00    | cop[tidb] |                          | eq(INFORMATION_SCHEMA.cluster_slow_query.user, "u1") |
+|     └─TableFullScan_11     | 10000.00 | cop[tidb] | table:CLUSTER_SLOW_QUERY | keep order:false, stats:pseudo                       |
 +----------------------------+----------+-----------+--------------------------+------------------------------------------------------+
 4 rows in set (0.00 sec)
 ```
 
-前述の実行プランでは、条件`user = u1`が他の ( `cop` ) TiDB ノードにプッシュダウンされ、集計演算子もプッシュダウンされます (グラフの`StreamAgg`演算子)。
+先行する実行計画では、`user = u1` の条件が他の（`cop`）TiDBノードにプッシュダウンされ、集約演算子もプッシュダウンされます（グラフ内の `StreamAgg` 演算子）。
 
-現在、システム テーブルの統計が収集されないため、一部の集計演算子をプッシュダウンできない場合があり、その結果、実行が遅くなります。この場合、SQL HINT を手動で指定して集計演算子をプッシュダウンできます。例えば：
+現在、システムテーブルの統計が収集されていないため、時々いくつかの集約演算子をプッシュダウンできないことがあり、それによって実行が遅くなることがあります。この場合、SQL HINTを手動で指定して集約演算子をプッシュダウンすることができます。例えば：
 
 ```sql
 SELECT /*+ AGG_TO_COP() */ COUNT(*) FROM CLUSTER_SLOW_QUERY GROUP BY user;

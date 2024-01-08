@@ -3,112 +3,112 @@ title: Get Started with Chat2Query API
 summary: Learn how to use TiDB Cloud Chat2Query API to generate and execute SQL statements using AI by providing instructions.
 ---
 
-# Chat2Query API を使ってみる {#get-started-with-chat2query-api}
+# Chat2Query APIのはじめ方 {#get-started-with-chat2query-api}
 
-TiDB Cloud は、指示を提供することで AI を使用して SQL ステートメントを生成および実行できる RESTful インターフェイスである Chat2Query API を提供します。その後、API はクエリ結果を返します。
+TiDB CloudはChat2Query APIを提供しており、RESTfulインターフェースを使用してAIを利用してSQLステートメントを生成および実行することができます。その後、APIはクエリの結果を返します。
 
-Chat2Query API には HTTPS 経由でのみアクセスできるため、ネットワーク上で送信されるすべてのデータは TLS を使用して暗号化されます。
+Chat2Query APIはHTTPSを介してのみアクセスでき、ネットワークを介して送信されるすべてのデータがTLSを使用して暗号化されることを保証します。
 
-> **注記：**
+> **Note:**
 >
-> Chat2Query APIは[TiDB サーバーレス](/tidb-cloud/select-cluster-tier.md#tidb-serverless)クラスタで利用可能です。 [TiDB専用](/tidb-cloud/select-cluster-tier.md#tidb-dedicated)クラスターで Chat2Query API を使用するには、 [TiDB Cloudのサポート](/tidb-cloud/tidb-cloud-support.md)にお問い合わせください。
+> Chat2Query APIは[TiDB Serverless](/tidb-cloud/select-cluster-tier.md#tidb-serverless)クラスターで利用可能です。[TiDB Dedicated](/tidb-cloud/select-cluster-tier.md#tidb-dedicated)クラスターでChat2Query APIを使用するには、[TiDB Cloudサポート](/tidb-cloud/tidb-cloud-support.md)に連絡してください。
 
-## ステップ 1. Chat2Query データ アプリを作成する {#step-1-create-a-chat2query-data-app}
+## ステップ1. Chat2Queryデータアプリの作成 {#step-1-create-a-chat2query-data-app}
 
-プロジェクトのデータ アプリを作成するには、次の手順を実行します。
+プロジェクトのデータアプリを作成するには、次の手順を実行します。
 
-1.  プロジェクトの[**データサービス**](https://tidbcloud.com/console/data-service)ページで、<mdsvgicon name="icon-create-data-app">左側のペインで**DataApp を作成します**。データアプリ作成ダイアログが表示されます。</mdsvgicon>
+1. プロジェクトの[**データサービス**](https://tidbcloud.com/console/data-service)ページで、左ペインの<MDSvgIcon name="icon-create-data-app" /> **Create DataApp**をクリックします。データアプリ作成ダイアログが表示されます。
 
-    > **ヒント：**
-    >
-    > クラスターの**Chat2Query**ページにいる場合は、右上隅の**[...]**をクリックし、 **[API 経由で Chat2Query にアクセス]**を選択し、 **[新しい Chat2Query データ アプリ]**をクリックして、データ アプリ作成ダイアログを開くこともできます。
+   > **Tip:**
+   >
+   > クラスターの**Chat2Query**ページにいる場合は、右上隅の\*\*...\*\*をクリックし、**Access Chat2Query via API**を選択し、**New Chat2Query Data App**をクリックすることで、データアプリ作成ダイアログを開くこともできます。
 
-2.  ダイアログで、データ アプリの名前を定義し、データ ソースとして目的のクラスターを選択し、**データ アプリ**の種類として**Chat2Query データ アプリ**を選択します。必要に応じて、アプリの説明を書くこともできます。
+2. ダイアログで、データアプリの名前を定義し、希望するクラスターをデータソースとして選択し、**Chat2Query Data App**を**Data App**タイプとして選択します。オプションで、アプリの説明を記述することもできます。
 
-3.  **「作成」**をクリックします。
+3. **Create**をクリックします。
 
-    新しく作成された Chat2Query データ アプリが左側のペインに表示されます。このデータ アプリの下に、Chat2Query エンドポイントのリストがあります。
+   新しく作成されたChat2Queryデータアプリが左ペインに表示されます。このデータアプリの下に、Chat2Queryエンドポイントのリストが表示されます。
 
-## ステップ 2. API キーを作成する {#step-2-create-an-api-key}
+## ステップ2. APIキーの作成 {#step-2-create-an-api-key}
 
-エンドポイントを呼び出す前に、Chat2Query データ アプリの API キーを作成する必要があります。この API キーは、エンドポイントがTiDB Cloudクラスター内のデータにアクセスするために使用します。
+エンドポイントを呼び出す前に、Chat2Queryデータアプリ用のAPIキーを作成する必要があります。このAPIキーは、TiDB Cloudクラスター内のデータにアクセスするためにエンドポイントによって使用されます。
 
-API キーを作成するには、次の手順を実行します。
+APIキーを作成するには、次の手順を実行します。
 
-1.  [**データサービス**](https://tidbcloud.com/console/data-service)の左側のペインで、Chat2Query データ アプリをクリックして、右側にその詳細を表示します。
+1. [**データサービス**](https://tidbcloud.com/console/data-service)の左ペインで、Chat2Queryデータアプリをクリックして、右側で詳細を表示します。
 
-2.  **「認証」**領域で、 **「API キーの作成」を**クリックします。
+2. **Authentication**エリアで、**Create API Key**をクリックします。
 
-3.  **[API キーの作成]**ダイアログで説明を入力し、API キーの次のロールのいずれかを選択します。
+3. **Create API Key**ダイアログで、説明を入力し、次の役割のいずれかをAPIキーに選択します。
 
-    -   `Chat2Query Admin` : API キーでデータの概要を管理し、提供された指示に基づいて SQL ステートメントを生成し、任意の SQL ステートメントを実行できるようにします。
+   - `Chat2Query Admin`: APIキーがデータサマリーの管理、指示に基づいたSQLステートメントの生成、および任意のSQLステートメントの実行を許可します。
 
-    -   `Chat2Query Data Summary Management Role` : API キーによるデータ概要の生成と更新のみを許可します。
+   - `Chat2Query Data Summary Management Role`: APIキーがデータサマリーの生成と更新のみを許可します。
 
-        > **ヒント：**
-        >
-        > Chat2Query API の場合、データ概要は AI によるデータベースの分析結果であり、データベースの説明、テーブルの説明、列の説明が含まれます。データベースのデータ概要を生成すると、SQL ステートメントを生成するときに指示を提供することで、より正確な応答を得ることができます。
+     > **Tip:**
+     >
+     > Chat2Query APIでは、データサマリーはAIによるデータベースの分析結果であり、データベースの説明、テーブルの説明、およびカラムの説明を含みます。データベースのデータサマリーを生成することで、指示に基づいてSQLステートメントを生成する際により正確な応答を得ることができます。
 
-    -   `Chat2Query SQL ReadOnly` : API キーは、指定された命令に基づいて SQL ステートメントを生成し、 `SELECT` SQL ステートメントを実行することのみを許可します。
+   - `Chat2Query SQL ReadOnly`: APIキーが指示に基づいたSQLステートメントの生成と`SELECT` SQLステートメントの実行のみを許可します。
 
-    -   `Chat2Query SQL ReadWrite` : API キーは、指定された命令に基づいて SQL ステートメントを生成し、任意の SQL ステートメントを実行できます。
+   - `Chat2Query SQL ReadWrite`: APIキーが指示に基づいたSQLステートメントの生成と任意のSQLステートメントの実行を許可します。
 
-4.  **「次へ」**をクリックします。公開鍵と秘密鍵が表示されます。
+4. **Next**をクリックします。公開鍵と秘密鍵が表示されます。
 
-    秘密キーをコピーして安全な場所に保存したことを確認してください。このページを離れると、完全な秘密キーを再度取得することはできなくなります。
+   このページを離れる前に、秘密鍵を安全な場所にコピーして保存してください。このページを離れると、再び完全な秘密鍵を取得することはできません。
 
-5.  **「完了」**をクリックします。
+5. **Done**をクリックします。
 
-## ステップ 3. Chat2Query エンドポイントを呼び出す {#step-3-call-chat2query-endpoints}
+## ステップ3. Chat2Queryエンドポイントの呼び出し {#step-3-call-chat2query-endpoints}
 
-> **注記：**
+> **Note:**
 >
-> 各 Chat2Query データ アプリには、1 日あたり 100 リクエストのレート制限があります。レート制限を超えると、API は`429`エラーを返します。さらに割り当てが必要な場合は、サポート チームに[リクエストを送信する](https://support.pingcap.com/hc/en-us/requests/new?ticket_form_id=7800003722519)お問い合わせください。
+> 各Chat2Queryデータアプリには、1日あたり100リクエストのレート制限があります。レート制限を超えると、APIは`429`エラーを返します。より多くのクォータをご希望の場合は、[リクエストを送信](https://support.pingcap.com/hc/en-us/requests/new?ticket_form_id=7800003722519)してください。
 
-各 Chat2Query データ アプリには、次のエンドポイントがあります。
+各Chat2Queryデータアプリには、次のエンドポイントがあります。
 
--   Chat2Query v1 エンドポイント: `/v1/chat2data`
--   Chat2Query v2 エンドポイント: `/v2/dataSummaries`や`/v2/chat2data`など、名前が`/v2`で始まるエンドポイント
+- Chat2Query v1エンドポイント: `/v1/chat2data`
+- Chat2Query v2エンドポイント: `/v2`で始まるエンドポイント、例えば`/v2/dataSummaries`および`/v2/chat2data`
 
-> **ヒント：**
+> **Tip:**
 >
-> `/v1/chat2data`と比較して、 `/v2/chat2data` 、最初に`/v2/dataSummaries`呼び出してデータベースを分析する必要があるため、一般に`/v2/chat2data`によって返される結果の方が正確です。
+> `/v1/chat2data`と比較して、`/v2/chat2data`は最初に`/v2/dataSummaries`を呼び出してデータベースを分析する必要があるため、`/v2/chat2data`が一般的により正確な結果を返します。
 
-### エンドポイントのコード例を取得する {#get-the-code-example-of-an-endpoint}
+### エンドポイントのコード例を取得 {#get-the-code-example-of-an-endpoint}
 
-TiDB Cloudには、 Chat2Query エンドポイントをすばやく呼び出すのに役立つコード サンプルが用意されています。 Chat2Query エンドポイントのコード例を取得するには、次の手順を実行します。
+TiDB Cloudでは、Chat2Queryエンドポイントを迅速に呼び出すためのコード例を提供しています。Chat2Queryエンドポイントのコード例を取得するには、次の手順を実行します。
 
-1.  [**データサービス**](https://tidbcloud.com/console/data-service)ページの左側のペインで、Chat2Query エンドポイントの名前をクリックします。
+1. [**データサービス**](https://tidbcloud.com/console/data-service)ページの左ペインで、Chat2Queryエンドポイントの名前をクリックします。
 
-    右側には、エンドポイントの URL、コード例、リクエスト メソッドなど、このエンドポイントを呼び出すための情報が表示されます。
+   エンドポイントの呼び出しに関する情報が右側に表示されます。エンドポイントURL、コード例、およびリクエストメソッドなどが表示されます。
 
-2.  **[コード例を表示]**をクリックします。
+2. **Show Code Example**をクリックします。
 
-3.  表示されたダイアログ ボックスで、エンドポイントの呼び出しに使用するクラスター、データベース、および認証方法を選択し、コード例をコピーします。
+3. 表示されたダイアログボックスで、エンドポイントを呼び出す際に使用するクラスター、データベース、および認証方法を選択し、コード例をコピーします。
 
-    > **注記：**
-    >
-    > `/v2/chat2data`と`/v2/jobs/{job_id}`の場合は、認証方法を選択するだけです。
+   > **Note:**
+   >
+   > `/v2/chat2data`および`/v2/jobs/{job_id}`の場合、認証方法のみを選択する必要があります。
 
-4.  エンドポイントを呼び出すには、サンプルをアプリケーションに貼り付け、サンプル内のパラメーターを独自のパラメーターに置き換えて ( `${PUBLIC_KEY}`と`${PRIVATE_KEY}`プレースホルダーを API キーに置き換えるなど)、実行します。
+4. エンドポイントを呼び出すには、アプリケーションに例を貼り付け、例のパラメータを自分のものに置き換え（たとえば`${PUBLIC_KEY}`および`${PRIVATE_KEY}`のプレースホルダをAPIキーに置き換え）して実行します。
 
-### Chat2Query v2 エンドポイントを呼び出す {#call-chat2query-v2-endpoints}
+### Chat2Query v2エンドポイントの呼び出し {#call-chat2query-v2-endpoints}
 
-TiDB Cloudデータ サービスは、次の Chat2Query v2 エンドポイントを提供します。
+TiDB Cloudデータサービスでは、次のChat2Query v2エンドポイントが提供されています。
 
-| 方法 | 終点                  | 説明                                                                         |
-| -- | ------------------- | -------------------------------------------------------------------------- |
-| 役職 | `/v2/dataSummaries` | このエンドポイントは、分析に人工知能を使用して、データベース スキーマ、テーブル スキーマ、および列スキーマのデータ概要を生成します。        |
-| 役職 | `/v2/chat2data`     | このエンドポイントを使用すると、データ サマリー ID と命令を提供することで、人工知能を使用して SQL ステートメントを生成および実行できます。 |
-| 得る | `/v2/jobs/{job_id}` | このエンドポイントを使用すると、データ概要生成ジョブのステータスをクエリできます。                                  |
+| メソッド | エンドポイント             | 説明                                                                |
+| ---- | ------------------- | ----------------------------------------------------------------- |
+| POST | `/v2/dataSummaries` | このエンドポイントは、人工知能を使用してデータベーススキーマ、テーブルスキーマ、およびカラムスキーマのデータサマリーを生成します。 |
+| POST | `/v2/chat2data`     | このエンドポイントは、データサマリーIDと指示を提供して人工知能を使用してSQLステートメントを生成および実行することができます。 |
+| GET  | `/v2/jobs/{job_id}` | このエンドポイントは、データサマリー生成ジョブのステータスをクエリすることができます。                       |
 
-後続のセクションでは、これらのエンドポイントを呼び出す方法を学習します。
+次のセクションでは、これらのエンドポイントの呼び出し方について学びます。
 
-#### 1. <code>/v2/dataSummaries</code>を呼び出してデータ概要を生成します。 {#1-generate-a-data-summary-by-calling-code-v2-datasummaries-code}
+#### 1. `/v2/dataSummaries`を呼び出してデータサマリーを生成 {#1-generate-a-data-summary-by-calling-v2-datasummaries}
 
-`/v2/chat2data`を呼び出す前に、AI にデータベースを分析させ、まず`/v2/dataSummaries`を呼び出してデータの概要を生成させます。これにより、後の SQL 生成で`/v2/chat2data`のパフォーマンスが向上します。
+`/v2/chat2data`を呼び出す前に、AIにデータベースを分析させ、`/v2/dataSummaries`を呼び出して最初にデータサマリーを生成し、後で`/v2/chat2data`でSQL生成のパフォーマンスを向上させることができます。
 
-以下は、 `/v2/chat2data`を呼び出して`sp500insight`データベースを分析し、データベースのデータ概要を生成するコード例です。
+以下は、`/v2/chat2data`を呼び出して`sp500insight`データベースを分析し、データベースのデータサマリーを生成するコード例です：
 
 ```bash
 curl --digest --user ${PUBLIC_KEY}:${PRIVATE_KEY} --request POST 'https://<region>.data.dev.tidbcloud.com/api/v1beta/app/chat2query-<ID>/endpoint/v2/dataSummaries'\
@@ -119,12 +119,12 @@ curl --digest --user ${PUBLIC_KEY}:${PRIVATE_KEY} --request POST 'https://<regio
 }'
 ```
 
-前述の例では、リクエスト本文は次のプロパティを持つ JSON オブジェクトです。
+先行する例では、リクエスト本文は次のプロパティを持つJSONオブジェクトです。
 
--   `cluster_id` :*文字列*。 TiDB クラスターの一意の識別子。
--   `database` :*文字列*。データベースの名前。
+- `cluster_id`: *string*. TiDBクラスターのユニークな識別子。
+- `database`: *string*. データベースの名前。
 
-応答の例は次のとおりです。
+例として、次のような応答があります:
 
 ```json
 {
@@ -137,18 +137,18 @@ curl --digest --user ${PUBLIC_KEY}:${PRIVATE_KEY} --request POST 'https://<regio
 }
 ```
 
-#### 2. <code>/v2/jobs/{job_id}</code>を呼び出して分析ステータスを確認します。 {#2-check-the-analysis-status-by-calling-code-v2-jobs-job-id-code}
+#### 2. `/v2/jobs/{job_id}` を呼び出して解析ステータスを確認します {#2-check-the-analysis-status-by-calling-v2-jobs-job-id}
 
-`/v2/dataSummaries` API は非同期です。大規模なデータセットを含むデータベースの場合、データベース分析が完了して完全なデータ概要が返されるまでに数分かかる場合があります。
+`/v2/dataSummaries` API は非同期です。大規模なデータセットを持つデータベースの場合、データベースの解析が完了し、完全なデータサマリーが返されるまで数分かかる場合があります。
 
-データベースの分析ステータスを確認するには、次のように`/v2/jobs/{job_id}`エンドポイントを呼び出します。
+データベースの解析ステータスを確認するには、次のように `/v2/jobs/{job_id}` エンドポイントを呼び出すことができます。
 
 ```bash
 curl --digest --user ${PUBLIC_KEY}:${PRIVATE_KEY} --request GET 'https://<region>.data.dev.tidbcloud.com/api/v1beta/app/chat2query-<ID>`/endpoint/v2/jobs/{job_id}'\
  --header 'content-type: application/json'
 ```
 
-応答の例は次のとおりです。
+以下は例としてのレスポンスです：
 
 ```json
 {
@@ -163,13 +163,13 @@ curl --digest --user ${PUBLIC_KEY}:${PRIVATE_KEY} --request GET 'https://<region
 }
 ```
 
-`"status"`が`"done"`の場合、完全なデータの概要が準備できているため、 `/v2/chat2data`を呼び出すことで、このデータベースの SQL ステートメントを生成して実行できるようになります。それ以外の場合は、分析が完了するまで待って、後で分析ステータスを確認する必要があります。
+もし`"status"`が`"done"`であれば、完全なデータサマリーが準備され、`/v2/chat2data`を呼び出すことでこのデータベースのためのSQLステートメントを生成して実行できます。そうでない場合は、完了するまで後で解析ステータスを待って確認する必要があります。
 
-応答では、 `DataSummaryObject`指定されたデータベースの AI 探索情報を表します。 `DataSummaryObject`の構造は以下の通りです。
+応答では、`DataSummaryObject`は与えられたデータベースのAI探査情報を表します。`DataSummaryObject`の構造は以下の通りです:
 
 ```json
 {
-    "cluster_id": 10939961583884005000, // Your cluster id
+    "cluster_id": 10939961583884005252, // Your cluster id
     "db_name": "sp500insight", // Database name
     "db_schema": { // Database schema information
         "users": { // A table named "users"
@@ -210,25 +210,29 @@ curl --digest --user ${PUBLIC_KEY}:${PRIVATE_KEY} --request GET 'https://<region
 }
 ```
 
-#### 3. <code>/v2/chat2data</code>を呼び出して SQL ステートメントを生成および実行します。 {#3-generate-and-execute-sql-statements-by-calling-code-v2-chat2data-code}
+#### 3. Generate and execute SQL statements by calling `/v2/chat2data` {#3-generate-and-execute-sql-statements-by-calling-v2-chat2data}
 
-データベースのデータ概要の準備ができたら、次のようにデータ概要 ID と質問を指定して`/v2/chat2data`を呼び出し、SQL ステートメントを生成して実行できます。
+データベースのデータサマリーが準備できたら、クラスターID、データベース名、および質問を提供して `/v2/chat2data` を呼び出すことで、SQLステートメントを生成および実行できます。
+
+たとえば：
 
 ```bash
 curl --digest --user ${PUBLIC_KEY}:${PRIVATE_KEY} --request POST 'https://<region>.data.dev.tidbcloud.com/api/v1beta/app/chat2query-<ID>/endpoint/v2/chat2data'\
  --header 'content-type: application/json'\
  --data-raw '{
-  "data_summary_id": <Your data summary id>,
+  "cluster_id": "10939961583884005252",
+  "database": "sp500insight",
   "raw_question": "<Your question to generate data>"
 }'
 ```
 
-前述のコードでは、リクエスト本文は次のプロパティを持つ JSON オブジェクトです。
+先行するコードでは、リクエストボディは次のプロパティを持つJSONオブジェクトです。
 
--   `data_summary_id` :*文字列*。データ概要の一意の識別子。 `/v2/dataSummaries`を呼び出すことで生成されます。
--   `raw_question` :*文字列*。必要なクエリを記述する自然言語。
+- `cluster_id`: *string*. TiDBクラスターのユニークな識別子。
+- `database`: *string*. データベースの名前。
+- `raw_question`: *string*. 欲しいクエリを記述する自然言語。
 
-応答の例は次のとおりです。
+例として、次のような応答があります：
 
 ```json
 {
@@ -240,14 +244,24 @@ curl --digest --user ${PUBLIC_KEY}:${PRIVATE_KEY} --request POST 'https://<regio
 }
 ```
 
-`/v2/chat2data` API は非同期です。 `/v2/jobs/{job_id}`エンドポイントを呼び出すことで、ジョブのステータスを確認できます。
+もし以下のようにステータスコード `400` で応答を受け取った場合、それはデータの要約が準備されるのを待つ必要があることを意味します。
+
+```json
+{
+    "code": 400,
+    "msg": "Data summary is not ready, please wait for a while and retry",
+    "result": {}
+}
+```
+
+`/v2/chat2data` APIは非同期です。`/v2/jobs/{job_id}`エンドポイントを呼び出すことで、ジョブの状態を確認できます。
 
 ```bash
 curl --digest --user ${PUBLIC_KEY}:${PRIVATE_KEY} --request GET 'https://<region>.data.dev.tidbcloud.com/api/v1beta/app/chat2query-<ID>/endpoint/v2/jobs/{job_id}'\
  --header 'content-type: application/json'
 ```
 
-応答の例は次のとおりです。
+以下は例としてのレスポンスです：
 
 ```json
 {
@@ -286,29 +300,30 @@ curl --digest --user ${PUBLIC_KEY}:${PRIVATE_KEY} --request GET 'https://<region
 }
 ```
 
-### Chat2Data v1 エンドポイントを呼び出す {#call-the-chat2data-v1-endpoint}
+### チャット2データ v1 エンドポイントを呼び出す {#call-the-chat2data-v1-endpoint}
 
-TiDB Cloudデータ サービスは、次の Chat2Query v1 エンドポイントを提供します。
+TiDB Cloudデータサービスは、次のChat2Query v1エンドポイントを提供します。
 
-| 方法 | 終点              | 説明                                                                          |
-| -- | --------------- | --------------------------------------------------------------------------- |
-| 役職 | `/v1/chat2data` | このエンドポイントを使用すると、ターゲット データベース名と命令を指定することで、人工知能を使用して SQL ステートメントを生成および実行できます。 |
+| メソッド | エンドポイント         | 説明                                                                    |
+| ---- | --------------- | --------------------------------------------------------------------- |
+| POST | `/v1/chat2data` | このエンドポイントを使用すると、ターゲットデータベース名と指示を提供して、人工知能を使用してSQLステートメントを生成および実行できます。 |
 
-`/v1/chat2data`エンドポイントを直接呼び出して、SQL ステートメントを生成および実行できます。 `/v2/chat2data`と比較して、 `/v1/chat2data`は応答が速くなりますが、パフォーマンスは低くなります。
+`/v1/chat2data` エンドポイントを直接呼び出して、SQLステートメントを生成および実行できます。 `/v2/chat2data` と比較して、`/v1/chat2data` はより迅速な応答を提供しますが、パフォーマンスは低くなります。
 
-TiDB Cloudは、エンドポイントの呼び出しに役立つコード サンプルを生成します。例を取得してコードを実行するには、 [エンドポイントのコード例を取得する](#get-the-code-example-of-an-endpoint)を参照してください。
+TiDB Cloudは、エンドポイントを呼び出すためのコード例を生成します。例とコードを取得するには、[エンドポイントのコード例を取得](#get-the-code-example-of-an-endpoint)を参照してください。
 
-`/v1/chat2data`を呼び出すときは、次のパラメータを置き換える必要があります。
+`/v1/chat2data` を呼び出す際に、次のパラメータを置き換える必要があります。
 
--   `${PUBLIC_KEY}`と`${PRIVATE_KEY}`プレースホルダーを API キーに置き換えます。
--   `<your table name, optional>`プレースホルダーを、クエリするテーブル名に置き換えます。テーブル名を指定しない場合、AI はデータベース内のすべてのテーブルをクエリします。
--   `<your instruction>`プレースホルダーを、AI に SQL ステートメントを生成して実行させる命令に置き換えます。
+- `${PUBLIC_KEY}` および `${PRIVATE_KEY}` のプレースホルダをAPIキーで置き換えます。
+- `<your table name, optional>` のプレースホルダをクエリしたいテーブル名で置き換えます。テーブル名を指定しない場合、AIはデータベース内のすべてのテーブルをクエリします。
+- `<your instruction>` のプレースホルダを、AIに生成および実行するSQLステートメントの指示で置き換えます。
 
-> **注記：**
+> **Note:**
 >
-> 各 Chat2Query データ アプリには、1 日あたり 100 リクエストのレート制限があります。レート制限を超えると、API は`429`エラーを返します。さらに割り当てが必要な場合は、サポート チームに[リクエストを送信する](https://support.pingcap.com/hc/en-us/requests/new?ticket_form_id=7800003722519)お問い合わせください。ロール`Chat2Query Data Summary Management Role`の API キーは、Chat2Data v1 エンドポイントを呼び出すことができません。
+> 各Chat2Queryデータアプリには、1日あたり100件のリクエストの制限があります。制限を超えると、APIは `429` エラーを返します。より多くのクォータをご希望の場合は、[リクエストを送信](https://support.pingcap.com/hc/en-us/requests/new?ticket_form_id=7800003722519)してください。
+> `Chat2Queryデータサマリ管理ロール` を持つAPIキーは、Chat2Data v1エンドポイントを呼び出すことができません。
 
-次のコード例は、 `sp500insight.users`テーブル内のユーザーの数をカウントするために使用されます。
+次のコード例は、`sp500insight.users` テーブルにいくつのユーザーがいるかをカウントするために使用されます：
 
 ```bash
 curl --digest --user ${PUBLIC_KEY}:${PRIVATE_KEY} --request POST 'https://<region>.data.dev.tidbcloud.com/api/v1beta/app/chat2query-<ID>/endpoint/chat2data'\
@@ -321,14 +336,14 @@ curl --digest --user ${PUBLIC_KEY}:${PRIVATE_KEY} --request POST 'https://<regio
 }'
 ```
 
-前述の例では、リクエスト本文は次のプロパティを持つ JSON オブジェクトです。
+先行する例では、リクエスト本文は次のプロパティを持つJSONオブジェクトです。
 
--   `cluster_id` :*文字列*。 TiDB クラスターの一意の識別子。
--   `database` :*文字列*。データベースの名前。
--   `tables` :*配列*。 (オプション) クエリ対象のテーブル名のリスト。
--   `instruction` :*文字列*。必要なクエリを説明する自然言語命令。
+- `cluster_id`: *string*. TiDBクラスターのユニークな識別子。
+- `database`: *string*. データベースの名前。
+- `tables`: *array*. (オプション) クエリするテーブル名のリスト。
+- `instruction`: *string*. 欲しいクエリを記述する自然言語の指示。
 
-応答は次のとおりです。
+レスポンスは次のようになります:
 
 ```json
 {
@@ -362,7 +377,7 @@ curl --digest --user ${PUBLIC_KEY}:${PRIVATE_KEY} --request POST 'https://<regio
 }
 ```
 
-API 呼び出しが成功しなかった場合は、 `200`以外のステータス コードが返されます。以下は`500`ステータス コードの例です。
+もしAPIの呼び出しが成功しない場合、`200`以外のステータスコードが返されます。以下は`500`ステータスコードの例です:
 
 ```json
 {
@@ -384,7 +399,7 @@ API 呼び出しが成功しなかった場合は、 `200`以外のステータ�
 }
 ```
 
-## もっと詳しく知る {#learn-more}
+## Learn more {#learn-more}
 
--   [APIキーを管理する](/tidb-cloud/data-service-api-key.md)
--   [データサービスのレスポンスコードとステータスコード](/tidb-cloud/data-service-response-and-status-code.md)
+- [APIキーの管理](/tidb-cloud/data-service-api-key.md)
+- [データサービスの応答とステータスコード](/tidb-cloud/data-service-response-and-status-code.md)

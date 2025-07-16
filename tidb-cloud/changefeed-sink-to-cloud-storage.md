@@ -20,7 +20,7 @@ This document describes how to create a changefeed to stream data from TiDB Clou
 
 ## Step 1. Configure destination
 
-Navigate to the cluster overview page of the target TiDB cluster. Click **Data** > **Changefeed** in the left navigation pane, click **Create Changefeed**, and select **Amazon S3** or **GCS** as the destination. The configuration process varies depend on the destination you choose.
+Navigate to the cluster overview page of the target TiDB cluster. Click **Changefeed** in the left navigation pane, click **Create Changefeed**, and select **Amazon S3** or **GCS** as the destination. The configuration process varies depend on the destination you choose.
 
 <SimpleTab>
 <div label="Amazon S3">
@@ -105,13 +105,7 @@ Click **Next** to establish the connection from the TiDB Cloud Dedicated cluster
 2. Customize **Event Filter** to filter the events that you want to replicate.
 
     - **Tables matching**: you can set which tables the event filter will be applied to in this column. The rule syntax is the same as that used for the preceding **Table Filter** area. You can add up to 10 event filter rules per changefeed.
-    - **Event Filter**: you can use the following event filters to exclude specific events from the changefeed:
-        - **Ignore event**: excludes specified event types.
-        - **Ignore SQL**: excludes DDL events that match specified expressions. For example, `^drop` excludes statements starting with `DROP`, and `add column` excludes statements containing `ADD COLUMN`.
-        - **Ignore insert value expression**: excludes `INSERT` statements that meet specific conditions. For example, `id >= 100` excludes `INSERT` statements where `id` is greater than or equal to 100.
-        - **Ignore update new value expression**: excludes `UPDATE` statements where the new value matches a specified condition. For example, `gender = 'male'` excludes updates that result in `gender` being `male`.
-        - **Ignore update old value expression**: excludes `UPDATE` statements where the old value matches a specified condition. For example, `age < 18` excludes updates where the old value of `age` is less than 18.
-        - **Ignore delete value expression**: excludes `DELETE` statements that meet a specified condition. For example, `name = 'john'` excludes `DELETE` statements where `name` is `'john'`.
+    - **Ignored events**: you can set which types of events the event filter will exclude from the changefeed.
 
 3. In the **Start Replication Position** area, select one of the following replication positions:
 

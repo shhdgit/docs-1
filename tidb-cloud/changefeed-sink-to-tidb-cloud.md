@@ -22,6 +22,7 @@ This document describes how to stream data from a TiDB Cloud Dedicated cluster t
     - AWS Frankfurt (eu-central-1)
     - AWS Singapore (ap-southeast-1)
     - AWS Tokyo (ap-northeast-1)
+    - AWS São Paulo (sa-east-1)
 
 - The source TiDB Cloud Dedicated cluster and the destination TiDB Cloud Serverless cluster must be in the same project and the same region.
 - The **Sink to TiDB Cloud** feature only supports network connection via private endpoints. When you create a changefeed to stream data from a TiDB Cloud Dedicated cluster to a TiDB Cloud Serverless cluster, TiDB Cloud will automatically set up the private endpoint connection between the two clusters.
@@ -43,7 +44,7 @@ Before creating a changefeed, you need to export existing data from the source T
     SET GLOBAL tidb_gc_life_time = '720h';
     ```
 
-2. Use [Dumpling](https://docs.pingcap.com/tidb/stable/dumpling-overview) to export data from your TiDB Cloud Dedicated cluster, then use [TiDB Cloud Serverless Import](/tidb-cloud/import-csv-files-serverless.md) to load data to the destination TiDB Cloud Serverless cluster.
+2. [Back up data](/tidb-cloud/backup-and-restore.md#backup) from your TiDB Cloud Dedicated cluster, then use community tools such as [mydumper/myloader](https://centminmod.com/mydumper.html) to load data to the destination TiDB Cloud Serverless cluster.
 
 3. From the [exported files of Dumpling](https://docs.pingcap.com/tidb/stable/dumpling-overview#format-of-exported-files), get the start position of TiDB Cloud sink from the metadata file:
 
@@ -61,7 +62,7 @@ Before creating a changefeed, you need to export existing data from the source T
 
 After completing the prerequisites, you can sink your data to the destination TiDB Cloud Serverless cluster.
 
-1. Navigate to the cluster overview page of the target TiDB cluster, and then click **Data** > **Changefeed** in the left navigation pane.
+1. Navigate to the cluster overview page of the target TiDB cluster, and then click **Changefeed** in the left navigation pane.
 
 2. Click **Create Changefeed**, and select **TiDB Cloud** as the destination.
 
@@ -81,13 +82,7 @@ After completing the prerequisites, you can sink your data to the destination Ti
 6. Customize **Event Filter** to filter the events that you want to replicate.
 
     - **Tables matching**: you can set which tables the event filter will be applied to in this column. The rule syntax is the same as that used for the preceding **Table Filter** area. You can add up to 10 event filter rules per changefeed.
-    - **Event Filter**: you can use the following event filters to exclude specific events from the changefeed:
-        - **Ignore event**: excludes specified event types.
-        - **Ignore SQL**: excludes DDL events that match specified expressions. For example, `^drop` excludes statements starting with `DROP`, and `add column` excludes statements containing `ADD COLUMN`.
-        - **Ignore insert value expression**: excludes `INSERT` statements that meet specific conditions. For example, `id >= 100` excludes `INSERT` statements where `id` is greater than or equal to 100.
-        - **Ignore update new value expression**: excludes `UPDATE` statements where the new value matches a specified condition. For example, `gender = 'male'` excludes updates that result in `gender` being `male`.
-        - **Ignore update old value expression**: excludes `UPDATE` statements where the old value matches a specified condition. For example, `age < 18` excludes updates where the old value of `age` is less than 18.
-        - **Ignore delete value expression**: excludes `DELETE` statements that meet a specified condition. For example, `name = 'john'` excludes `DELETE` statements where `name` is `'john'`.
+    - **Ignored events**: you can set which types of events the event filter will exclude from the changefeed.
 
 7. In the **Start Replication Position** area, fill in the TSO that you get from Dumpling exported metadata files.
 

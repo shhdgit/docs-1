@@ -19,10 +19,10 @@ To get help for the `auth` command:
 ticloud help auth
 ```
 
-To get help for the `serverless create` command:
+To get help for the `serveless create` command:
 
 ```shell
-ticloud help serverless create
+ticloud help serveless create
 ```
 
 ## Flags

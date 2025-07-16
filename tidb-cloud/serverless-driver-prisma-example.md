@@ -41,9 +41,7 @@ datasource db {
 
 ## Initialize Prisma Client
 
-Before using Prisma Client, you need to initialize it with `@tidbcloud/prisma-adapter`. 
-
-For `@tidbcloud/prisma-adapter` earlier than v6.6.0: 
+Before using Prisma Client, you need to initialize it with `@tidbcloud/prisma-adapter`. For example:
 
 ```js
 import { connect } from '@tidbcloud/serverless';
@@ -53,17 +51,6 @@ import { PrismaClient } from '@prisma/client';
 // Initialize Prisma Client
 const connection = connect({ url: ${DATABASE_URL} });
 const adapter = new PrismaTiDBCloud(connection);
-const prisma = new PrismaClient({ adapter });
-```
-
-For `@tidbcloud/prisma-adapter` v6.6.0 or a later version: 
-
-```js
-import { PrismaTiDBCloud } from '@tidbcloud/prisma-adapter';
-import { PrismaClient } from '@prisma/client';
-
-// Initialize Prisma Client
-const adapter = new PrismaTiDBCloud({ url: ${DATABASE_URL} });
 const prisma = new PrismaClient({ adapter });
 ```
 
@@ -106,12 +93,12 @@ To complete this tutorial, you need the following:
    {
      "type": "module",
      "dependencies": {
-       "@prisma/client": "^6.6.0",
-       "@tidbcloud/prisma-adapter": "^6.6.0",
-       "@tidbcloud/serverless": "^0.1.0"
+       "@prisma/client": "^5.5.2",
+       "@tidbcloud/prisma-adapter": "^5.5.2",
+       "@tidbcloud/serverless": "^0.0.7"
      },
      "devDependencies": {
-       "prisma": "^6.6.0"
+       "prisma": "^5.5.2"
      }
    }
    ```
@@ -200,6 +187,7 @@ To complete this tutorial, you need the following:
 1. Create a file named `hello-word.js` and add the following code to initialize Prisma Client:
 
    ```js
+   import { connect } from '@tidbcloud/serverless';
    import { PrismaTiDBCloud } from '@tidbcloud/prisma-adapter';
    import { PrismaClient } from '@prisma/client';
    import dotenv from 'dotenv';
@@ -209,7 +197,8 @@ To complete this tutorial, you need the following:
    const connectionString = `${process.env.DATABASE_URL}`;
    
    // Initialize Prisma Client
-   const adapter = new PrismaTiDBCloud({ url: connectionString });
+   const connection = connect({ url: connectionString });
+   const adapter = new PrismaTiDBCloud(connection);
    const prisma = new PrismaClient({ adapter });
    ```
 

@@ -1,7 +1,6 @@
 ---
 title: TiDB Dashboard Introduction
 summary: TiDB Dashboard is a Web UI for monitoring, diagnosing, and managing the TiDB cluster. It shows overall running status, component and host status, traffic distribution, SQL statement execution information, slow queries, cluster diagnostics, log search, resource control, and profiling data collection.
-aliases: ['/docs/dev/dashboard/dashboard-intro/']
 ---
 
 # TiDB Dashboard Introduction
@@ -62,7 +61,7 @@ See [Search Logs Page](/dashboard/dashboard-log-search.md) for details.
 
 ## Estimate cluster capacity for resource control
 
-To implement resource isolation using the [Resource Control](/tidb-resource-control.md) feature, cluster administrators can create resource groups and set quotas for each group.
+To implement resource isolation using the [Resource Control](/tidb-resource-control-ru-groups.md) feature, cluster administrators can create resource groups and set quotas for each group.
 
 Before resource planning, you need to know the overall capacity of the cluster. For more details, see [Resource Manager page](/dashboard/dashboard-resource-manager.md).
 

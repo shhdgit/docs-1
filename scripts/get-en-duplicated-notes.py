@@ -25,10 +25,13 @@ def store_exst_rn(ext_path,main_path):
                         exst_issue_num = re.search(r'https://github.com/(pingcap|tikv)/[\w-]+/(issues|pull)/\d+', line)
                         authors = re.findall(r'@\[([^\]]+)\]', line) # Get the list of authors in this line
                         if exst_issue_num:
-                            note_level = level1 + level2 + level3
-                            note_pair = [exst_issue_num.group(),line.strip(),afile, note_level, authors]
-                            exst_issue_nums.append(exst_issue_num.group())
-                            exst_notes.append(note_pair)
+                            if exst_issue_num.group() not in exst_issue_nums:
+                                note_level = level1 + level2 + level3
+                                note_pair = [exst_issue_num.group(),line.strip(),afile, note_level, authors]
+                                exst_issue_nums.append(exst_issue_num.group())
+                                exst_notes.append(note_pair)
+                            else:
+                                continue
                         elif line.startswith("##"):
                             level1 = "> " + line.replace("##","").strip()
                             level2 = level3 = ""

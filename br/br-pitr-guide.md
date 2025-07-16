@@ -1,7 +1,6 @@
 ---
 title: TiDB Log Backup and PITR Guide
 summary: TiDB Log Backup and PITR Guide explains how to back up and restore data using the br command-line tool. It includes instructions for starting log backup, running full backup regularly, and cleaning up outdated data. The guide also provides information on running PITR and the performance capabilities of PITR.
-aliases: ['/tidb/dev/pitr-usage']
 ---
 
 # TiDB Log Backup and PITR Guide
@@ -26,6 +25,8 @@ tiup br log start --task-name=pitr --pd "${PD_IP}:2379" \
 --storage 's3://backup-101/logbackup?access-key=${access-key}&secret-access-key=${secret-access-key}'
 ```
 
+### Query the status of the log backup
+
 After the log backup task starts, it runs in the background of the TiDB cluster until you stop it manually. During this process, the TiDB change logs are regularly backed up to the specified storage in small batches. To query the status of the log backup task, run the following command:
 
 ```shell
@@ -37,14 +38,37 @@ Expected output:
 ```
 ● Total 1 Tasks.
 > #1 <
-    name: pitr
-    status: ● NORMAL
-    start: 2022-05-13 11:09:40.7 +0800
-      end: 2035-01-01 00:00:00 +0800
-    storage: s3://backup-101/log-backup
+           name: pitr
+         status: ● NORMAL
+          start: 2022-05-13 11:09:40.7 +0800
+            end: 2035-01-01 00:00:00 +0800
+        storage: s3://backup-101/log-backup
     speed(est.): 0.00 ops/s
 checkpoint[global]: 2022-05-13 11:31:47.2 +0800; gap=4m53s
 ```
+
+The fields are explained as follows:
+
+- `name`: the name of the log backup task.
+- `status`: the status of the log backup task, including `NORMAL`, `PAUSED`, and `ERROR`.
+- `start`: the start timestamp of the log backup task.
+- `end`: the end timestamp of the log backup task. Currently, this field does not take effect.
+- `storage`: the URI of the external storage for the log backup.
+- `speed(est.)`: the current data transfer rate of the log backup. This value is estimated based on traffic samples taken in the past few seconds. For more accurate traffic statistics, you can check the `Log Backup` row in the **[TiKV-Details](/grafana-tikv-dashboard.md#tikv-details-dashboard)** dashboard at Grafana.
+- `checkpoint[global]`: the current progress of the log backup. You can use PITR to restore to a point in time before this timestamp.
+
+If the log backup task is paused, the `log status` command outputs additional fields to display the details of the pause. They are:
+
+- `pause-time`: the time when the pause operation is executed.
+- `pause-operator`: the hostname of the machine that executes the pause operation.
+- `pause-operator-pid`: the PID of the process that executes the pause operation.
+- `pause-payload`: additional information attached when the task is paused.
+
+If the pause is due to an error in TiKV, you might also see additional error reports from TiKV:
+
+- `error[store=*]`: the error code on TiKV.
+- `error-happen-at[store=*]`: the time when the error occurs on TiKV.
+- `error-message[store=*]`: the error message on TiKV.
 
 ### Run full backup regularly
 
@@ -105,17 +129,17 @@ The following steps describe how to clean up backup data that exceeds the backup
 
 ## Performance capabilities of PITR
 
-- On each TiKV node, PITR can restore snapshot data (full restore) at a speed of 280 GB/h and log data (including meta files and KV files) at a speed of 30 GB/h.
+- On each TiKV node, PITR can restore snapshot data (full restore) at a speed of 2 TiB/h and log data (including meta files and KV files) at a speed of 30 GiB/h.
 - BR deletes outdated log backup data (`tiup br log truncate`) at a speed of 600 GB/h.
 
 > **Note:**
 >
 > The preceding specifications are based on test results from the following two testing scenarios. The actual data might be different.
 >
-> - Snapshot data restore speed = Snapshot data size / (duration * the number of TiKV nodes)
-> - Log data restore speed = Restored log data size / (duration * the number of TiKV nodes)
+> - Snapshot data restore speed = Total size of restored snapshot data on all TiKV nodes in the cluster / (duration * the number of TiKV nodes)
+> - Log data restore speed = Total size of restored log data on all TiKV nodes in the cluster / (duration * the number of TiKV nodes)
 >
-> The snapshot data size refers to the logical size of all KVs in a single replica, not the actual amount of restored data. BR restores all replicas according to the number of replicas configured for the cluster. The more replicas there are, the more data can be actually restored.
+> External storage only contains KV data of a single replica. Therefore, the data size in external storage does not represent the actual data size restored in the cluster. BR restores all replicas according to the number of replicas configured for the cluster. The more replicas there are, the more data can be actually restored.
 > The default replica number for all clusters in the test is 3.
 > To improve the overall restore performance, you can modify the [`import.num-threads`](/tikv-configuration-file.md#import) item in the TiKV configuration file and the [`pitr-concurrency`](/br/use-br-command-line-tool.md#common-options) option in the BR command.
 

@@ -1,7 +1,6 @@
 ---
 title: LOAD STATS
 summary: An overview of the usage of LOAD STATS for the TiDB database.
-aliases: ['/docs/dev/sql-statements/sql-statement-load-stats/']
 ---
 
 # LOAD STATS
@@ -10,7 +9,7 @@ The `LOAD STATS` statement is used to load the statistics into TiDB.
 
 > **Note:**
 >
-> This feature is not available on [TiDB Cloud Serverless](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) clusters.
+> This feature is not available on [{{{ .starter }}}](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) clusters.
 
 ## Synopsis
 

@@ -1,7 +1,6 @@
 ---
 title: SHOW PLUGINS
 summary: An overview of the usage of SHOW PLUGINS for the TiDB database.
-aliases: ['/docs/dev/sql-statements/sql-statement-show-plugins/']
 ---
 
 # SHOW PLUGINS
@@ -10,7 +9,7 @@ aliases: ['/docs/dev/sql-statements/sql-statement-show-plugins/']
 
 > **Note:**
 >
-> This feature is not available on [TiDB Cloud Serverless](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) clusters.
+> This feature is not available on [{{{ .starter }}}](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) clusters.
 
 ## Synopsis
 

@@ -1,7 +1,6 @@
 ---
 title: Download TiDB Tools
 summary: Download the most officially maintained versions of TiDB tools.
-aliases: ['/docs/dev/download-ecosystem-tools/','/docs/dev/reference/tools/download/']
 ---
 
 # Download TiDB Tools
@@ -28,7 +27,7 @@ You can download TiDB Toolkit from the following link:
 https://download.pingcap.org/tidb-community-toolkit-{version}-linux-{arch}.tar.gz
 ```
 
-`{version}` in the link indicates the version number of TiDB and `{arch}` indicates the architecture of the system, which can be `amd64` or `arm64`. For example, the download link for `v8.5.0` in the `amd64` architecture is `https://download.pingcap.org/tidb-community-toolkit-v8.5.0-linux-amd64.tar.gz`.
+`{version}` in the link indicates the version number of TiDB and `{arch}` indicates the architecture of the system, which can be `amd64` or `arm64`. For example, the download link for `{{{ .tidb-version }}}` in the `amd64` architecture is `https://download.pingcap.org/tidb-community-toolkit-{{{ .tidb-version }}}-linux-amd64.tar.gz`.
 
 > **Note:**
 >

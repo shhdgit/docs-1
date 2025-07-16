@@ -1,7 +1,6 @@
 ---
 title: SHOW TABLE REGIONS
 summary: Learn how to use SHOW TABLE REGIONS in TiDB.
-aliases: ['/docs/dev/sql-statements/sql-statement-show-table-regions/','/docs/dev/reference/sql/statements/show-table-regions/']
 ---
 
 # SHOW TABLE REGIONS
@@ -10,7 +9,7 @@ The `SHOW TABLE REGIONS` statement is used to show the Region information of a t
 
 > **Note:**
 >
-> This feature is not available on [TiDB Cloud Serverless](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) clusters.
+> This feature is not available on [{{{ .starter }}}](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) clusters.
 
 ## Syntax
 

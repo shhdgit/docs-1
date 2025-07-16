@@ -1,7 +1,6 @@
 ---
 title: Create a Private Mirror
 summary: Learn how to create a private mirror.
-aliases: ['/tidb/dev/tiup-mirrors','/docs/dev/tiup/tiup-mirrors/','/docs/dev/reference/tools/tiup/mirrors/']
 ---
 
 # Create a Private Mirror
@@ -87,9 +86,9 @@ The `tiup mirror clone` command provides many optional flags (might provide more
 
     If you want to clone only one version (not all versions) of a component, use `--<component>=<version>` to specify this version. For example:
 
-    - Execute the `tiup mirror clone <target-dir> --tidb v8.5.0` command to clone the v8.5.0 version of the TiDB component.
-    - Run the `tiup mirror clone <target-dir> --tidb v8.5.0 --tikv all` command to clone the v8.5.0 version of the TiDB component and all versions of the TiKV component.
-    - Run the `tiup mirror clone <target-dir> v8.5.0` command to clone the v8.5.0 version of all components in a cluster.
+    - Execute the `tiup mirror clone <target-dir> --tidb {{{ .tidb-version }}}` command to clone the {{{ .tidb-version }}} version of the TiDB component.
+    - Run the `tiup mirror clone <target-dir> --tidb {{{ .tidb-version }}} --tikv all` command to clone the {{{ .tidb-version }}} version of the TiDB component and all versions of the TiKV component.
+    - Run the `tiup mirror clone <target-dir> {{{ .tidb-version }}}` command to clone the {{{ .tidb-version }}} version of all components in a cluster.
 
 After cloning, signing keys are set up automatically.
 

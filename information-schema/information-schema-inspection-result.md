@@ -1,7 +1,6 @@
 ---
 title: INSPECTION_RESULT
 summary: Learn the `INSPECTION_RESULT` diagnostic result table.
-aliases: ['/docs/dev/system-tables/system-table-inspection-result/','/docs/dev/reference/system-databases/inspection-result/','/tidb/dev/system-table-inspection-result/']
 ---
 
 # INSPECTION_RESULT
@@ -230,7 +229,6 @@ In the `config` diagnostic rule, the following two diagnostic rules are executed
     |  Component  | Configuration item | Expected value |
     |  ----  | ----  |  ----  |
     | TiDB | log.slow-threshold | larger than `0` |
-    | TiKV | raftstore.sync-log | `true` |
 
 ### `version` diagnostic rule
 

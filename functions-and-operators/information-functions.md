@@ -1,7 +1,6 @@
 ---
 title: Information Functions
 summary: Learn about the information functions.
-aliases: ['/docs/dev/functions-and-operators/information-functions/','/docs/dev/reference/sql/functions-and-operators/information-functions/']
 ---
 
 # Information Functions
@@ -218,6 +217,8 @@ TABLE t1;
 > - In TiDB, [`AUTO_ID_CACHE`](/auto-increment.md#auto_id_cache) might lead to results that differ from those returned by MySQL. This discrepancy arises because TiDB caches IDs on each node, potentially leading to IDs that are out of order or have gaps. If maintaining strict ID ordering is essential for your application, you can enable [MySQL compatible mode](/auto-increment.md#mysql-compatibility-mode).
 >
 > - In the preceding example, IDs increase by 2 while MySQL would generate IDs incrementing by 1 in the same scenario. For more compatibility information, see [Auto-increment ID](/mysql-compatibility.md#auto-increment-id).
+
+The `LAST_INSERT_ID(expr)` function can accept an expression as an argument, storing the value for the next call to `LAST_INSERT_ID()`. You can use it as a MySQL-compatible method for generating sequences. Note that TiDB also supports proper [sequence functions](/functions-and-operators/sequence-functions.md).
 
 ### ROW_COUNT()
 

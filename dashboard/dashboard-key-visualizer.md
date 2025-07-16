@@ -1,7 +1,6 @@
 ---
 title: Key Visualizer Page
 summary: TiDB Dashboard's Key Visualizer page analyzes and troubleshoots traffic hotspots in the TiDB cluster. It visually shows traffic changes over time, and allows users to zoom in on specific time periods or region ranges. The page also provides settings to adjust brightness, select metrics, and refresh the heatmap. It identifies common heatmap types and offers solutions to address hotspot issues.
-aliases: ['/docs/dev/dashboard/dashboard-key-visualizer/','/docs/dev/key-visualizer-monitoring-tool/']
 ---
 
 # Key Visualizer Page
@@ -47,7 +46,7 @@ When you use the TiDB database, the hotspot issue is typical, where high traffic
 + Write adjacent data into a table with the `AUTO_INCREMENT` primary key, which causes a hotspot issue on this table.
 + Write adjacent time data into the time index of a table, which causes a hotspot issue on the table index.
 
-For more details about hotspot, refer to [Highly Concurrent Write Best Practices](/best-practices/high-concurrency-best-practices.md#hotspot-causes)
+For more details about hotspot, refer to [Best Practices for High-Concurrency Writes](/best-practices/high-concurrency-best-practices.md#hotspot-causes)
 
 ### Heatmap
 
@@ -178,4 +177,4 @@ Regions in the bright areas are the hotspots of read and write traffic, which of
 
 ## Address hotspot issues
 
-TiDB has some built-in features to mitigate the common hotspot issue. Refer to [Highly Concurrent Write Best Practices](/best-practices/high-concurrency-best-practices.md) for details.
+TiDB has some built-in features to mitigate the common hotspot issue. Refer to [Best Practices for High-Concurrency Writes](/best-practices/high-concurrency-best-practices.md) for details.

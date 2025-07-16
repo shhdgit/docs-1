@@ -1,7 +1,6 @@
 ---
 title: Hybrid Deployment Topology
 summary: Learn the hybrid deployment topology of TiDB clusters.
-aliases: ['/docs/dev/hybrid-deployment-topology/']
 ---
 
 # Hybrid Deployment Topology
@@ -20,6 +19,10 @@ The deployment machine has multiple CPU processors with sufficient memory. To im
 | PD | 3 | 16 VCore 32 GB | 10.0.1.4<br/> 10.0.1.5<br/> 10.0.1.6 | Configure the `location_labels` parameter |
 | TiKV | 6 | 32 VCore 64GB | 10.0.1.7<br/> 10.0.1.8<br/> 10.0.1.9 | 1. Separate the instance-level port and status_port; <br/> 2. Configure the global parameters `readpool`, `storage` and `raftstore`; <br/> 3. Configure labels of the instance-level host; <br/> 4. Configure NUMA to bind CPU cores |
 | Monitoring & Grafana | 1 | 4 VCore 8GB * 1 500GB (ssd)  | 10.0.1.10 | Default configuration |
+
+> **Note:**
+>
+> The IP addresses of the instances are given as examples only. In your actual deployment, replace the IP addresses with your actual IP addresses.
 
 ### Topology templates
 

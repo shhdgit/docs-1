@@ -1,12 +1,11 @@
 ---
 title: ROLLBACK | TiDB SQL Statement Reference
 summary: An overview of the usage of ROLLBACK for the TiDB database.
-aliases: ['/docs/dev/sql-statements/sql-statement-rollback/','/docs/dev/reference/sql/statements/rollback/']
 ---
 
 # ROLLBACK
 
-This statement reverts all changes in the current transaction inside of TIDB. It is the opposite of a `COMMIT` statement.
+This statement reverts all changes in the current transaction inside of TiDB. It is the opposite of a `COMMIT` statement.
 
 ## Synopsis
 

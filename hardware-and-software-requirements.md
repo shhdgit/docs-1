@@ -1,7 +1,6 @@
 ---
 title: TiDB Software and Hardware Requirements
-summary: Learn the software and hardware requirements for deploying and running TiDB.
-aliases: ['/docs/dev/hardware-and-software-requirements/','/docs/dev/how-to/deploy/hardware-recommendations/']
+summary: Learn the software and hardware recommendations for deploying and running TiDB.
 ---
 
 # TiDB Software and Hardware Requirements
@@ -18,90 +17,110 @@ This document describes the software and hardware requirements for deploying and
 
 ## OS and platform requirements
 
-<table>
-<thead>
-  <tr>
-    <th>Operating systems</th>
-    <th>Supported CPU architectures</th>
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    <td>Red Hat Enterprise Linux 8.4 or a later 8.x version</td>
-    <td><ul><li>x86_64</li><li>ARM 64</li></ul></td>
-  </tr>
-  <tr>
-    <td>Amazon Linux 2</td>
-    <td><ul><li>x86_64</li><li>ARM 64</li></ul></td>
-  </tr>
-  <tr>
-    <td>Amazon Linux 2023</td>
-    <td><ul><li>x86_64</li><li>ARM 64</li></ul></td>
-  </tr>
-  <tr>
-    <td>Rocky Linux 9.1 or later</td>
-    <td><ul><li>x86_64</li><li>ARM 64</li></ul></td>
-  </tr>
-  <tr>
-    <td>Kylin Euler V10 SP1/SP2</td>
-    <td><ul><li>x86_64</li><li>ARM 64</li></ul></td>
-  </tr>
-  <tr>
-    <td>UnionTech OS (UOS) V20</td>
-    <td><ul><li>x86_64</li><li>ARM 64</li></ul></td>
-  </tr>
-  <tr>
-    <td>openEuler 22.03 LTS SP1/SP3</td>
-    <td><ul><li>x86_64</li><li>ARM 64</li></ul></td>
-  </tr>
-  <tr>
-    <td>macOS 12 (Monterey) or later</td>
-    <td><ul><li>x86_64</li><li>ARM 64</li></ul></td>
-  </tr>
-  <tr>
-    <td>Oracle Enterprise Linux 8 or a later</td>
-    <td>x86_64</td>
-  </tr>
-  <tr>
-    <td>Ubuntu LTS 20.04 or later</td>
-    <td>x86_64</td>
-  </tr>
-  <tr>
-    <td>CentOS 8 Stream</td>
-    <td><ul><li>x86_64</li><li>ARM 64</li></ul></td>
-  </tr>
-  <tr>
-    <td>Debian 10 (Buster) or later</td>
-    <td>x86_64</td>
-  </tr>
-  <tr>
-    <td>Fedora 38 or later</td>
-    <td>x86_64</td>
-  </tr>
-  <tr>
-    <td>openSUSE Leap later than v15.5 (not including Tumbleweed)</td>
-    <td>x86_64</td>
-  </tr>
-  <tr>
-    <td>SUSE Linux Enterprise Server 15</td>
-    <td>x86_64</td>
-  </tr>
-</tbody>
-</table>
+In v8.5 LTS, TiDB ensures multi-level quality standards for various combinations of operating systems and CPU architectures.
 
-> **Warning:**
->
-> - According to [CentOS Linux EOL](https://www.centos.org/centos-linux-eol/), the upstream support for CentOS Linux 7 ends on June 30, 2024. TiDB ends the support for CentOS 7 starting from the 8.4 DMR version. It is recommended to use Rocky Linux 9.1 or a later version. Upgrading a TiDB cluster on CentOS 7 to v8.4.0 or later will cause the cluster to become unavailable. Before upgrading TiDB, make sure to check your operating system version.
-> - According to [Red Hat Enterprise Linux Life Cycle](https://access.redhat.com/support/policy/updates/errata/#Life_Cycle_Dates), the maintenance support for Red Hat Enterprise Linux 7 ends on June 30, 2024. TiDB ends the support for Red Hat Enterprise Linux 7 starting from the 8.4 DMR version. It is recommended to use Rocky Linux 9.1 or a later version. Upgrading a TiDB cluster on Red Hat Enterprise Linux 7 to v8.4.0 or later will cause the cluster to become unavailable. Before upgrading TiDB, make sure to check your operating system version.
-> - If you are using the 32-bit version of an operating system listed in the preceding table, TiDB **is not guaranteed** to be compilable, buildable or deployable on the 32-bit operating system and the corresponding CPU architecture, or TiDB does not actively adapt to the 32-bit operating system.
-> - Other operating system versions not mentioned above might work but are not officially supported.
++ For the following combinations of operating systems and CPU architectures, TiDB **provides enterprise-level production quality**, and the product features have been comprehensively and systematically verified:
 
-> **Note:**
->
-> - For Oracle Enterprise Linux, TiDB supports the Red Hat Compatible Kernel (RHCK) and does not support the Unbreakable Enterprise Kernel provided by Oracle Enterprise Linux.
-> - While the upstream support for CentOS Linux 8 ends on December 31, 2021, CentOS Stream 8 continues to be supported by the CentOS organization.
-> - Support for Ubuntu 16.04 will be removed in future versions of TiDB. Upgrading to Ubuntu 18.04 or later is strongly recommended.
-> - Starting from v8.4.0, TiDB requires glibc 2.28. If your glibc version does not meet this requirement, it is recommended to use an operating system listed in the preceding table or upgrade the operating system to a version that supports glibc 2.28.
+    <table>
+    <thead>
+      <tr>
+        <th>Operating systems</th>
+        <th>Supported CPU architectures</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Red Hat Enterprise Linux 8.4 or a later 8.x version</td>
+        <td><ul><li>x86_64</li><li>ARM 64</li></ul></td>
+      </tr>
+      <tr>
+        <td>Amazon Linux 2</td>
+        <td><ul><li>x86_64</li><li>ARM 64</li></ul></td>
+      </tr>
+      <tr>
+        <td>Amazon Linux 2023</td>
+        <td><ul><li>x86_64</li><li>ARM 64</li></ul></td>
+      </tr>
+      <tr>
+        <td>Rocky Linux 9.1 or later</td>
+        <td><ul><li>x86_64</li><li>ARM 64</li></ul></td>
+      </tr>
+      <tr>
+        <td>Kylin V10 SP1/SP2/SP3 (SP3 is supported starting from v7.5.5)</td>
+        <td><ul><li>x86_64</li><li>ARM 64</li></ul></td>
+      </tr>
+      <tr>
+        <td>UnionTech OS (UOS) V20</td>
+        <td><ul><li>x86_64</li><li>ARM 64</li></ul></td>
+      </tr>
+      <tr>
+        <td>openEuler 22.03 LTS SP1/SP3</td>
+        <td><ul><li>x86_64</li><li>ARM 64</li></ul></td>
+      </tr>
+    </tbody>
+    </table>
+
+    > **Warning:**
+    >
+    > - According to [CentOS Linux EOL](https://blog.centos.org/2023/04/end-dates-are-coming-for-centos-stream-8-and-centos-linux-7/), the upstream support for CentOS Linux 7 ended on June 30, 2024.
+    >     - Before upgrading TiDB, make sure to check your operating system version. TiDB v8.4.0 DMR and v8.5.0 removed the support of glibc 2.17, and dropped support and testing with CentOS Linux 7. It is recommended to use Rocky Linux 9.1 or a later version. Upgrading a TiDB cluster on CentOS 7 to v8.4.0 or v8.5.0 will cause the risk of cluster unavailability.
+    >     - Starting from v8.5.1, to assist users still using CentOS Linux 7, TiDB resumes the support of glibc 2.17, resumes testing of CentOS Linux 7, and is now compatible with CentOS Linux 7. However, due to the EOL status of CentOS Linux, it is strongly recommended that you review the [official announcements and security guidance](https://www.redhat.com/en/blog/centos-linux-has-reached-its-end-life-eol) for CentOS Linux 7 and migrate to an operating system supported by TiDB for production use, such as Rocky Linux 9.1 or later.
+    > - According to [Red Hat Enterprise Linux Life Cycle](https://access.redhat.com/support/policy/updates/errata/#Life_Cycle_Dates), the maintenance support for Red Hat Enterprise Linux 7 ended on June 30, 2024. TiDB ends the support for Red Hat Enterprise Linux 7 starting from the 8.4 DMR version. It is recommended to use Rocky Linux 9.1 or a later version. Upgrading a TiDB cluster on Red Hat Enterprise Linux 7 to v8.4.0 or later will cause the cluster to become unavailable. Before upgrading TiDB, make sure to check your operating system version.
+
++ For the following combinations of operating systems and CPU architectures, you can compile, build, and deploy TiDB. In addition, you can also use the basic features of OLTP, OLAP, and the data tools. However, TiDB **does not guarantee enterprise-level production quality**:
+
+    <table>
+    <thead>
+      <tr>
+        <th>Operating systems</th>
+        <th>Supported CPU architectures</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>macOS 12 (Monterey) or later</td>
+        <td><ul><li>x86_64</li><li>ARM 64</li></ul></td>
+      </tr>
+      <tr>
+        <td>Oracle Enterprise Linux 8 or a later</td>
+        <td>x86_64</td>
+      </tr>
+      <tr>
+        <td>Ubuntu LTS 20.04 or later</td>
+        <td>x86_64</td>
+      </tr>
+      <tr>
+        <td>CentOS Stream 8</td>
+        <td><ul><li>x86_64</li><li>ARM 64</li></ul></td>
+      </tr>
+      <tr>
+        <td>Debian 10 (Buster) or later</td>
+        <td>x86_64</td>
+      </tr>
+      <tr>
+        <td>Fedora 38 or later</td>
+        <td>x86_64</td>
+      </tr>
+      <tr>
+        <td>openSUSE Leap later than v15.5 (not including Tumbleweed)</td>
+        <td>x86_64</td>
+      </tr>
+      <tr>
+        <td>SUSE Linux Enterprise Server 15</td>
+        <td>x86_64</td>
+      </tr>
+    </tbody>
+    </table>
+
+    > **Note:**
+    >
+    > - For Oracle Enterprise Linux, TiDB supports the Red Hat Compatible Kernel (RHCK) and does not support the Unbreakable Enterprise Kernel provided by Oracle Enterprise Linux.
+    > - Support for Ubuntu 16.04 will be removed in future versions of TiDB. Upgrading to Ubuntu 18.04 or later is strongly recommended.
+    > - CentOS Stream 8 reaches [End of Builds](https://blog.centos.org/2023/04/end-dates-are-coming-for-centos-stream-8-and-centos-linux-7/) on May 31, 2024.
+
++ If you are using the 32-bit version of an operating system listed in the preceding two tables, TiDB **is not guaranteed** to be compilable, buildable or deployable on the 32-bit operating system and the corresponding CPU architecture, or TiDB does not actively adapt to the 32-bit operating system.
+
++ Other operating system versions not mentioned above might work but are not officially supported.
 
 ### Libraries required for compiling and running TiDB
 
@@ -150,7 +169,7 @@ You can deploy and run TiDB on the 64-bit generic hardware server platform in th
 
 | Component | CPU     | Memory | Local Storage  | Network  | Number of Instances (Minimum Requirement) |
 | :------: | :-----: | :-----: | :----------: | :------: | :----------------: |
-| TiDB    | 8 core+   | 16 GB+  | [Disk space requirements](#disk-space-requirements) | Gigabit network card | 1 (can be deployed on the same machine with PD)      |
+| TiDB    | 8 core+   | 16 GB+  | [Storage requirements](#storage-requirements) | Gigabit network card | 1 (can be deployed on the same machine with PD)      |
 | PD      | 4 core+   | 8 GB+  | SAS, 200 GB+ | Gigabit network card | 1 (can be deployed on the same machine with TiDB)       |
 | TiKV    | 8 core+   | 32 GB+  | SAS, 200 GB+ | Gigabit network card | 3       |
 | TiFlash | 32 core+  | 64 GB+  | SSD, 200 GB+ | Gigabit network card | 1     |
@@ -225,7 +244,7 @@ As an open-source distributed SQL database, TiDB requires the following network 
 | Alertmanager | 9093 | the port for the alert web service |
 | Alertmanager | 9094 | the alert communication port |
 
-## Disk space requirements
+## Storage requirements
 
 <table>
 <thead>
@@ -268,6 +287,8 @@ As an open-source distributed SQL database, TiDB requires the following network 
   </tr>
 </tbody>
 </table>
+
+TiDB supports the XFS and Ext4 file systems. Other file systems are not recommended for production environments.  
 
 ## Web browser requirements
 

@@ -1,7 +1,6 @@
 ---
 title: Split Region
 summary: An overview of the usage of Split Region for the TiDB database.
-aliases: ['/docs/dev/sql-statements/sql-statement-split-region/','/docs/dev/reference/sql/statements/split-region/']
 ---
 
 # Split Region
@@ -14,7 +13,7 @@ To solve the hotspot problem in the above scenario, TiDB introduces the pre-spli
 
 > **Note:**
 >
-> This feature is not available on [TiDB Cloud Serverless](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) clusters.
+> This feature is not available on [{{{ .starter }}}](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) clusters.
 
 ## Synopsis
 

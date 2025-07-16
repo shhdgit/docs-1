@@ -1,6 +1,5 @@
 ---
 title: How to Run TPC-C Test on TiDB
-aliases: ['/docs/dev/benchmark/benchmark-tidb-using-tpcc/','/docs/dev/benchmark/how-to-run-tpcc/']
 summary: This document describes how to test TiDB using TPC-C, an online transaction processing benchmark. It specifies the initial state of the database, provides commands for loading data, running the test, and cleaning up test data. The test measures the maximum qualified throughput using tpmC (transactions per minute).
 ---
 
@@ -24,7 +23,7 @@ Before testing, TPC-C Benchmark specifies the initial state of the database, whi
 * The `DISTRICT` table has W \* 10 records (Each warehouse provides services to 10 districts)
 * The `CUSTOMER` table has W \* 10 \* 3,000 records (Each district has 3,000 customers)
 * The `HISTORY` table has W \* 10 \* 3,000 records (Each customer has one transaction history)
-* The `ORDER` table has W \* 10 \* 3,000 records (Each district has 3,000 orders and the last 900 orders generated are added to the `NEW-ORDER` table. Each order randomly generates 5 ~ 15 ORDER-LINE records.
+* The `ORDER` table has W \* 10 \* 3,000 records (Each district has 3,000 orders and the last 900 orders generated are added to the `NEW-ORDER` table. Each order randomly generates 5 ~ 15 ORDER-LINE records.)
 
 In this document, the testing uses 1,000 warehouses as an example to test TiDB.
 

@@ -1,7 +1,6 @@
 ---
 title: ALTER INSTANCE
 summary: Learn the overview of the `ALTER INSTANCE` usage in TiDB.
-aliases: ['/docs/dev/sql-statements/sql-statement-alter-instance/','/docs/dev/reference/sql/statements/alter-instance/']
 ---
 
 # ALTER INSTANCE
@@ -10,7 +9,7 @@ The `ALTER INSTANCE` statement is used to make changes to a single TiDB instance
 
 > **Note:**
 >
-> [TiDB Cloud Serverless](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) can automatically refresh the TLS certificate, so this feature is not applicable to [TiDB Cloud Serverless](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) clusters.
+> [{{{ .starter }}}](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) can automatically refresh the TLS certificate, so this feature is not applicable to [{{{ .starter }}}](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) clusters.
 
 ## RELOAD TLS
 

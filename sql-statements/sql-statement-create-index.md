@@ -1,7 +1,6 @@
 ---
 title: CREATE INDEX | TiDB SQL Statement Reference
 summary: An overview of the usage of CREATE INDEX for the TiDB database.
-aliases: ['/docs/dev/sql-statements/sql-statement-create-index/','/docs/dev/reference/sql/statements/create-index/']
 ---
 
 # CREATE INDEX
@@ -158,6 +157,7 @@ Expression index involves various kinds of expressions. To ensure correctness, o
 - [`JSON_QUOTE()`](/functions-and-operators/json-functions.md)
 - [`JSON_REMOVE()`](/functions-and-operators/json-functions.md)
 - [`JSON_REPLACE()`](/functions-and-operators/json-functions.md)
+- [`JSON_SCHEMA_VALID()`](/functions-and-operators/json-functions/json-functions-validate.md)
 - [`JSON_SEARCH()`](/functions-and-operators/json-functions.md)
 - [`JSON_SET()`](/functions-and-operators/json-functions.md)
 - [`JSON_STORAGE_SIZE()`](/functions-and-operators/json-functions.md)

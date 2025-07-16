@@ -1,7 +1,6 @@
 ---
 title: PLACEMENT_POLICIES
 summary: Learn the `PLACEMENT_POLICIES` information_schema table.
-aliases: ['/tidb/dev/information-schema-placement-rules']
 ---
 
 # PLACEMENT_POLICIES
@@ -10,7 +9,7 @@ The `PLACEMENT_POLICIES` table provides information on all placement policies. F
 
 > **Note:**
 >
-> This table is not available on [TiDB Cloud Serverless](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) clusters.
+> This table is not available on [{{{ .starter }}}](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) clusters.
 
 {{< copyable "sql" >}}
 

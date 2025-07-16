@@ -42,11 +42,13 @@ TiDB Cloud works with almost all workloads that TiDB supports, but there are som
 | `SHOW BACKUPS` | Supported | Not supported [^3] |
 | `RESTORE` | Supported | Not supported [^3] |
 | `SHOW RESTORES` | Supported | Not supported [^3] |
+| `ADMIN RESET TELEMETRY_ID` | Supported | Telemetry is not supported on TiDB Cloud Serverless. |
+| `ADMIN SHOW TELEMETRY` | Not supported [^4] | Not supported [^4] |
 | `ADMIN SHOW SLOW` | Supported | Not supported [^5] |
 | `ADMIN PLUGINS ENABLE` | Supported | Not supported [^8] |
 | `ADMIN PLUGINS DISABLE` | Supported | Not supported [^8] |
 | `ALTER INSTANCE RELOAD TLS` | Supported | TiDB Cloud Serverless automatically refreshes the TLS certificate. |
-| `LOAD DATA INFILE` | Only supports `LOAD DATA LOCAL INFILE` | Only supports `LOAD DATA LOCAL INFILE` |
+| `LOAD DATA INFILE` | Supports `LOAD DATA LOCAL INFILE`, and `LOAD DATA INFILE` from Amazon S3 or Google Cloud Storage | Only supports `LOAD DATA LOCAL INFILE` |
 | `CHANGE DRAINER` | Not supported [^7] | Not supported [^7] |
 | `CHANGE PUMP` | Not supported [^7] | Not supported [^7] |
 | `FLASHBACK CLUSTER` | Supported | Not supported [^3] |
@@ -92,7 +94,6 @@ TiDB Cloud works with almost all workloads that TiDB supports, but there are som
 | `information_schema` | `SLOW_QUERY` | Supported | Not supported [^5] |
 | `information_schema` | `STATEMENTS_SUMMARY` | Supported | Not supported [^6] |
 | `information_schema` | `STATEMENTS_SUMMARY_EVICTED` | Supported | Not supported [^6] |
-| `information_schema` | `STATEMENTS_SUMMARY_HISTORY` | Supported | Not supported [^6] |
 | `information_schema` | `TIDB_HOT_REGIONS` | Not supported [^4] | Not supported [^4] |
 | `information_schema` | `TIDB_HOT_REGIONS_HISTORY` | Supported | Not supported [^1] |
 | `information_schema` | `TIDB_SERVERS_INFO` | Supported | Not supported [^1] |
@@ -130,6 +131,7 @@ TiDB Cloud works with almost all workloads that TiDB supports, but there are som
 | `require_secure_transport` | Not supported [^12] | Read-only [^10] |
 | `skip_name_resolve` | No limitation | Read-only [^10] |
 | `sql_log_bin` | No limitation | Read-only [^10] |
+| `tidb_analyze_skip_column_types` | No limitation | Read-only [^10] |
 | `tidb_cdc_write_source` | No limitation | Read-only [^10] |
 | `tidb_check_mb4_value_in_utf8` | Not supported [^4] | Not supported [^4] |
 | `tidb_config` | Not supported [^4] | Not supported [^4] |
@@ -151,6 +153,7 @@ TiDB Cloud works with almost all workloads that TiDB supports, but there are som
 | `tidb_enable_resource_control` | No limitation | Read-only [^10] |
 | `tidb_enable_slow_log` | Not supported [^4] | Not supported [^4] |
 | `tidb_enable_stmt_summary` | No limitation | Read-only [^10] |
+| `tidb_enable_telemetry` | Not supported [^4] | Not supported [^4] |
 | `tidb_enable_top_sql` | No limitation | Read-only [^10] |
 | `tidb_enable_tso_follower_proxy` | No limitation | Read-only [^10] |
 | `tidb_expensive_query_time_threshold` | Not supported [^4] | Not supported [^4] |

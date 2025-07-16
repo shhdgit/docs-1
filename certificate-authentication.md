@@ -1,7 +1,6 @@
 ---
 title: Certificate-Based Authentication for Login
 summary: Learn the certificate-based authentication used for login.
-aliases: ['/docs/dev/certificate-authentication/','/docs/dev/reference/security/cert-based-authentication/']
 ---
 
 # Certificate-Based Authentication for Login
@@ -361,7 +360,7 @@ The output:
 
 ```
 --------------
-mysql  Ver 8.5.0 for Linux on x86_64 (MySQL Community Server - GPL)
+mysql  Ver 8.5.1 for Linux on x86_64 (MySQL Community Server - GPL)
 
 Connection id:       1
 Current database:    test

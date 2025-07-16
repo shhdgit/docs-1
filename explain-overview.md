@@ -1,7 +1,6 @@
 ---
 title: TiDB Query Execution Plan Overview
 summary: Learn about the execution plan information returned by the `EXPLAIN` statement in TiDB.
-aliases: ['/docs/dev/query-execution-plan/','/docs/dev/reference/performance/understanding-the-query-execution-plan/','/docs/dev/index-merge/','/docs/dev/reference/performance/index-merge/','/tidb/dev/index-merge','/tidb/dev/query-execution-plan']
 ---
 
 # TiDB Query Execution Plan Overview
@@ -143,7 +142,7 @@ An operator is a particular step that is executed as part of returning query res
 
 TiDB aggregates the data or calculation results scanned from TiKV/TiFlash. The data aggregation operators can be divided into the following categories:
 
-- **TableReader**: Aggregates the data obtained by the underlying operators in TiKV or TiFlash.
+- **TableReader**: Aggregates the data obtained by the underlying operators like `TableFullScan` or `TableRangeScan` in TiKV.
 - **IndexReader**: Aggregates the data obtained by the underlying operators like `IndexFullScan` or `IndexRangeScan` in TiKV.
 - **IndexLookUp**: First aggregates the RowID (in TiKV) scanned by the `Build` side. Then at the `Probe` side, accurately reads the data from TiKV based on these RowIDs. At the `Build` side, there are operators like `IndexFullScan` or `IndexRangeScan`; at the `Probe` side, there is the `TableRowIDScan` operator.
 - **IndexMerge**: Similar to `IndexLookUp`. `IndexMerge` can be seen as an extension of `IndexLookupReader`. `IndexMerge` supports reading multiple indexes at the same time. There are many `Build`s and one `Probe`. The execution process of `IndexMerge` the same as that of `IndexLookUp`.
@@ -166,14 +165,9 @@ In the `WHERE`/`HAVING`/`ON` conditions, the TiDB optimizer analyzes the result 
 
 ### Task overview
 
-TiDB calculation tasks are categorized into four types: root task, cop task, batchCop task, and MPP task:
+Currently, calculation tasks of TiDB can be divided into two categories: cop tasks and root tasks. A `cop[tikv]` task indicates that the operator is performed inside the TiKV coprocessor. A `root` task indicates that it will be completed inside of TiDB.
 
-- Root task: executed in TiDB.
-- Cop task: executed using TiKV Coprocessor or TiFlash Coprocessor.
-- BatchCop task: an optimized version of TiFlash cop tasks, allowing multiple Regions to be queried in a single task.
-- MPP task: executed using TiFlash's [MPP mode](/explain-mpp.md).
-
-A key goal of SQL optimization is to push calculations down to TiKV or TiFlash whenever possible to improve query efficiency. TiKV Coprocessor supports most of the built-in SQL functions (including aggregate functions and scalar functions), `LIMIT` operations, index scans, and table scans. TiFlash Coprocessor is similar to TiKV Coprocessor in functionality but does not support index scans.
+One of the goals of SQL optimization is to push the calculation down to TiKV as much as possible. The Coprocessor in TiKV supports most of the built-in SQL functions (including the aggregate functions and the scalar functions), SQL `LIMIT` operations, index scans, and table scans.
 
 ### Operator info overview
 

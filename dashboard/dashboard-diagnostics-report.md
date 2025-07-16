@@ -1,7 +1,6 @@
 ---
 title: TiDB Dashboard Diagnostic Report
 summary: TiDB Dashboard Diagnostic Report introduces diagnostic report content, including basic, diagnostic, load, overview, monitoring, and configuration information. It also includes comparison report details, DIFF_RATIO explanation, and Maximum Different Item table.
-aliases: ['/docs/dev/dashboard/dashboard-diagnostics-report/']
 ---
 
 # TiDB Dashboard Diagnostic Report
@@ -33,7 +32,7 @@ In this report, some small buttons are described as follows:
 
 All monitoring metrics basically correspond to those on the TiDB Grafana monitoring dashboard. After a module is found to be abnormal, you can view more monitoring information on the TiDB Grafana.
 
-In addition, the `TOTAL_TIME` and `TOTAL_COUNT` metrics in this report are monitoring data read from Prometheus, so calculation inaccuracy might exits in their statistics.
+In addition, the `TOTAL_TIME` and `TOTAL_COUNT` metrics in this report are monitoring data read from Prometheus, so calculation inaccuracy might exist in their statistics.
 
 Each part of this report is introduced as follows.
 

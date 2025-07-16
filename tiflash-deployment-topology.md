@@ -1,7 +1,6 @@
 ---
 title: TiFlash Deployment Topology
 summary: Learn the deployment topology of TiFlash based on the minimal TiDB topology.
-aliases: ['/docs/dev/tiflash-deployment-topology/']
 ---
 
 # TiFlash Deployment Topology
@@ -19,6 +18,10 @@ TiFlash is a columnar storage engine, and gradually becomes the standard cluster
 | TiKV | 3 | 16 VCore 32GB 2TB (nvme ssd) * 1 | 10.0.1.1 <br/> 10.0.1.2 <br/> 10.0.1.3 | Default port <br/> Global directory configuration |
 | TiFlash | 1 | 32 VCore 64 GB 2TB (nvme ssd) * 1  | 10.0.1.11 | Default port <br/> Global directory configuration |
 | Monitoring & Grafana | 1 | 4 VCore 8GB * 1 500GB (ssd) | 10.0.1.10 | Default port <br/> Global directory configuration |
+
+> **Note:**
+>
+> The IP addresses of the instances are given as examples only. In your actual deployment, replace the IP addresses with your actual IP addresses.
 
 ### Topology templates
 

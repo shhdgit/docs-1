@@ -1,7 +1,6 @@
 ---
 title: TiDB Best Practices
 summary: This document summarizes best practices for using TiDB, covering SQL use and optimization tips for OLAP and OLTP scenarios, with a focus on TiDB-specific optimization options. It also recommends reading three blog posts introducing TiDB's technical principles before diving into the best practices.
-aliases: ['/docs/dev/tidb-best-practices/']
 ---
 
 # TiDB Best Practices
@@ -34,7 +33,7 @@ To store three replicas, compared with the replication of Source-Replica, Raft i
 
 ### Distributed transactions
 
-TiDB provides complete distributed transactions and the model has some optimizations on the basis of [Google Percolator](https://research.google.com/pubs/pub36726.html). This document introduces the following features:
+TiDB provides complete distributed transactions and the model has some optimizations on the basis of [Google Percolator](https://research.google/pubs/large-scale-incremental-processing-using-distributed-transactions-and-notifications/). This document introduces the following features:
 
 * Optimistic transaction model
 

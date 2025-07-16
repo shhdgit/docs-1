@@ -1,7 +1,6 @@
 ---
 title: TiCDC Deployment Topology
 summary: Learn the deployment topology of TiCDC based on the minimal TiDB topology.
-aliases: ['/docs/dev/ticdc-deployment-topology/']
 ---
 
 # TiCDC Deployment Topology
@@ -23,6 +22,10 @@ TiCDC is a tool for replicating the incremental data of TiDB, introduced in TiDB
 | TiKV | 3 | 16 VCore 32GB 2TB (nvme ssd) * 1 | 10.0.1.7 <br/> 10.0.1.8 <br/> 10.0.1.9 | Default port <br/> Global directory configuration |
 | CDC | 3 | 8 VCore 16GB * 1 | 10.0.1.11 <br/> 10.0.1.12 <br/> 10.0.1.13 | Default port <br/> Global directory configuration |
 | Monitoring & Grafana | 1 | 4 VCore 8GB * 1 500GB (ssd) | 10.0.1.11 | Default port <br/> Global directory configuration |
+
+> **Note:**
+>
+> The IP addresses of the instances are given as examples only. In your actual deployment, replace the IP addresses with your actual IP addresses.
 
 ### Topology templates
 

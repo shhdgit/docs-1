@@ -1,7 +1,6 @@
 ---
 title: Cast Functions and Operators
 summary: Learn about the cast functions and operators.
-aliases: ['/docs/dev/functions-and-operators/cast-functions-and-operators/','/docs/dev/reference/sql/functions-and-operators/cast-functions-and-operators/']
 ---
 
 # Cast Functions and Operators
@@ -44,6 +43,7 @@ The following types are supported:
 | `SIGNED [INTEGER]`   | Signed integer   | Yes                                                        |
 | `TIME(fsp)`          | Time             | Yes                                                        |
 | `UNSIGNED [INTEGER]` | Unsigned integer | Yes                                                        |
+| `VECTOR`             | Vector           | No                                                         |
 | `YEAR`               | Year             | No                                                         |
 
 Examples:

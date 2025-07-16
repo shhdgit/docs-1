@@ -1,7 +1,6 @@
 ---
 title: TiSpark User Guide
 summary: Use TiSpark to provide an HTAP solution to serve as a one-stop solution for both online transactions and analysis.
-aliases: ['/docs/dev/tispark-overview/','/docs/dev/reference/tispark/','/docs/dev/get-started-with-tispark/','/docs/dev/how-to/get-started/tispark/','/docs/dev/how-to/deploy/tispark/','/tidb/dev/get-started-with-tispark/','/tidb/stable/get-started-with-tispark']
 ---
 
 # TiSpark User Guide
@@ -100,11 +99,12 @@ You can choose TiSpark version according to your TiDB and Spark version.
 | 3.1.x            | 6.x, 5.x, 4.x          | 3.0.x, 3.1.x, 3.2.x, 3.3.x|2.12|
 | 3.2.x            | 6.x, 5.x, 4.x          | 3.0.x, 3.1.x, 3.2.x, 3.3.x|2.12|
 
-TiSpark 2.4.4, 2.5.2, 3.0.2, 3.1.1, and 3.2.3 are the latest stable versions and are highly recommended.
+TiSpark 2.4.4, 2.5.3, 3.0.3, 3.1.7, and 3.2.3 are the latest stable versions and are highly recommended.
 
 > **Note:**
 >
 > TiSpark does not guarantee compatibility with TiDB v7.0.0 and later versions.
+> TiSpark does not guarantee compatibility with Spark v3.4.0 and later versions.
 
 ### Get TiSpark jar
 

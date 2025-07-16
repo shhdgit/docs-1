@@ -1,7 +1,6 @@
 ---
 title: Security Compatibility with MySQL
 summary: Learn TiDB's security compatibilities with MySQL.
-aliases: ['/docs/dev/security-compatibility-with-mysql/','/docs/dev/reference/security/compatibility/']
 ---
 
 # Security Compatibility with MySQL
@@ -190,7 +189,7 @@ Signature is used to sign the Header and Payload data.
 > **Warning:**
 >
 > - The encoding of the Header and Payload in base64 is reversible. Do **Not** attach any sensitive information to them.
-> - The `tidb_auth_token` authentication method requires clients to support the [`mysql_clear_password`](https://dev.mysql.com/doc/refman/8.0/en/cleartext-pluggable-authentication.html) plugin to send the token to TiDB in plain text. Therefore, you need to [enale TLS between clients and servers](/enable-tls-between-clients-and-servers.md) before using `tidb_auth_token`.
+> - The `tidb_auth_token` authentication method requires clients to support the [`mysql_clear_password`](https://dev.mysql.com/doc/refman/8.0/en/cleartext-pluggable-authentication.html) plugin to send the token to TiDB in plain text. Therefore, you need to [enable TLS between clients and servers](/enable-tls-between-clients-and-servers.md) before using `tidb_auth_token`.
 
 #### Usage
 

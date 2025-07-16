@@ -1,7 +1,6 @@
 ---
 title: Backup Storages
 summary: TiDB supports backup storage to Amazon S3, Google Cloud Storage, Azure Blob Storage, and NFS. You can specify the URI and authentication for different storage services. BR sends credentials to TiKV by default when using S3, GCS, or Azure Blob Storage. You can disable this for cloud environments. The URI format for each storage service is specified, along with authentication methods. Server-side encryption is supported for Amazon S3 and Azure Blob Storage. BR v6.3.0 also supports AWS S3 Object Lock.
-aliases: ['/docs/dev/br/backup-and-restore-storages/','/tidb/dev/backup-storage-S3/','/tidb/dev/backup-storage-azblob/','/tidb/dev/backup-storage-gcs/','/tidb/dev/external-storage/']
 ---
 
 # Backup Storages
@@ -10,9 +9,9 @@ TiDB supports storing backup data to Amazon S3, Google Cloud Storage (GCS), Azur
 
 ## Send credentials to TiKV
 
-| CLI parameter | Description | Default value
-|:----------|:-------|:-------|
-| `--send-credentials-to-tikv` | Controls whether to send credentials obtained by BR to TiKV. | `true`|
+| CLI parameter                | Description                                                  | Default value |
+|:-----------------------------|:-------------------------------------------------------------|:--------------|
+| `--send-credentials-to-tikv` | Controls whether to send credentials obtained by BR to TiKV. | `true`        |
 
 By default, BR sends a credential to each TiKV node when using Amazon S3, GCS, or Azure Blob Storage as the storage system. This behavior simplifies the configuration and is controlled by the parameter `--send-credentials-to-tikv`(or `-c` in short).
 

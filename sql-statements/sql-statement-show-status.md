@@ -1,15 +1,15 @@
 ---
-title: SHOW [GLOBAL|SESSION] STATUS | TiDB SQL Statement Reference
-summary: An overview of the usage of SHOW [GLOBAL|SESSION] STATUS for the TiDB database.
+title: SHOW [GLOBAL|SESSION] STATUS | TiDB SQL 语句参考
+summary: 关于 TiDB 数据库中使用 SHOW [GLOBAL|SESSION] STATUS 的概述。
 ---
 
 # SHOW [GLOBAL|SESSION] STATUS
 
-This statement is included for compatibility with MySQL. TiDB uses Prometheus and Grafana for centralized metrics collection instead of `SHOW STATUS` for most metrics.
+此语句为兼容 MySQL 而设计。TiDB 使用 Prometheus 和 Grafana 进行集中式指标收集，而不是使用 `SHOW STATUS` 来获取大部分指标。
 
-A full description of the variables can be found here: [status variables](/status-variables.md)
+变量的完整描述可以在这里找到： [status variables](/status-variables.md)
 
-## Synopsis
+## 概要
 
 ```ebnf+diagram
 ShowStatusStmt ::=
@@ -23,7 +23,7 @@ ShowLikeOrWhere ::=
 |   "WHERE" Expression
 ```
 
-## Examples
+## 示例
 
 ```sql
 mysql> SHOW SESSION STATUS;
@@ -44,7 +44,7 @@ mysql> SHOW SESSION STATUS;
 | last_plan_binding_update_time | 0000-00-00 00:00:00                  |
 | server_id                     | 61160e73-ab80-40ff-8f33-27d55d475fd1 |
 +-------------------------------+--------------------------------------+
-13 rows in set (0.00 sec)
+13 行，耗时 0.00 秒
 
 mysql> SHOW GLOBAL STATUS;
 +-----------------------+--------------------------------------+
@@ -60,14 +60,14 @@ mysql> SHOW GLOBAL STATUS;
 | ddl_schema_version    | 116                                  |
 | server_id             | 61160e73-ab80-40ff-8f33-27d55d475fd1 |
 +-----------------------+--------------------------------------+
-9 rows in set (0.00 sec)
+9 行，耗时 0.00 秒
 ```
 
-## MySQL compatibility
+## MySQL 兼容性
 
-* This statement is compatible with MySQL.
+* 此语句与 MySQL 兼容。
 
-## See also
+## 相关链接
 
 * [FLUSH STATUS](/sql-statements/sql-statement-flush-status.md)
 * [Server Status Variables](/status-variables.md)

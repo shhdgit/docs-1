@@ -1,13 +1,12 @@
 ---
 title: Explain Statements That Use Aggregation
-summary: Learn about the execution plan information returned by the `EXPLAIN` statement in TiDB.
+summary: 了解 TiDB 中 `EXPLAIN` 语句返回的执行计划信息。
 ---
 
-# Explain Statements Using Aggregation
+# 使用聚合的 Explain 语句
 
-When aggregating data, the SQL Optimizer will select either a Hash Aggregation or Stream Aggregation operator. To improve query efficiency, aggregation is performed at both the coprocessor and TiDB layers. Consider the following example:
+在进行数据聚合时，SQL 优化器会选择 Hash Aggregation 或 Stream Aggregation 操作符。为了提高查询效率，聚合操作会在 coprocessor 和 TiDB 层同时执行。考虑以下示例：
 
-{{< copyable "sql" >}}
 
 ```sql
 CREATE TABLE t1 (id INT NOT NULL PRIMARY KEY auto_increment, pad1 BLOB, pad2 BLOB, pad3 BLOB);
@@ -31,9 +30,8 @@ SELECT SLEEP(1);
 ANALYZE TABLE t1;
 ```
 
-From the output of [`SHOW TABLE REGIONS`](/sql-statements/sql-statement-show-table-regions.md), you can see that this table is split into multiple Regions:
+从 [`SHOW TABLE REGIONS`](/sql-statements/sql-statement-show-table-regions.md) 的输出可以看到，这个表被划分成了多个 Regions：
 
-{{< copyable "sql" >}}
 
 ```sql
 SHOW TABLE t1 REGIONS;
@@ -51,9 +49,8 @@ SHOW TABLE t1 REGIONS;
 4 rows in set (0.00 sec)
 ```
 
-Using `EXPLAIN` with the following aggregation statement, you can see that `└─StreamAgg_8` is first performed on each Region inside TiKV. Each TiKV Region will then send one row back to TiDB, which aggregates the data from each Region in `StreamAgg_16`:
+使用以下聚合语句结合 `EXPLAIN`，可以看到 `└─StreamAgg_8` 首先在每个 Region 内部的 TiKV 上执行。每个 TiKV Region 会向 TiDB 发送一行数据，TiDB 再在 `StreamAgg_16` 中对每个 Region 的数据进行聚合：
 
-{{< copyable "sql" >}}
 
 ```sql
 EXPLAIN SELECT COUNT(*) FROM t1;
@@ -71,7 +68,8 @@ EXPLAIN SELECT COUNT(*) FROM t1;
 4 rows in set (0.00 sec)
 ```
 
-This is easiest to observe in `EXPLAIN ANALYZE`, where the `actRows` matches the number of Regions from `SHOW TABLE REGIONS` because a `TableFullScan` is being used and there are no secondary indexes:
+在 `EXPLAIN ANALYZE` 中观察会更直观，其中的 `actRows` 数量与 `SHOW TABLE REGIONS` 中的 Region 数量一致，因为此时使用的是 `TableFullScan`，且没有二级索引：
+
 
 ```sql
 EXPLAIN ANALYZE SELECT COUNT(*) FROM t1;
@@ -91,11 +89,10 @@ EXPLAIN ANALYZE SELECT COUNT(*) FROM t1;
 
 ## Hash Aggregation
 
-The Hash Aggregation algorithm uses a hash table to store intermediate results while performing aggregation. It executes in parallel using multiple threads but consumes more memory than Stream Aggregation.
+Hash Aggregation 算法在执行聚合时会使用哈希表存储中间结果。它可以并行执行，使用多个线程，但比 Stream Aggregation 消耗更多内存。
 
-The following is an example of the `HashAgg` operator:
+以下是 `HashAgg` 操作符的示例：
 
-{{< copyable "sql" >}}
 
 ```sql
 EXPLAIN SELECT /*+ HASH_AGG() */ count(*) FROM t1;
@@ -113,15 +110,14 @@ EXPLAIN SELECT /*+ HASH_AGG() */ count(*) FROM t1;
 4 rows in set (0.00 sec)
 ```
 
-The `operator info` shows that the hashing function used to aggregate the data is `funcs:count(1)->Column#6`.
+`operator info` 显示用于聚合数据的哈希函数是 `funcs:count(1)->Column#6`。
 
 ## Stream Aggregation
 
-The Stream Aggregation algorithm usually consumes less memory than Hash Aggregation. However, this operator requires that data is sent ordered so that it can _stream_ and apply the aggregation on values as they arrive.
+Stream Aggregation 算法通常比 Hash Aggregation 消耗更少的内存。然而，该操作符要求数据是有序传输的，以便可以 _stream_ 并在值到达时进行聚合。
 
-Consider the following example:
+考虑以下示例：
 
-{{< copyable "sql" >}}
 
 ```sql
 CREATE TABLE t2 (id INT NOT NULL PRIMARY KEY, col1 INT NOT NULL);
@@ -147,9 +143,8 @@ Records: 5  Duplicates: 0  Warnings: 0
 5 rows in set (0.00 sec)
 ```
 
-In this example, the `└─Sort_13` operator can be eliminated by adding an index on `col1`. Once the index is added, the data can be read in order and the `└─Sort_13` operator is eliminated:
+在此示例中，`└─Sort_13` 操作符可以通过在 `col1` 上添加索引来省略。一旦添加索引，数据可以按顺序读取，`└─Sort_13` 操作符也会被省略：
 
-{{< copyable "sql" >}}
 
 ```sql
 ALTER TABLE t2 ADD INDEX (col1);
@@ -171,15 +166,15 @@ Query OK, 0 rows affected (0.28 sec)
 5 rows in set (0.00 sec)
 ```
 
-## Multidimensional data aggregation with ROLLUP
+## 多维数据聚合与 ROLLUP
 
-Starting from v7.4.0, the `GROUP BY` clause of TiDB supports the `WITH ROLLUP` modifier.
+从 v7.4.0 版本开始，TiDB 的 `GROUP BY` 子句支持 `WITH ROLLUP` 修饰符。
 
-In the `GROUP BY` clause, you can specify one or more columns as a group list and append the `WITH ROLLUP` modifier after the list. Then, TiDB will conduct multidimensional descending grouping based on the columns in the group list and provide you with summary results for each group in the output.
+在 `GROUP BY` 子句中，可以指定一个或多个列作为分组列表，并在列表后添加 `WITH ROLLUP` 修饰符。然后，TiDB 会基于分组列表中的列进行多维降序分组，并在输出中为每个分组提供汇总结果。
 
 > **Note:**
 >
-> Currently, TiDB does not support the Cube syntax.
+> 目前，TiDB 不支持 Cube 语法。
 
 ```sql
 explain SELECT year, month, grouping(year), grouping(month), SUM(profit) AS profit FROM bank GROUP BY year, month WITH ROLLUP;
@@ -200,6 +195,6 @@ explain SELECT year, month, grouping(year), grouping(month), SUM(profit) AS prof
 10 rows in set (0.05 sec)
 ```
 
-According to the `GROUP BY year, month WITH ROLLUP` syntax in the preceding statement, the SQL aggregation results for this statement can be calculated and concatenated in three groups: `{year, month}`, `{year}`, and `{}` respectively.
+根据前述语句中的 `GROUP BY year, month WITH ROLLUP` 语法，该语句的 SQL 聚合结果可以按 `{year, month}`、`{year}` 和 `{}` 三个分组进行计算和拼接。
 
-For more information, see [GROUP BY modifiers](/functions-and-operators/group-by-modifier.md).
+更多信息请参见 [GROUP BY modifiers](/functions-and-operators/group-by-modifier.md)。

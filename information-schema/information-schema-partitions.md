@@ -1,18 +1,18 @@
 ---
 title: PARTITIONS
-summary: Learn the `PARTITIONS` INFORMATION_SCHEMA table.
+summary: 了解 `PARTITIONS` INFORMATION_SCHEMA 表。
 ---
 
 # PARTITIONS
 
-The `PARTITIONS` table provides information about [partitioned tables](/partitioned-table.md).
+`PARTITIONS` 表提供关于 [分区表](/partitioned-table.md) 的信息。
 
 ```sql
 USE INFORMATION_SCHEMA;
 DESC partitions;
 ```
 
-The output is as follows:
+输出结果如下：
 
 ```sql
 +-------------------------------+--------------+------+------+---------+-------+
@@ -46,7 +46,7 @@ The output is as follows:
 | TIDB_PARTITION_ID             | bigint(21)   | YES  |      | NULL    |       |
 | TIDB_PLACEMENT_POLICY_NAME    | varchar(64)  | YES  |      | NULL    |       |
 +-------------------------------+--------------+------+------+---------+-------+
-27 rows in set (0.00 sec)
+27 行结果（耗时 0.00 秒）
 ```
 
 ```sql
@@ -54,10 +54,10 @@ CREATE TABLE test.t1 (id INT NOT NULL PRIMARY KEY) PARTITION BY HASH (id) PARTIT
 SELECT * FROM PARTITIONS WHERE table_schema='test' AND table_name='t1'\G
 ```
 
-The output is as follows:
+输出结果如下：
 
 ```sql
-*************************** 1. row ***************************
+*************************** 1. 行 ***************************
                 TABLE_CATALOG: def
                  TABLE_SCHEMA: test
                    TABLE_NAME: t1
@@ -85,7 +85,7 @@ SUBPARTITION_ORDINAL_POSITION: NULL
               TABLESPACE_NAME: NULL
             TIDB_PARTITION_ID: 89
    TIDB_PLACEMENT_POLICY_NAME: NULL
-*************************** 2. row ***************************
+*************************** 2. 行 ***************************
                 TABLE_CATALOG: def
                  TABLE_SCHEMA: test
                    TABLE_NAME: t1
@@ -113,9 +113,9 @@ SUBPARTITION_ORDINAL_POSITION: NULL
               TABLESPACE_NAME: NULL
             TIDB_PARTITION_ID: 90
    TIDB_PLACEMENT_POLICY_NAME: NULL
-2 rows in set (0.00 sec)
+2 行结果（耗时 0.00 秒）
 ```
 
-## See also
+## 相关链接
 
 - [Explain statements using partitions](/explain-partitions.md)

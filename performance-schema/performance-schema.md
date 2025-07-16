@@ -1,13 +1,13 @@
 ---
 title: Performance Schema
-summary: TiDB implements the performance_schema for viewing system metadata.
+summary: TiDB 实现了 performance_schema 用于查看系统元数据。
 ---
 
 # Performance Schema
 
-TiDB implements performance schema tables for MySQL compatibility.
+TiDB 实现了 performance schema 表以实现 MySQL 兼容性。
 
-## Tables for MySQL compatibility
+## 用于 MySQL 兼容性的表
 
 | Table name                                                                                       | Description                                               |
 |--------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
@@ -23,7 +23,7 @@ TiDB implements performance schema tables for MySQL compatibility.
 | `events_transactions_history_long`                                                               |                                                           |
 | `global_status`                                                                                  |                                                           |
 | `prepared_statements_instances`                                                                  |                                                           |
-| [`session_connect_attrs`](/performance-schema/performance-schema-session-connect-attrs.md)       | Provides connection attributes for sessions.              |
+| [`session_connect_attrs`](/performance-schema/performance-schema-session-connect-attrs.md)       | 提供会话的连接属性。                                      |
 | `session_status`                                                                                 |                                                           |
 | `session_variables`                                                                              |                                                           |
 | `setup_actors`                                                                                   |                                                           |
@@ -31,7 +31,7 @@ TiDB implements performance schema tables for MySQL compatibility.
 | `setup_instruments`                                                                              |                                                           |
 | `setup_objects`                                                                                  |                                                           |
 
-## Tables that are TiDB extensions
+## TiDB 扩展的表
 
 | Table name                                                                                       | Description                                               |
 |--------------------------------------------------------------------------------------------------|-----------------------------------------------------------|

@@ -1,13 +1,11 @@
 ---
 title: KEY_COLUMN_USAGE
-summary: Learn the `KEY_COLUMN_USAGE` information_schema table.
+summary: 了解 `KEY_COLUMN_USAGE` information_schema 表。
 ---
 
 # KEY_COLUMN_USAGE
 
-The `KEY_COLUMN_USAGE` table describes the key constraints of the columns, such as the primary key constraint.
-
-{{< copyable "sql" >}}
+`KEY_COLUMN_USAGE` 表描述了列的键约束信息，例如主键约束。
 
 ```sql
 USE information_schema;
@@ -34,7 +32,6 @@ DESC key_column_usage;
 12 rows in set (0.00 sec)
 ```
 
-{{< copyable "sql" >}}
 
 ```sql
 SELECT * FROM key_column_usage WHERE table_schema='mysql' and table_name='user';

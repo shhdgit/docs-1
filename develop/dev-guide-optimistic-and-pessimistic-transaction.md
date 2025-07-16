@@ -3,7 +3,7 @@ title: Optimistic Transactions and Pessimistic Transactions
 summary: Learn about optimistic and pessimistic transactions in TiDB.
 ---
 
-# Optimistic Transactions and Pessimistic Transactions
+# Optimistic Transactions and Pessimistic Transactions {#optimistic-transactions-and-pessimistic-transactions}
 
 The [optimistic transaction](/optimistic-transaction.md) model commits the transaction directly, and rolls back when there is a conflict. By contrast, the [pessimistic transaction](/pessimistic-transaction.md) model tries to lock the resources that need to be modified before actually committing the transaction, and only starts committing after ensuring that the transaction can be successfully executed.
 
@@ -15,13 +15,13 @@ The pessimistic transaction model is more intuitive and easier to implement on t
 
 The following is an example of a [bookshop](/develop/dev-guide-bookshop-schema-design.md). It uses an example of buying books to show the pros and cons of optimistic and pessimistic transactions. The process of buying books mainly consists of the following:
 
-1. Update the stock quantity
-2. Create an order
-3. Make the payment
+1.  Update the stock quantity
+2.  Create an order
+3.  Make the payment
 
 These operations must either all succeed or all fail. You must ensure that overselling does not happen in the case of concurrent transactions.
 
-## Pessimistic transactions
+## Pessimistic transactions {#pessimistic-transactions}
 
 The following code uses two threads to simulate the process that two users buy the same book in a pessimistic transaction mode. There are 10 books left in the bookstore. Bob buys 6 books, and Alice buys 4 books. They complete the orders at nearly the same time. As a result, all books in inventory are sold out.
 
@@ -99,7 +99,7 @@ To ensure thread safety, you can use the mysqlclient driver to open multiple con
 
 </SimpleTab>
 
-### Write a pessimistic transaction example
+### Write a pessimistic transaction example {#write-a-pessimistic-transaction-example}
 
 <SimpleTab groupId="language">
 
@@ -835,7 +835,7 @@ The Python example already includes optimistic transactions.
 
 </SimpleTab>
 
-### An example that does not involve overselling
+### An example that does not involve overselling {#an-example-that-does-not-involve-overselling}
 
 Run the sample program:
 
@@ -916,7 +916,7 @@ mysql> SELECT * FROM users;
 2 rows in set (0.00 sec)
 ```
 
-### An example that prevents overselling
+### An example that prevents overselling {#an-example-that-prevents-overselling}
 
 The task in this example is more challenging. Suppose there are 10 books left in stock. Bob buys 7 books, Alice buys 4 books, and they place orders almost at the same time. What will happen? You can reuse the code from the previous example to solve this challenge, and change Bob's purchase quantity from 6 to 7.
 
@@ -996,11 +996,11 @@ mysql> SELECT * FROM users;
 2 rows in set (0.01 sec)
 ```
 
-## Optimistic transactions
+## Optimistic transactions {#optimistic-transactions}
 
 The following code uses two threads to simulate the process that two users buy the same book in an optimistic transaction, just like the pessimistic transaction example. There are 10 books left in inventory. Bob buys 6 and Alice buys 4. They complete the order at about the same time. In the end, no books are left in inventory.
 
-### Write an optimistic transaction example
+### Write an optimistic transaction example {#write-an-optimistic-transaction-example}
 
 <SimpleTab groupId="language">
 
@@ -1194,7 +1194,7 @@ The Python example in the [Write a pessimistic transaction example](#write-a-pes
 
 </SimpleTab>
 
-### An example that does not involve overselling
+### An example that does not involve overselling {#an-example-that-does-not-involve-overselling}
 
 Run the sample program:
 
@@ -1283,7 +1283,7 @@ mysql> SELECT * FROM users;
 2 rows in set (0.00 sec)
 ```
 
-### An example that prevents overselling
+### An example that prevents overselling {#an-example-that-prevents-overselling}
 
 This section describes an optimistic transaction example that prevents overselling. Suppose there are 10 books left in inventory. Bob buys 7 books,and Alice buys 4 books. They place orders almost at the same time. What will happen? You can reuse the code from the optimistic transaction example to address this requirement. Change Bob's purchases from 6 to 7.
 
@@ -1367,16 +1367,16 @@ mysql> SELECT * FROM users;
 2 rows in set (0.00 sec)
 ```
 
-## Need help?
+## Need help? {#need-help}
 
 <CustomContent platform="tidb">
 
-Ask the community on [Discord](https://discord.gg/DQZ2dy3cuc?utm_source=doc) or [Slack](https://slack.tidb.io/invite?team=tidb-community&channel=everyone&ref=pingcap-docs), or [submit a support ticket](/support.md).
+Ask the community on [Discord](https://discord.gg/DQZ2dy3cuc?utm_source=doc) or [Slack](https://slack.tidb.io/invite?team=tidb-community&#x26;channel=everyone&#x26;ref=pingcap-docs), or [submit a support ticket](/support.md).
 
 </CustomContent>
 
 <CustomContent platform="tidb-cloud">
 
-Ask the community on [Discord](https://discord.gg/DQZ2dy3cuc?utm_source=doc) or [Slack](https://slack.tidb.io/invite?team=tidb-community&channel=everyone&ref=pingcap-docs), or [submit a support ticket](https://tidb.support.pingcap.com/).
+Ask the community on [Discord](https://discord.gg/DQZ2dy3cuc?utm_source=doc) or [Slack](https://slack.tidb.io/invite?team=tidb-community&#x26;channel=everyone&#x26;ref=pingcap-docs), or [submit a support ticket](https://tidb.support.pingcap.com/).
 
 </CustomContent>

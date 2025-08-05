@@ -18,7 +18,7 @@ const extractFilefromList = (
   fileList.forEach((filePath = "") => {
     if (
       filePath.includes(`/tidb-cloud/`) ||
-      CLOUD_TOC_LIST.includes(filePath)
+      CLOUD_TOC_LIST.some((tocFile) => filePath.includes(tocFile))
     ) {
       return;
     }

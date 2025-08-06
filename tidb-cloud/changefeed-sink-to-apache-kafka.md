@@ -1,155 +1,302 @@
 ---
 title: Sink to Apache Kafka
-summary: This document explains how to create a changefeed to stream data from TiDB Cloud to Apache Kafka. It includes restrictions, prerequisites, and steps to configure the changefeed for Apache Kafka. The process involves setting up network connections, adding permissions for Kafka ACL authorization, and configuring the changefeed specification.
+summary: 本文档介绍如何创建变更订阅（changefeed），将数据从 TiDB Cloud 流式同步到 Apache Kafka。内容包括限制、前置条件，以及为 Apache Kafka 配置变更订阅的步骤。该过程涉及网络连接设置、为 Kafka ACL 授权添加权限，以及变更订阅规范的配置。
 ---
 
 # Sink to Apache Kafka
 
-This document describes how to create a changefeed to stream data from TiDB Cloud to Apache Kafka.
+本文档描述如何创建变更订阅（changefeed），将数据从 TiDB Cloud 流式同步到 Apache Kafka。
 
 > **Note:**
 >
-> - To use the changefeed feature, make sure that your TiDB Cloud Dedicated cluster version is v6.1.3 or later.
-> - For [TiDB Cloud Serverless clusters](/tidb-cloud/select-cluster-tier.md#tidb-cloud-serverless), the changefeed feature is unavailable.
+> - 要使用变更订阅功能，请确保你的 TiDB Cloud 专属集群版本为 v6.1.3 或更高版本。
+> - 对于 [TiDB Cloud Serverless 集群](/tidb-cloud/select-cluster-tier.md#tidb-cloud-serverless)，暂不支持变更订阅功能。
 
-## Restrictions
+## 限制
 
-- For each TiDB Cloud cluster, you can create up to 100 changefeeds.
-- Currently, TiDB Cloud does not support uploading self-signed TLS certificates to connect to Kafka brokers.
-- Because TiDB Cloud uses TiCDC to establish changefeeds, it has the same [restrictions as TiCDC](https://docs.pingcap.com/tidb/stable/ticdc-overview#unsupported-scenarios).
-- If the table to be replicated does not have a primary key or a non-null unique index, the absence of a unique constraint during replication could result in duplicated data being inserted downstream in some retry scenarios.
+- 每个 TiDB Cloud 集群最多可创建 100 个变更订阅。
+- 目前，TiDB Cloud 不支持上传自签名 TLS 证书以连接 Kafka broker。
+- 由于 TiDB Cloud 使用 TiCDC 建立变更订阅，因此具有与 TiCDC 相同的[限制](https://docs.pingcap.com/tidb/stable/ticdc-overview#unsupported-scenarios)。
+- 如果待同步的表没有主键或非空唯一索引，在某些重试场景下，由于缺少唯一约束，可能会导致下游插入重复数据。
+- 如果你选择 Private Link 或 Private Service Connect 作为网络连接方式，请确保 TiDB 集群版本满足以下要求：
 
-## Prerequisites
+    - v6.5.x：需为 v6.5.9 或更高版本
+    - v7.1.x：需为 v7.1.4 或更高版本
+    - v7.5.x：需为 v7.5.1 或更高版本
+    - v8.1.x：支持所有 v8.1.x 及更高版本
+- 如果你希望使用 Debezium 作为数据格式，请确保 TiDB 集群版本为 v8.1.0 或更高。
+- 关于 Kafka 消息的分区分布，请注意以下事项：
 
-Before creating a changefeed to stream data to Apache Kafka, you need to complete the following prerequisites:
+    - 如果你希望按主键或索引值分发变更日志到指定索引名的 Kafka 分区，请确保 TiDB 集群版本为 v7.5.0 或更高。
+    - 如果你希望按列值分发变更日志到 Kafka 分区，请确保 TiDB 集群版本为 v7.5.0 或更高。
 
-- Set up your network connection
-- Add permissions for Kafka ACL authorization
+## 前置条件
 
-### Network
+在创建变更订阅以将数据流式同步到 Apache Kafka 之前，你需要完成以下前置条件：
 
-Make sure that your TiDB cluster can connect to the Apache Kafka service.
+- 设置网络连接
+- 为 Kafka ACL 授权添加权限
 
-If your Apache Kafka service is in an AWS VPC that has no internet access, take the following steps:
+### 网络
 
-1. [Set up a VPC peering connection](/tidb-cloud/set-up-vpc-peering-connections.md) between the VPC of the Apache Kafka service and your TiDB cluster.
-2. Modify the inbound rules of the security group that the Apache Kafka service is associated with.
+确保你的 TiDB 集群可以连接到 Apache Kafka 服务。你可以选择以下任一连接方式：
 
-    You must add the CIDR of the region where your TiDB Cloud cluster is located to the inbound rules. The CIDR can be found on the **VPC Peering** page. Doing so allows the traffic to flow from your TiDB cluster to the Kafka brokers.
+- Private Connect：适用于避免 VPC CIDR 冲突并满足安全合规要求，但会产生额外的 [Private Data Link Cost](/tidb-cloud/tidb-cloud-billing-ticdc-rcu.md#private-data-link-cost)。
+- VPC Peering：作为一种经济高效的选择，但需要管理潜在的 VPC CIDR 冲突和安全问题。
+- Public IP：适用于快速搭建场景。
 
-3. If the Apache Kafka URL contains hostnames, you need to allow TiDB Cloud to be able to resolve the DNS hostnames of the Apache Kafka brokers.
+<SimpleTab>
+<div label="Private Connect">
 
-    1. Follow the steps in [Enable DNS resolution for a VPC peering connection](https://docs.aws.amazon.com/vpc/latest/peering/modify-peering-connections.html#vpc-peering-dns).
-    2. Enable the **Accepter DNS resolution** option.
+Private Connect 利用云服务商的 **Private Link** 或 **Private Service Connect** 技术，使你 VPC 内的资源可以通过私有 IP 地址连接到其他 VPC 的服务，就像这些服务直接托管在你自己的 VPC 内一样。
 
-If your Apache Kafka service is in a Google Cloud VPC that has no internet access, take the following steps:
+TiDB Cloud 目前仅支持自建 Kafka 的 Private Connect，不支持与 MSK、Confluent Kafka 或其他 Kafka SaaS 服务的直接集成。若需通过 Private Connect 连接这些 Kafka SaaS 服务，你可以部署一个 [kafka-proxy](https://github.com/grepplabs/kafka-proxy) 作为中间层，将 Kafka 服务暴露为自建 Kafka。详细示例可参考 [Set Up Self-Hosted Kafka Private Service Connect by Kafka-proxy in Google Cloud](/tidb-cloud/setup-self-hosted-kafka-private-service-connect.md#set-up-self-hosted-kafka-private-service-connect-by-kafka-proxy)。该方案适用于所有 Kafka SaaS 服务。
 
-1. [Set up a VPC peering connection](/tidb-cloud/set-up-vpc-peering-connections.md) between the VPC of the Apache Kafka service and your TiDB cluster.
-2. Modify the ingress firewall rules of the VPC where Apache Kafka is located.
+- 如果你的 Apache Kafka 服务托管在 AWS，请按照 [Set Up Self-Hosted Kafka Private Link Service in AWS](/tidb-cloud/setup-aws-self-hosted-kafka-private-link-service.md) 配置网络连接。配置完成后，在 TiDB Cloud 控制台创建变更订阅时需提供以下信息：
 
-    You must add the CIDR of the region where your TiDB Cloud cluster is located to the ingress firewall rules. The CIDR can be found on the **VPC Peering** page. Doing so allows the traffic to flow from your TiDB cluster to the Kafka brokers.
+    - Kafka Advertised Listener Pattern 中的 ID
+    - Endpoint Service Name
+    - Bootstrap Ports
 
-### Kafka ACL authorization
+- 如果你的 Apache Kafka 服务托管在 Google Cloud，请按照 [Set Up Self-Hosted Kafka Private Service Connect in Google Cloud](/tidb-cloud/setup-self-hosted-kafka-private-service-connect.md) 配置网络连接。配置完成后，在 TiDB Cloud 控制台创建变更订阅时需提供以下信息：
 
-To allow TiDB Cloud changefeeds to stream data to Apache Kafka and create Kafka topics automatically, ensure that the following permissions are added in Kafka:
+    - Kafka Advertised Listener Pattern 中的 ID
+    - Service Attachment
+    - Bootstrap Ports
 
-- The `Create` and `Write` permissions are added for the topic resource type in Kafka.
-- The `DescribeConfigs` permission is added for the cluster resource type in Kafka.
+- 如果你的 Apache Kafka 服务托管在 Azure，请按照 [Set Up Self-Hosted Kafka Private Link Service in Azure](/tidb-cloud/setup-azure-self-hosted-kafka-private-link-service.md) 配置网络连接。配置完成后，在 TiDB Cloud 控制台创建变更订阅时需提供以下信息：
 
-For example, if your Kafka cluster is in Confluent Cloud, you can see [Resources](https://docs.confluent.io/platform/current/kafka/authorization.html#resources) and [Adding ACLs](https://docs.confluent.io/platform/current/kafka/authorization.html#adding-acls) in Confluent documentation for more information.
+    - Kafka Advertised Listener Pattern 中的 ID
+    - Private Link Service 的别名（Alias）
+    - Bootstrap Ports
 
-## Step 1. Open the changefeed page for Apache Kafka
+</div>
+<div label="VPC Peering">
 
-1. In the [TiDB Cloud console](https://tidbcloud.com), navigate to the cluster overview page of the target TiDB cluster, and then click **Changefeed** in the left navigation pane.
-2. Click **Create Changefeed**, and select **Kafka** as **Target Type**.
+如果你的 Apache Kafka 服务位于没有互联网访问权限的 AWS VPC，请按以下步骤操作：
 
-## Step 2. Configure the changefeed target
+1. 在 Apache Kafka 服务所在 VPC 与 TiDB 集群之间[建立 VPC Peering 连接](/tidb-cloud/set-up-vpc-peering-connections.md)。
+2. 修改 Apache Kafka 服务关联的安全组的入站规则。
 
-1. Under **Brokers Configuration**, fill in your Kafka brokers endpoints. You can use commas `,` to separate multiple endpoints.
-2. Select an authentication option according to your Kafka authentication configuration.
+    你必须将 TiDB Cloud 集群所在区域的 CIDR 添加到入站规则中。该 CIDR 可在 **VPC Peering** 页面找到。这样可以允许 TiDB 集群的流量访问 Kafka broker。
 
-    - If your Kafka does not require authentication, keep the default option **Disable**.
-    - If your Kafka requires authentication, select the corresponding authentication type, and then fill in the user name and password of your Kafka account for authentication.
+3. 如果 Apache Kafka 的 URL 包含主机名，你需要允许 TiDB Cloud 能够解析 Apache Kafka broker 的 DNS 主机名。
 
-3. Select your Kafka version. If you do not know that, use Kafka V2.
-4. Select a desired compression type for the data in this changefeed.
-5. Enable the **TLS Encryption** option if your Kafka has enabled TLS encryption and you want to use TLS encryption for the Kafka connection.
-6. Click **Next** to check the configurations you set and go to the next page.
+    1. 按照 [Enable DNS resolution for a VPC peering connection](https://docs.aws.amazon.com/vpc/latest/peering/vpc-peering-dns.html) 的步骤操作。
+    2. 启用 **Accepter DNS resolution** 选项。
 
-## Step 3. Set the changefeed
+如果你的 Apache Kafka 服务位于没有互联网访问权限的 Google Cloud VPC，请按以下步骤操作：
 
-1. Customize **Table Filter** to filter the tables that you want to replicate. For the rule syntax, refer to [table filter rules](/table-filter.md).
+1. 在 Apache Kafka 服务所在 VPC 与 TiDB 集群之间[建立 VPC Peering 连接](/tidb-cloud/set-up-vpc-peering-connections.md)。
+2. 修改 Apache Kafka 所在 VPC 的 ingress 防火墙规则。
 
-    - **Filter Rules**: you can set filter rules in this column. By default, there is a rule `*.*`, which stands for replicating all tables. When you add a new rule, TiDB Cloud queries all the tables in TiDB and displays only the tables that match the rules in the box on the right. You can add up to 100 filter rules.
-    - **Tables with valid keys**: this column displays the tables that have valid keys, including primary keys or unique indexes.
-    - **Tables without valid keys**: this column shows tables that lack primary keys or unique keys. These tables present a challenge during replication because the absence of a unique identifier can result in inconsistent data when the downstream handles duplicate events. To ensure data consistency, it is recommended to add unique keys or primary keys to these tables before initiating the replication. Alternatively, you can add filter rules to exclude these tables. For example, you can exclude the table `test.tbl1` by using the rule `"!test.tbl1"`.
+    你必须将 TiDB Cloud 集群所在区域的 CIDR 添加到 ingress 防火墙规则中。该 CIDR 可在 **VPC Peering** 页面找到。这样可以允许 TiDB 集群的流量访问 Kafka broker。
 
-2. Customize **Event Filter** to filter the events that you want to replicate.
+</div>
+<div label="Public IP">
 
-    - **Tables matching**: you can set which tables the event filter will be applied to in this column. The rule syntax is the same as that used for the preceding **Table Filter** area. You can add up to 10 event filter rules per changefeed.
-    - **Ignored events**: you can set which types of events the event filter will exclude from the changefeed.
+如果你希望通过 Public IP 访问 Apache Kafka 服务，请为所有 Kafka broker 分配 Public IP 地址。
 
-3. In the **Data Format** area, select your desired format of Kafka messages.
+在生产环境中**不推荐**使用 Public IP。
 
-   - Avro is a compact, fast, and binary data format with rich data structures, which is widely used in various flow systems. For more information, see [Avro data format](https://docs.pingcap.com/tidb/stable/ticdc-avro-protocol).
-   - Canal-JSON is a plain JSON text format, which is easy to parse. For more information, see [Canal-JSON data format](https://docs.pingcap.com/tidb/stable/ticdc-canal-json).
+</div>
+</SimpleTab>
 
-4. Enable the **TiDB Extension** option if you want to add TiDB-extension fields to the Kafka message body.
+### Kafka ACL 授权
 
-    For more information about TiDB-extension fields, see [TiDB extension fields in Avro data format](https://docs.pingcap.com/tidb/stable/ticdc-avro-protocol#tidb-extension-fields) and [TiDB extension fields in Canal-JSON data format](https://docs.pingcap.com/tidb/stable/ticdc-canal-json#tidb-extension-field).
+为了让 TiDB Cloud 变更订阅能够将数据流式同步到 Apache Kafka 并自动创建 Kafka topic，请确保在 Kafka 中添加以下权限：
 
-5. If you select **Avro** as your data format, you will see some Avro-specific configurations on the page. You can fill in these configurations as follows:
+- 为 Kafka 的 topic 资源类型添加 `Create` 和 `Write` 权限。
+- 为 Kafka 的 cluster 资源类型添加 `DescribeConfigs` 权限。
 
-    - In the **Decimal** and **Unsigned BigInt** configurations, specify how TiDB Cloud handles the decimal and unsigned bigint data types in Kafka messages.
-    - In the **Schema Registry** area, fill in your schema registry endpoint. If you enable **HTTP Authentication**, the fields for user name and password are displayed and automatically filled in with your TiDB cluster endpoint and password.
+例如，如果你的 Kafka 集群在 Confluent Cloud，可以参考 Confluent 文档中的 [Resources](https://docs.confluent.io/platform/current/kafka/authorization.html#resources) 和 [Adding ACLs](https://docs.confluent.io/platform/current/kafka/authorization.html#adding-acls) 获取更多信息。
 
-6. In the **Topic Distribution** area, select a distribution mode, and then fill in the topic name configurations according to the mode.
+## 第 1 步：打开 Apache Kafka 的 Changefeed 页面
 
-    If you select **Avro** as your data format, you can only choose the **Distribute changelogs by table to Kafka Topics** mode in the **Distribution Mode** drop-down list.
+1. 登录 [TiDB Cloud 控制台](https://tidbcloud.com)。
+2. 进入目标 TiDB 集群的集群总览页面，然后点击左侧导航栏的 **Data** > **Changefeed**。
+3. 点击 **Create Changefeed**，并选择 **Kafka** 作为 **Destination**。
 
-    The distribution mode controls how the changefeed creates Kafka topics, by table, by database, or creating one topic for all changelogs.
+## 第 2 步：配置变更订阅目标
 
-   - **Distribute changelogs by table to Kafka Topics**
+具体步骤根据你选择的连接方式有所不同。
 
-        If you want the changefeed to create a dedicated Kafka topic for each table, choose this mode. Then, all Kafka messages of a table are sent to a dedicated Kafka topic. You can customize topic names for tables by setting a topic prefix, a separator between a database name and table name, and a suffix. For example, if you set the separator as `_`, the topic names are in the format of `<Prefix><DatabaseName>_<TableName><Suffix>`.
+<SimpleTab>
+<div label="VPC Peering or Public IP">
 
-        For changelogs of non-row events, such as Create Schema Event, you can specify a topic name in the **Default Topic Name** field. The changefeed will create a topic accordingly to collect such changelogs.
+1. 在 **Connectivity Method** 选择 **VPC Peering** 或 **Public IP**，填写你的 Kafka broker endpoint。多个 endpoint 可用英文逗号 `,` 分隔。
+2. 根据你的 Kafka 认证配置，选择 **Authentication** 选项。
 
-   - **Distribute changelogs by database to Kafka Topics**
+    - 如果 Kafka 不需要认证，保持默认选项 **Disable**。
+    - 如果 Kafka 需要认证，选择相应的认证类型，并填写 Kafka 账号的 **user name** 和 **password**。
 
-        If you want the changefeed to create a dedicated Kafka topic for each database, choose this mode. Then, all Kafka messages of a database are sent to a dedicated Kafka topic. You can customize topic names of databases by setting a topic prefix and a suffix.
+3. 选择你的 **Kafka Version**。如果不确定，建议选择 **Kafka v2**。
+4. 选择本次变更订阅的数据 **Compression** 类型。
+5. 如果你的 Kafka 启用了 TLS 加密，并希望使用 TLS 加密连接 Kafka，则启用 **TLS Encryption** 选项。
+6. 点击 **Next** 测试网络连接。测试通过后会进入下一页面。
 
-        For changelogs of non-row events, such as Resolved Ts Event, you can specify a topic name in the **Default Topic Name** field. The changefeed will create a topic accordingly to collect such changelogs.
+</div>
+<div label="Private Link (AWS)">
 
-   - **Send all changelogs to one specified Kafka Topic**
+1. 在 **Connectivity Method** 选择 **Private Link**。
+2. 授权 TiDB Cloud 的 [AWS Principal](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_principal.html#principal-accounts) 为你的 endpoint service 创建 endpoint。AWS Principal 信息可在网页提示中获取。
+3. 在 **Network** 部分 [Set Up Self-Hosted Kafka Private Link Service in AWS](/tidb-cloud/setup-aws-self-hosted-kafka-private-link-service.md) 时，确保选择相同的 **Number of AZs** 和 **AZ IDs of Kafka Deployment**，并在 **Kafka Advertised Listener Pattern** 中填写相同的唯一 ID。
+4. 填写在 [Set Up Self-Hosted Kafka Private Link Service in AWS](/tidb-cloud/setup-aws-self-hosted-kafka-private-link-service.md) 配置的 **Endpoint Service Name**。
+5. 填写 **Bootstrap Ports**。建议每个 AZ 至少设置一个端口。多个端口可用英文逗号 `,` 分隔。
+6. 根据你的 Kafka 认证配置，选择 **Authentication** 选项。
 
-        If you want the changefeed to create one Kafka topic for all changelogs, choose this mode. Then, all Kafka messages in the changefeed will be sent to one Kafka topic. You can define the topic name in the **Topic Name** field.
+    - 如果 Kafka 不需要认证，保持默认选项 **Disable**。
+    - 如果 Kafka 需要认证，选择相应的认证类型，并填写 Kafka 账号的 **user name** 和 **password**。
 
-7. In the **Partition Distribution** area, you can decide which partition a Kafka message will be sent to:
+7. 选择你的 **Kafka Version**。如果不确定，建议选择 **Kafka v2**。
+8. 选择本次变更订阅的数据 **Compression** 类型。
+9. 如果你的 Kafka 启用了 TLS 加密，并希望使用 TLS 加密连接 Kafka，则启用 **TLS Encryption** 选项。
+10. 点击 **Next** 测试网络连接。测试通过后会进入下一页面。
+11. TiDB Cloud 会为 **Private Link** 创建 endpoint，可能需要几分钟时间。
+12. endpoint 创建完成后，登录你的云服务商控制台并接受连接请求。
+13. 返回 [TiDB Cloud 控制台](https://tidbcloud.com) 确认你已接受连接请求。TiDB Cloud 会测试连接，测试通过后进入下一页面。
 
-   - **Distribute changelogs by index value to Kafka partition**
+</div>
+<div label="Private Service Connect (Google Cloud)">
 
-        If you want the changefeed to send Kafka messages of a table to different partitions, choose this distribution method. The index value of a row changelog will determine which partition the changelog is sent to. This distribution method provides a better partition balance and ensures row-level orderliness.
+1. 在 **Connectivity Method** 选择 **Private Service Connect**。
+2. 在 **Network** 部分 [Set Up Self-Hosted Kafka Private Service Connect in Google Cloud](/tidb-cloud/setup-self-hosted-kafka-private-service-connect.md) 时，确保在 **Kafka Advertised Listener Pattern** 中填写相同的唯一 ID。
+3. 填写在 [Setup Self Hosted Kafka Private Service Connect in Google Cloud](/tidb-cloud/setup-self-hosted-kafka-private-service-connect.md) 配置的 **Service Attachment**。
+4. 填写 **Bootstrap Ports**。建议提供多个端口。多个端口可用英文逗号 `,` 分隔。
+5. 根据你的 Kafka 认证配置，选择 **Authentication** 选项。
 
-   - **Distribute changelogs by table to Kafka partition**
+    - 如果 Kafka 不需要认证，保持默认选项 **Disable**。
+    - 如果 Kafka 需要认证，选择相应的认证类型，并填写 Kafka 账号的 **user name** 和 **password**。
 
-        If you want the changefeed to send Kafka messages of a table to one Kafka partition, choose this distribution method. The table name of a row changelog will determine which partition the changelog is sent to. This distribution method ensures table orderliness but might cause unbalanced partitions.
+6. 选择你的 **Kafka Version**。如果不确定，建议选择 **Kafka v2**。
+7. 选择本次变更订阅的数据 **Compression** 类型。
+8. 如果你的 Kafka 启用了 TLS 加密，并希望使用 TLS 加密连接 Kafka，则启用 **TLS Encryption** 选项。
+9. 点击 **Next** 测试网络连接。测试通过后会进入下一页面。
+10. TiDB Cloud 会为 **Private Service Connect** 创建 endpoint，可能需要几分钟时间。
+11. endpoint 创建完成后，登录你的云服务商控制台并接受连接请求。
+12. 返回 [TiDB Cloud 控制台](https://tidbcloud.com) 确认你已接受连接请求。TiDB Cloud 会测试连接，测试通过后进入下一页面。
 
-8. In the **Topic Configuration** area, configure the following numbers. The changefeed will automatically create the Kafka topics according to the numbers.
+</div>
+<div label="Private Link (Azure)">
 
-    - **Replication Factor**: controls how many Kafka servers each Kafka message is replicated to. The valid value ranges from [`min.insync.replicas`](https://kafka.apache.org/33/documentation.html#brokerconfigs_min.insync.replicas) to the number of Kafka brokers.
-    - **Partition Number**: controls how many partitions exist in a topic. The valid value range is `[1, 10 * the number of Kafka brokers]`.
+1. 在 **Connectivity Method** 选择 **Private Link**。
+2. 在创建变更订阅前，授权 TiDB Cloud 的 Azure 订阅，或允许任何拥有你别名的人访问你的 Private Link 服务。Azure 订阅信息可在网页的 **Reminders before proceeding** 提示中获取。关于 Private Link 服务可见性，详见 Azure 文档 [Control service exposure](https://learn.microsoft.com/en-us/azure/private-link/private-link-service-overview#control-service-exposure)。
+3. 在 **Network** 部分 [Set Up Self-Hosted Kafka Private Link Service in Azure](/tidb-cloud/setup-azure-self-hosted-kafka-private-link-service.md) 时，确保在 **Kafka Advertised Listener Pattern** 中填写相同的唯一 ID。
+4. 填写在 [Set Up Self-Hosted Kafka Private Link Service in Azure](/tidb-cloud/setup-azure-self-hosted-kafka-private-link-service.md) 配置的 **Alias of Private Link Service**。
+5. 填写 **Bootstrap Ports**。建议每个 AZ 至少设置一个端口。多个端口可用英文逗号 `,` 分隔。
+6. 根据你的 Kafka 认证配置，选择 **Authentication** 选项。
 
-9. Click **Next**.
+    - 如果 Kafka 不需要认证，保持默认选项 **Disable**。
+    - 如果 Kafka 需要认证，选择相应的认证类型，并填写 Kafka 账号的 **user name** 和 **password**。
 
-## Step 4. Configure your changefeed specification
+7. 选择你的 **Kafka Version**。如果不确定，建议选择 **Kafka v2**。
+8. 选择本次变更订阅的数据 **Compression** 类型。
+9. 如果你的 Kafka 启用了 TLS 加密，并希望使用 TLS 加密连接 Kafka，则启用 **TLS Encryption** 选项。
+10. 点击 **Next** 测试网络连接。测试通过后会进入下一页面。
+11. TiDB Cloud 会为 **Private Link** 创建 endpoint，可能需要几分钟时间。
+12. endpoint 创建完成后，登录 [Azure portal](https://portal.azure.com/) 并接受连接请求。
+13. 返回 [TiDB Cloud 控制台](https://tidbcloud.com) 确认你已接受连接请求。TiDB Cloud 会测试连接，测试通过后进入下一页面。
 
-1. In the **Changefeed Specification** area, specify the number of Replication Capacity Units (RCUs) to be used by the changefeed.
-2. In the **Changefeed Name** area, specify a name for the changefeed.
-3. Click **Next** to check the configurations you set and go to the next page.
+</div>
+</SimpleTab>
 
-## Step 5. Review the configurations
+## 第 3 步：设置变更订阅
 
-On this page, you can review all the changefeed configurations that you set.
+1. 自定义 **Table Filter**，筛选你希望同步的表。规则语法详见 [table filter rules](/table-filter.md)。
 
-If you find any error, you can go back to fix the error. If there is no error, you can click the check box at the bottom, and then click **Create** to create the changefeed.
+    - **Filter Rules**：你可以在此列设置过滤规则。默认有一条规则 `*.*`，表示同步所有表。添加新规则后，TiDB Cloud 会查询 TiDB 中所有表，并在右侧仅显示匹配规则的表。最多可添加 100 条过滤规则。
+    - **Tables with valid keys**：此列显示具有有效键（主键或唯一索引）的表。
+    - **Tables without valid keys**：此列显示缺少主键或唯一键的表。这类表在同步时存在挑战，因为缺少唯一标识符可能导致下游处理重复事件时数据不一致。为保证数据一致性，建议在同步前为这些表添加唯一键或主键，或通过过滤规则排除这些表。例如，可通过规则 `"!test.tbl1"` 排除表 `test.tbl1`。
+
+2. 自定义 **Event Filter**，筛选你希望同步的事件。
+
+    - **Tables matching**：你可以在此列设置事件过滤器应用的表，规则语法与前述 **Table Filter** 区域相同。每个变更订阅最多可添加 10 条事件过滤规则。
+    - **Event Filter**：你可以使用以下事件过滤器排除特定事件类型：
+        - **Ignore event**：排除指定类型的事件。
+        - **Ignore SQL**：排除匹配指定表达式的 DDL 事件。例如，`^drop` 排除以 `DROP` 开头的语句，`add column` 排除包含 `ADD COLUMN` 的语句。
+        - **Ignore insert value expression**：排除满足特定条件的 `INSERT` 语句。例如，`id >= 100` 排除 `id` 大于等于 100 的 `INSERT` 语句。
+        - **Ignore update new value expression**：排除新值满足指定条件的 `UPDATE` 语句。例如，`gender = 'male'` 排除更新后 `gender` 为 `male` 的变更。
+        - **Ignore update old value expression**：排除旧值满足指定条件的 `UPDATE` 语句。例如，`age < 18` 排除旧值 `age` 小于 18 的变更。
+        - **Ignore delete value expression**：排除满足指定条件的 `DELETE` 语句。例如，`name = 'john'` 排除 `name` 为 `'john'` 的删除操作。
+
+3. 自定义 **Column Selector**，选择事件中的列，仅将这些列的数据变更发送到下游。
+
+    - **Tables matching**：指定 column selector 应用的表。未匹配任何规则的表将发送所有列。
+    - **Column Selector**：指定匹配表中将发送到下游的列。
+
+    更多匹配规则说明，参见 [Column selectors](https://docs.pingcap.com/tidb/stable/ticdc-sink-to-kafka/#column-selectors)。
+
+4. 在 **Data Format** 区域，选择你期望的 Kafka 消息格式。
+
+    - Avro 是一种紧凑、高效的二进制数据格式，支持丰富的数据结构，广泛应用于各类流式系统。详见 [Avro data format](https://docs.pingcap.com/tidb/stable/ticdc-avro-protocol)。
+    - Canal-JSON 是一种纯 JSON 文本格式，易于解析。详见 [Canal-JSON data format](https://docs.pingcap.com/tidb/stable/ticdc-canal-json)。
+    - Open Protocol 是一种行级数据变更通知协议，可为监控、缓存、全文索引、分析引擎及不同数据库间主从复制等场景提供数据源。详见 [Open Protocol data format](https://docs.pingcap.com/tidb/stable/ticdc-open-protocol)。
+    - Debezium 是一个捕获数据库变更的工具。它将每个捕获到的数据库变更转换为一个称为“事件”的消息，并发送到 Kafka。详见 [Debezium data format](https://docs.pingcap.com/tidb/stable/ticdc-debezium)。
+
+5. 如果你希望在 Kafka 消息体中添加 TiDB 扩展字段，可启用 **TiDB Extension** 选项。
+
+    关于 TiDB 扩展字段，详见 [Avro 数据格式中的 TiDB 扩展字段](https://docs.pingcap.com/tidb/stable/ticdc-avro-protocol#tidb-extension-fields) 和 [Canal-JSON 数据格式中的 TiDB 扩展字段](https://docs.pingcap.com/tidb/stable/ticdc-canal-json#tidb-extension-field)。
+
+6. 如果你选择 **Avro** 作为数据格式，页面会显示一些 Avro 专属配置。你可以按如下方式填写：
+
+    - 在 **Decimal** 和 **Unsigned BigInt** 配置项中，指定 TiDB Cloud 如何在 Kafka 消息中处理 decimal 和 unsigned bigint 数据类型。
+    - 在 **Schema Registry** 区域，填写你的 schema registry endpoint。如果启用 **HTTP Authentication**，会显示用户名和密码字段，并自动填入 TiDB 集群 endpoint 和密码。
+
+7. 在 **Topic Distribution** 区域，选择分发模式，并根据所选模式填写 topic 名称配置。
+
+    如果你选择 **Avro** 作为数据格式，则只能在 **Distribution Mode** 下拉列表中选择 **Distribute changelogs by table to Kafka Topics** 模式。
+
+    分发模式决定变更订阅如何创建 Kafka topic：按表、按数据库，或所有变更日志共用一个 topic。
+
+    - **Distribute changelogs by table to Kafka Topics**
+
+        如果你希望为每个表创建独立的 Kafka topic，选择此模式。这样，每个表的 Kafka 消息会发送到专属 topic。你可以通过设置 topic 前缀、数据库名与表名之间的分隔符、后缀自定义 topic 名称。例如，分隔符设置为 `_` 时，topic 名称格式为 `<Prefix><DatabaseName>_<TableName><Suffix>`。
+
+        对于非行级事件（如 Create Schema Event）的变更日志，可在 **Default Topic Name** 字段指定 topic 名称，变更订阅会相应创建 topic 收集此类变更日志。
+
+    - **Distribute changelogs by database to Kafka Topics**
+
+        如果你希望为每个数据库创建独立的 Kafka topic，选择此模式。这样，每个数据库的 Kafka 消息会发送到专属 topic。你可以通过设置 topic 前缀和后缀自定义数据库的 topic 名称。
+
+        对于非行级事件（如 Resolved Ts Event）的变更日志，可在 **Default Topic Name** 字段指定 topic 名称，变更订阅会相应创建 topic 收集此类变更日志。
+
+    - **Send all changelogs to one specified Kafka Topic**
+
+        如果你希望所有变更日志共用一个 Kafka topic，选择此模式。这样，变更订阅中的所有 Kafka 消息都会发送到同一个 topic。你可以在 **Topic Name** 字段定义 topic 名称。
+
+8. 在 **Partition Distribution** 区域，你可以决定 Kafka 消息发送到哪个分区。你可以为所有表定义**单一分区分发器**，也可以为不同表定义**不同的分区分发器**。TiDB Cloud 提供四种分发器类型：
+
+    - **Distribute changelogs by primary key or index value to Kafka partition**
+
+        如果你希望将表的 Kafka 消息分发到不同分区，选择此方式。行变更日志的主键或索引值决定其发送到哪个分区。该方式可实现更好的分区均衡，并保证行级有序。
+
+    - **Distribute changelogs by table to Kafka partition**
+
+        如果你希望表的所有 Kafka 消息发送到同一个分区，选择此方式。行变更日志的表名决定其发送到哪个分区。该方式保证表级有序，但可能导致分区不均衡。
+
+    - **Distribute changelogs by timestamp to Kafka partition**
+
+        如果你希望将 Kafka 消息随机分发到不同分区，选择此方式。行变更日志的 commitTs 决定其发送到哪个分区。该方式可实现更好的分区均衡，并保证每个分区内有序。但同一数据项的多次变更可能被发送到不同分区，不同消费者的消费进度可能不同，可能导致数据不一致。因此，消费者需在消费前按 commitTs 对多分区数据进行排序。
+
+    - **Distribute changelogs by column value to Kafka partition**
+
+        如果你希望将表的 Kafka 消息分发到不同分区，选择此方式。行变更日志的指定列值决定其发送到哪个分区。该方式保证每个分区内有序，并确保相同列值的变更日志发送到同一分区。
+
+9. 在 **Topic Configuration** 区域，配置以下数值。变更订阅会根据这些数值自动创建 Kafka topic。
+
+    - **Replication Factor**：控制每条 Kafka 消息在多少台 Kafka 服务器上进行副本。有效取值范围为 [`min.insync.replicas`](https://kafka.apache.org/33/documentation.html#brokerconfigs_min.insync.replicas) 到 Kafka broker 数量。
+    - **Partition Number**：控制每个 topic 的分区数。有效取值范围为 `[1, 10 * Kafka broker 数量]`。
+
+10. 点击 **Next**。
+
+## 第 4 步：配置变更订阅规范
+
+1. 在 **Changefeed Specification** 区域，指定变更订阅使用的 Replication Capacity Units（RCU）数量。
+2. 在 **Changefeed Name** 区域，为变更订阅指定名称。
+3. 点击 **Next**，检查你设置的配置并进入下一页面。
+
+## 第 5 步：检查配置
+
+在此页面，你可以检查所有已设置的变更订阅配置。
+
+如果发现有误，可以返回修改。若无误，勾选底部的复选框，然后点击 **Create** 创建变更订阅。

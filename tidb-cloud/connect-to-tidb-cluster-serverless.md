@@ -1,62 +1,62 @@
 ---
-title: Connect to Your TiDB Cloud Serverless Cluster
-summary: Learn how to connect to your TiDB Cloud Serverless cluster via different methods.
+title: 连接到你的 TiDB Cloud Serverless 集群
+summary: 了解如何通过不同方式连接到你的 TiDB Cloud Serverless 集群。
 ---
 
-# Connect to Your TiDB Cloud Serverless Cluster
+# 连接到你的 TiDB Cloud Serverless 集群
 
-This document describes how to connect to your TiDB Cloud Serverless cluster.
+本文档介绍如何连接到你的 TiDB Cloud Serverless 集群。
 
 > **Tip:**
 >
-> To learn how to connect to a TiDB Cloud Dedicated cluster, see [Connect to Your TiDB Cloud Dedicated Cluster](/tidb-cloud/connect-to-tidb-cluster.md).
+> 如果你想了解如何连接到 TiDB Cloud Dedicated 集群，请参见 [Connect to Your TiDB Cloud Dedicated Cluster](/tidb-cloud/connect-to-tidb-cluster.md)。
 
-## Connection methods
+## 连接方式
 
-After your TiDB Cloud Serverless cluster is created on TiDB Cloud, you can connect to it via one of the following methods:
+在 TiDB Cloud 上创建好你的 TiDB Cloud Serverless 集群后，你可以通过以下任一方式进行连接：
 
-- Direct connections
+- 直连
 
-  Direct connections mean the MySQL native connection system over TCP. You can connect to your TiDB Cloud Serverless cluster using any tool that supports MySQL connection, such as [MySQL client](https://dev.mysql.com/doc/refman/8.0/en/mysql.html).
+  直连指的是通过 TCP 的 MySQL 原生连接系统。你可以使用任何支持 MySQL 连接的工具连接到你的 TiDB Cloud Serverless 集群，例如 [MySQL client](https://dev.mysql.com/doc/refman/8.0/en/mysql.html)。
 
 - [Data Service (beta)](/tidb-cloud/data-service-overview.md)
 
-  TiDB Cloud provides a Data Service feature that enables you to connect to your TiDB Cloud Serverless cluster via an HTTPS request using a custom API endpoint. Unlike direct connections, Data Service accesses TiDB Cloud Serverless data via a RESTful API rather than raw SQL.
+  TiDB Cloud 提供了 Data Service 功能，使你可以通过自定义 API 端点的 HTTPS 请求连接到你的 TiDB Cloud Serverless 集群。与直连不同，Data Service 通过 RESTful API 访问 TiDB Cloud Serverless 的数据，而不是原生 SQL。
 
 - [Serverless Driver (beta)](/tidb-cloud/serverless-driver.md)
 
-  TiDB Cloud provides a serverless driver for JavaScript, which allows you to connect to your TiDB Cloud Serverless cluster in edge environments with the same experience as direct connections.
+  TiDB Cloud 为 JavaScript 提供了 serverless driver，允许你在边缘环境中以与直连相同的体验连接到 TiDB Cloud Serverless 集群。
 
-In the preceding connection methods, you can choose your desired one based on your needs:
+在上述连接方式中，你可以根据需求选择合适的方式：
 
-| Connection method  | User interface     | Scenario                                                                                                                                                       |
-|--------------------|--------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Direct connections | SQL/ORM            | Long-running environment, such as Java, Node.js, and Python.                                                                                                   |
-| Data Service       | RESTful API        | All browser and application interactions.                                                                                                                      |
-| Serverless Driver  | SQL/ORM            | Serverless and edge environments such as [Vercel Edge Functions](https://vercel.com/docs/functions/edge-functions) and [Cloudflare Workers](https://workers.cloudflare.com/). |
+| 连接方式           | 用户界面         | 场景                                                                                                                                                       |
+|--------------------|------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 直连               | SQL/ORM          | 长时间运行的环境，如 Java、Node.js 和 Python。                                                                                                              |
+| Data Service       | RESTful API      | 所有浏览器和应用程序交互。                                                                                                                                 |
+| Serverless Driver  | SQL/ORM          | Serverless 和边缘环境，如 [Vercel Edge Functions](https://vercel.com/docs/functions/edge-functions) 和 [Cloudflare Workers](https://workers.cloudflare.com/)。 |
 
-## Network
+## 网络
 
-There are two network connection types for TiDB Cloud Serverless:
+TiDB Cloud Serverless 支持两种网络连接类型：
 
-- [Private endpoint](/tidb-cloud/set-up-private-endpoint-connections-serverless.md) (recommended)
+- [Private endpoint](/tidb-cloud/set-up-private-endpoint-connections-serverless.md)（推荐）
 
-    Private endpoint connection provides a private endpoint to allow SQL clients in your VPC to securely access services over AWS PrivateLink, which provides highly secure and one-way access to database services with simplified network management.
+    Private endpoint 连接为你的 VPC 中的 SQL 客户端提供一个私有端点，通过 AWS PrivateLink 安全访问服务，提供高度安全且单向的数据库服务访问，并简化网络管理。
 
 - [Public endpoint](/tidb-cloud/connect-via-standard-connection-serverless.md)
 
-  The standard connection exposes a public endpoint, so you can connect to your TiDB cluster via a SQL client from your laptop.
+  标准连接会暴露一个公共端点，因此你可以通过笔记本上的 SQL 客户端连接到你的 TiDB 集群。
 
-  TiDB Cloud Serverless requires [TLS connections](/tidb-cloud/secure-connections-to-serverless-clusters.md), which ensures the security of data transmission from your applications to TiDB clusters.
+  TiDB Cloud Serverless 要求 [TLS 连接](/tidb-cloud/secure-connections-to-serverless-clusters.md)，以确保从你的应用程序到 TiDB 集群的数据传输安全。
 
-The following table shows the network you can use in different connection methods:
+下表展示了不同连接方式可用的网络类型：
 
-| Connection method          | Network                      | Description                                                                                                       |
-|----------------------------|------------------------------|-------------------------------------------------------------------------------------------------------------------|
-| Direct connections         | Public or private endpoint   | Direct connections can be made via both public and private endpoints.                                             |
-| Data Service (beta)        | /                            | Accessing TiDB Cloud Serverless via Data Service (beta) does not need to specify the network type.                      |
-| Serverless Driver (beta)   | Public endpoint              | Serverless Driver only supports connections via public endpoint.                                                  |
+| 连接方式                  | 网络类型                    | 说明                                                                                                       |
+|---------------------------|-----------------------------|------------------------------------------------------------------------------------------------------------|
+| 直连                      | 公共或私有端点              | 直连可以通过公共端点或私有端点进行。                                                                       |
+| Data Service (beta)       | /                           | 通过 Data Service (beta) 访问 TiDB Cloud Serverless 无需指定网络类型。                                     |
+| Serverless Driver (beta)  | 公共端点                    | Serverless Driver 仅支持通过公共端点进行连接。                                                             |
 
-## What's next
+## 后续操作
 
-After you have successfully connected to your TiDB cluster, you can [explore SQL statements with TiDB](/basic-sql-operations.md).
+成功连接到你的 TiDB 集群后，你可以 [使用 TiDB 探索 SQL 语句](/basic-sql-operations.md)。

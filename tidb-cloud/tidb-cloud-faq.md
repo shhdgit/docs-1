@@ -1,203 +1,207 @@
 ---
-title: TiDB Cloud FAQs
-summary: Learn about the most frequently asked questions (FAQs) relating to TiDB Cloud.
+title: TiDB Cloud 常见问题
+summary: 了解与 TiDB Cloud 相关的最常见问题（FAQs）。
 ---
 
-# TiDB Cloud FAQs
+# TiDB Cloud 常见问题
 
 <!-- markdownlint-disable MD026 -->
 
-This document lists the most frequently asked questions about TiDB Cloud.
+本文档列出了关于 TiDB Cloud 的最常见问题。
 
-## General FAQs
+## 通用常见问题
 
-### What is TiDB Cloud?
+### 什么是 TiDB Cloud？
 
-TiDB Cloud makes deploying, managing, and maintaining your TiDB clusters even simpler with a fully managed cloud instance that you control through an intuitive console. You are able to easily deploy on Amazon Web Services or Google Cloud to quickly build mission-critical applications.
+TiDB Cloud 通过一个直观的控制台，让你可以更简单地部署、管理和维护 TiDB 集群，提供了完全托管的云实例。你可以轻松地在 Amazon Web Services (AWS)、Google Cloud 或 Microsoft Azure 上部署，快速构建关键业务应用。
 
-TiDB Cloud allows developers and DBAs with little or no training to handle once-complex tasks such as infrastructure management and cluster deployment with ease, to focus on your applications, not the complexities of your database. And by scaling TiDB clusters in or out with a simple click of a button, you no longer waste costly resources because you are able to provision your databases for exactly how much and how long you need them.
+TiDB Cloud 让开发者和 DBA 即使没有或几乎没有培训，也能轻松处理以往复杂的任务，如基础设施管理和集群部署，让你专注于应用本身，而不是数据库的复杂性。通过一键横向扩展或缩容 TiDB 集群，你可以根据实际需求灵活配置数据库资源，避免资源浪费。
 
-### What is the relationship between TiDB and TiDB Cloud?
+### TiDB 和 TiDB Cloud 之间是什么关系？
 
-TiDB is an open-source database and is the best option for organizations who want to run TiDB Self-Managed in their own data centers, in a self-managed cloud environment, or in a hybrid of the two.
+TiDB 是一个开源数据库，非常适合希望在自有数据中心、自管云环境或两者混合环境中运行 TiDB 自管版的组织。
 
-TiDB Cloud is a fully managed cloud Database as a Service of TiDB. It has an easy-to-use web-based management console to let you manage TiDB clusters for mission-critical production environments.
+TiDB Cloud 是 TiDB 的完全托管云数据库服务（Database as a Service）。它提供了易用的基于 Web 的管理控制台，帮助你在关键生产环境中管理 TiDB 集群。
 
-### Is TiDB Cloud compatible with MySQL?
+### TiDB Cloud 兼容 MySQL 吗？
 
-Currently, TiDB Cloud supports the majority of MySQL 5.7 and MySQL 8.0 syntax with the exception of triggers, stored procedures, and user-defined functions. For more details, see [Compatibility with MySQL](/mysql-compatibility.md).
+目前，TiDB Cloud 支持大部分 MySQL 5.7 和 MySQL 8.0 语法，但不支持触发器、存储过程和用户自定义函数。更多详情请参见 [与 MySQL 的兼容性](/mysql-compatibility.md)。
 
-### What programming languages can I use to work with TiDB Cloud?
+### 我可以使用哪些编程语言操作 TiDB Cloud？
 
-You can use any language supported by the MySQL client or driver.
+你可以使用任何被 MySQL 客户端或驱动支持的语言。
 
-### Where can I run TiDB Cloud?
+### 我可以在哪里运行 TiDB Cloud？
 
-TiDB Cloud is currently available on Amazon Web Services and Google Cloud.
+TiDB Cloud 目前可在 Amazon Web Services (AWS)、Google Cloud 和 Microsoft Azure 上使用。
 
-### Does TiDB Cloud support VPC peering between different cloud service providers?
+### TiDB Cloud 支持不同云服务商之间的 VPC 对等连接吗？
 
-No.
+不支持。
 
-### What versions of TiDB are supported on TiDB Cloud?
+### TiDB Cloud 支持哪些 TiDB 版本？
 
-- Starting from August 6, 2024, the default TiDB version for new TiDB Cloud Dedicated clusters is v7.5.3.
-- Starting from February 21, 2024, the TiDB version for TiDB Cloud Serverless clusters is v7.1.3.
+- 对于新建的 TiDB Cloud 专属集群，自 2025 年 7 月 15 日起，默认 TiDB 版本为 [v8.5.2](https://docs.pingcap.com/tidb/v8.5/release-8.5.2)。
+- 对于 TiDB Cloud Serverless 集群，自 2025 年 4 月 22 日起，TiDB 版本为 [v7.5.2](https://docs.pingcap.com/tidb/v7.5/release-7.5.2)。
 
-For more information, see [TiDB Cloud Release Notes](/tidb-cloud/tidb-cloud-release-notes.md).
+更多信息请参见 [TiDB Cloud 发布说明](/tidb-cloud/tidb-cloud-release-notes.md)。
 
-### What companies are using TiDB or TiDB Cloud in production?
+### 哪些公司在生产环境中使用 TiDB 或 TiDB Cloud？
 
-TiDB is trusted by over 1500 global enterprises across a variety of industries, such as financial services, gaming, and e-commerce. Our users include Square (US), Shopee (Singapore), and China UnionPay (China). See our [case studies](https://www.pingcap.com/customers/) for specific details.
+TiDB 已被全球 1500 多家企业信赖，覆盖金融服务、游戏、电商等多个行业。我们的用户包括 Square（美国）、Shopee（新加坡）和中国银联（中国）。具体案例请参见我们的 [客户案例](https://www.pingcap.com/customers/)。
 
-### What does the SLA look like?
+### SLA 是什么样的？
 
-TiDB Cloud provides 99.99% SLA. For details, see [Service Level Agreement for TiDB Cloud Services](https://www.pingcap.com/legal/service-level-agreement-for-tidb-cloud-services/).
+TiDB Cloud 提供 99.99% 的 SLA。详情请参见 [TiDB Cloud 服务级别协议](https://www.pingcap.com/legal/service-level-agreement-for-tidb-cloud-services/)。
 
-### How can I learn more about TiDB Cloud?
+### TiDB Cloud 中的 BETA 是什么意思？
 
-The best way to learn about TiDB Cloud is to follow our step-by-step tutorial. Check out the following topics to get started:
+BETA 是 TiDB Cloud 某项功能或服务在正式发布（GA）前的公开预览阶段。
 
-- [TiDB Cloud Introduction](/tidb-cloud/tidb-cloud-intro.md)
-- [Get Started](/tidb-cloud/tidb-cloud-quickstart.md)
-- [Create a TiDB Cloud Serverless Cluster](/tidb-cloud/create-tidb-cluster-serverless.md)
+### 如何进一步了解 TiDB Cloud？
 
-### What does `XXX's Org/default project/Cluster0` refer to when deleting a cluster?
+了解 TiDB Cloud 的最佳方式是按照我们的分步教程操作。你可以从以下主题开始：
 
-In TiDB Cloud, a cluster is uniquely identified by the combination of the organization name, project name, and cluster name. To ensure that you are deleting the intended cluster, you need to provide the fully qualified name of that cluster, such as `XXX's Org/default project/Cluster0`.
+- [TiDB Cloud 简介](/tidb-cloud/tidb-cloud-intro.md)
+- [快速入门](/tidb-cloud/tidb-cloud-quickstart.md)
+- [创建 TiDB Cloud Serverless 集群](/tidb-cloud/create-tidb-cluster-serverless.md)
 
-## Architecture FAQs
+### 删除集群时，`XXX's Org/default project/Cluster0` 指的是什么？
 
-### There are different components in my TiDB cluster. What are TiDB, TiKV, and TiFlash nodes?
+在 TiDB Cloud 中，一个集群由组织名、项目名和集群名唯一标识。为确保你删除的是目标集群，需要提供该集群的全限定名称，例如 `XXX's Org/default project/Cluster0`。
 
-TiDB is the SQL computing layer that aggregates data from queries returned from TiKV or TiFlash stores. TiDB is horizontally scalable; increasing the number of TiDB nodes will increase the number of concurrent queries the cluster can handle.
+## 架构常见问题
 
-TiKV is the transactional store used to store OLTP data. All the data in TiKV is automatically maintained in multiple replicas (three replicas by default), so TiKV has native high availability and supports automatic failover. TiKV is horizontally scalable; increasing the number of transactional stores will increase OLTP throughput.
+### 我的 TiDB 集群中有不同的组件。什么是 TiDB、TiKV 和 TiFlash 节点？
 
-TiFlash is the analytical storage that replicates data from the transactional store (TiKV) in real-time and supports real-time OLAP workloads. Unlike TiKV, TiFlash stores data in columns to accelerate analytical processing. TiFlash is also horizontally scalable; increasing TiFlash nodes will increase OLAP storage and computing capacity.
+TiDB 是 SQL 计算层，用于聚合来自 TiKV 或 TiFlash 存储的查询数据。TiDB 支持横向扩展，增加 TiDB 节点数量可以提升集群的并发查询能力。
 
-PD, the Placement Driver is "the brain" of the entire TiDB cluster, as it stores the metadata of the cluster. It sends data scheduling commands to specific TiKV nodes according to the data distribution state reported by TiKV nodes in real-time. On TiDB Cloud, PD of each cluster is managed by PingCAP and you can not see or maintain it.
+TiKV 是事务型存储，用于存储 OLTP 数据。TiKV 中的所有数据会自动维护多副本（默认三副本），因此 TiKV 天生具备高可用性并支持自动故障转移。TiKV 支持横向扩展，增加事务存储节点可以提升 OLTP 吞吐量。
 
-### How does TiDB replicate data between the TiKV nodes?
+TiFlash 是分析型存储，实时从事务存储（TiKV）同步数据，支持实时 OLAP 负载。与 TiKV 不同，TiFlash 以列存方式存储数据，加速分析型处理。TiFlash 也支持横向扩展，增加 TiFlash 节点可以提升 OLAP 存储和计算能力。
 
-TiKV divides the key-value space into key ranges, and each key range is treated as a "Region". In TiKV, data is distributed among all nodes in a cluster and uses the Region as the basic unit. PD is responsible for spreading (scheduling) Regions as evenly as possible across all nodes in a cluster.
+PD（Placement Driver）是整个 TiDB 集群的“大脑”，负责存储集群元数据。它根据 TiKV 节点实时上报的数据分布状态，向特定 TiKV 节点下发数据调度命令。在 TiDB Cloud 上，每个集群的 PD 由 PingCAP 统一管理，你无法直接查看或维护。
 
-TiDB uses the Raft consensus algorithm to replicate data by Regions. Multiple replicas of a Region stored in different nodes form a Raft Group.
+### TiDB 如何在 TiKV 节点之间复制数据？
 
-Each data change is recorded as a Raft log. Through Raft log replication, data is safely and reliably replicated to multiple nodes of the Raft Group.
+TiKV 将键值空间划分为多个键区间，每个区间称为一个 “Region”。在 TiKV 中，数据以 Region 为基本单位分布在集群所有节点上。PD 负责将 Region 尽可能均匀地调度到集群所有节点。
 
-## High availability FAQ
+TiDB 通过 Raft 共识算法按 Region 复制数据。存储在不同节点上的同一个 Region 的多个副本组成一个 Raft Group。
 
-### How does TiDB Cloud ensure high availability?
+每次数据变更都会被记录为一条 Raft 日志。通过 Raft 日志复制，数据可以安全可靠地同步到 Raft Group 的多个节点。
 
-TiDB uses the Raft consensus algorithm to ensure that data is highly available and safely replicated throughout storage in Raft Groups. Data is redundantly copied between TiKV nodes and placed in different Availability Zones to protect against machine or data center failure. With automatic failover, TiDB ensures that your service is always on.
+## 高可用性常见问题
 
-As a Software as a Service (SaaS) provider, we take data security seriously. We have established strict information security policies and procedures required by the [Service Organization Control (SOC) 2 Type 1 compliance](https://www.pingcap.com/press-release/pingcap-successfully-completes-soc-2-type-1-examination-for-tidb-cloud/). This ensures that your data is secure, available, and confidential.
+### TiDB Cloud 如何保证高可用性？
 
-## Migration FAQ
+TiDB 采用 Raft 共识算法，确保数据在 Raft Group 内高度可用并安全复制。数据会在 TiKV 节点之间冗余复制，并分布在不同的可用区，以防止机器或数据中心故障。通过自动故障转移，TiDB 能确保你的服务始终可用。
 
-### Is there an easy migration path from another RDBMS to TiDB Cloud?
+作为软件即服务（SaaS）提供商，我们高度重视数据安全。我们已建立严格的信息安全政策和流程，符合 [SOC 2 Type 1 合规性](https://www.pingcap.com/press-release/pingcap-successfully-completes-soc-2-type-1-examination-for-tidb-cloud/) 的要求。这确保了你的数据安全、可用且保密。
 
-TiDB is highly compatible with MySQL. You can migrate data from any MySQL-compatible databases to TiDB smoothly, whether the data is from a self-hosted MySQL instance or RDS service provided by the public cloud. For more information, see [Migrate MySQL-Compatible Databases to TiDB Cloud Using Data Migration](/tidb-cloud/migrate-from-mysql-using-data-migration.md).
+## 迁移常见问题
 
-## Backup and restore FAQ
+### 从其他关系型数据库迁移到 TiDB Cloud 是否有便捷路径？
 
-### Does TiDB Cloud support incremental backups?
+TiDB 与 MySQL 高度兼容。你可以顺利地将数据从任何 MySQL 兼容数据库迁移到 TiDB，无论数据来自自建 MySQL 实例还是公有云提供的 RDS 服务。更多信息请参见 [使用数据迁移将 MySQL 兼容数据库迁移到 TiDB Cloud](/tidb-cloud/migrate-from-mysql-using-data-migration.md)。
 
-No. If you need to restore data to any point in time within the cluster's backup retention, you can use PITR (Point-in-time Recovery). For more information, see [Use PITR in a TiDB Cloud Dedicated cluster](/tidb-cloud/backup-and-restore.md#turn-on-auto-backup) or [Use PITR in a TiDB Cloud Serverless cluster](/tidb-cloud/backup-and-restore-serverless.md#restore).
+## 备份与恢复常见问题
 
-## HTAP FAQs
+### TiDB Cloud 支持增量备份吗？
 
-### How do I make use of TiDB Cloud's HTAP capabilities?
+不支持。如果你需要在集群备份保留期内恢复到任意时间点，可以使用 PITR（时间点恢复）。更多信息请参见 [在 TiDB Cloud 专属集群中使用 PITR](/tidb-cloud/backup-and-restore.md#turn-on-auto-backup) 或 [在 TiDB Cloud Serverless 集群中使用 PITR](/tidb-cloud/backup-and-restore-serverless.md#restore)。
 
-Traditionally, there are two types of databases: Online Transactional Processing (OLTP) databases and Online Analytical Processing (OLAP) databases. OLTP and OLAP requests are often processed in different and isolated databases. With this traditional architecture, migrating data from an OLTP database to a data warehouse or data lake for OLAP is a long and error-prone process.
+## HTAP 常见问题
 
-As a Hybrid Transactional Analytical Processing (HTAP) database, TiDB Cloud helps you simplify your system architecture, reduce maintenance complexity, and support real-time analytics on transactional data by automatically replicating data reliably between the OLTP (TiKV) store and OLAP (TiFlash) store. Typical HTAP use cases are user personalization, AI recommendation, fraud detection, business intelligence, and real-time reporting.
+### 如何利用 TiDB Cloud 的 HTAP 能力？
 
-For further HTAP scenarios, refer to [How We Build an HTAP Database That Simplifies Your Data Platform](https://pingcap.com/blog/how-we-build-an-htap-database-that-simplifies-your-data-platform).
+传统上，数据库分为联机事务处理（OLTP）和联机分析处理（OLAP）两类，OLTP 和 OLAP 请求通常在不同且隔离的数据库中处理。在这种架构下，将数据从 OLTP 数据库迁移到数据仓库或数据湖进行 OLAP 分析是一个漫长且易出错的过程。
 
-### Can I import my data directly to TiFlash?
+作为混合事务与分析处理（HTAP）数据库，TiDB Cloud 通过在 OLTP（TiKV）存储和 OLAP（TiFlash）存储之间自动可靠地复制数据，帮助你简化系统架构，降低运维复杂度，并支持对事务数据的实时分析。典型 HTAP 场景包括用户个性化、AI 推荐、欺诈检测、商业智能和实时报表。
 
-No. When you import data to TiDB Cloud, the data is imported to TiKV. After the import is complete, you can use SQL statements to specify which tables to be replicated to TiFlash. Then, TiDB will create the replicas of the specified tables in TiFlash accordingly. For more information, see [Create TiFlash Replicas](/tiflash/create-tiflash-replicas.md).
+更多 HTAP 场景请参见 [我们如何构建简化数据平台的 HTAP 数据库](https://pingcap.com/blog/how-we-build-an-htap-database-that-simplifies-your-data-platform)。
 
-### Can I export TiFlash data in the CSV format?
+### 我可以直接将数据导入 TiFlash 吗？
 
-No. TiFlash data cannot be exported.
+不可以。当你将数据导入 TiDB Cloud 时，数据会被导入到 TiKV。导入完成后，你可以通过 SQL 语句指定哪些表需要同步到 TiFlash。随后，TiDB 会在 TiFlash 中为指定表创建副本。更多信息请参见 [创建 TiFlash 副本](/tiflash/create-tiflash-replicas.md)。
 
-## Security FAQs
+### 我可以将 TiFlash 数据导出为 CSV 格式吗？
 
-### Is TiDB Cloud secure?
+不可以。TiFlash 数据无法导出。
 
-In TiDB Cloud, all data at rest is encrypted, and all network traffic is encrypted using Transport Layer Security (TLS).
+## 安全性常见问题
 
-- Encryption of data at rest is automated using encrypted storage volumes.
-- Encryption of data in transit between your client and your cluster is automated using TiDB Cloud web server TLS and TiDB cluster TLS.
+### TiDB Cloud 安全吗？
 
-### How does TiDB Cloud encrypt my business data?
+在 TiDB Cloud 中，所有静态数据都经过加密，所有网络流量均通过传输层安全协议（TLS）加密。
 
-TiDB Cloud uses storage volume encryption by default for your business data at rest, including your database data and backup data. TiDB Cloud requires TLS encryption for data in transit, and also requires component-level TLS encryption for data in your database cluster between TiDB, PD, TiKV, and TiFlash.
+- 静态数据的加密通过加密存储卷自动完成。
+- 客户端与集群之间的数据传输加密通过 TiDB Cloud Web 服务器 TLS 和 TiDB 集群 TLS 自动完成。
 
-To get more specific information about business data encryption in TiDB Cloud, contact [TiDB Cloud Support](/tidb-cloud/tidb-cloud-support.md).
+### TiDB Cloud 如何加密我的业务数据？
 
-### What versions of TLS does TiDB Cloud support?
+TiDB Cloud 默认对你的静态业务数据（包括数据库数据和备份数据）使用存储卷加密。TiDB Cloud 要求传输中的数据必须使用 TLS 加密，并且要求数据库集群内部（TiDB、PD、TiKV、TiFlash 之间）也采用组件级 TLS 加密。
 
-TiDB Cloud supports TLS 1.2 or TLS 1.3.
+如需获取 TiDB Cloud 业务数据加密的详细信息，请联系 [TiDB Cloud 支持](/tidb-cloud/tidb-cloud-support.md)。
 
-### Can I run TiDB Cloud in my VPC?
+### TiDB Cloud 支持哪些 TLS 版本？
 
-No. TiDB Cloud is Database-as-a-Service (DBaaS) and runs only in the TiDB Cloud VPC. As a cloud computing managed service, TiDB Cloud provides access to a database without requiring the setup of physical hardware and the installation of software.
+TiDB Cloud 支持 TLS 1.2 或 TLS 1.3。
 
-### Is my TiDB cluster secure?
+### 我可以在自己的 VPC 中运行 TiDB Cloud 吗？
 
-In TiDB Cloud, you can use either a TiDB Cloud Dedicated cluster or a TiDB Cloud Serverless cluster according to your needs.
+不可以。TiDB Cloud 是数据库即服务（DBaaS），仅运行在 TiDB Cloud 的 VPC 中。作为云计算托管服务，TiDB Cloud 提供数据库访问，无需你搭建物理硬件和安装软件。
 
-For TiDB Cloud Dedicated clusters, TiDB Cloud ensures cluster security with the following measures:
+### 我的 TiDB 集群安全吗？
 
-- Creates independent sub-accounts and VPCs for each cluster.
-- Sets up firewall rules to isolate external connections.
-- Creates server-side TLS certificates and component-level TLS certificates for each cluster to encrypt cluster data in transit.
-- Provide IP access rules for each cluster to ensure that only allowed source IP addresses can access your cluster.
+在 TiDB Cloud 中，你可以根据需求选择 TiDB Cloud 专属集群或 TiDB Cloud Serverless 集群。
 
-For TiDB Cloud Serverless clusters, TiDB Cloud ensures cluster security with the following measures:
+对于 TiDB Cloud 专属集群，TiDB Cloud 通过以下措施保障集群安全：
 
-- Creates independent sub-accounts for each cluster.
-- Sets up firewall rules to isolate external connections.
-- Provides cluster server TLS certificates to encrypt cluster data in transit.
+- 为每个集群创建独立的子账号和 VPC。
+- 配置防火墙规则，隔离外部连接。
+- 为每个集群创建服务器端 TLS 证书和组件级 TLS 证书，加密集群内传输数据。
+- 为每个集群提供 IP 访问规则，确保只有允许的源 IP 地址可以访问你的集群。
 
-### How do I connect to my database in a TiDB cluster?
+对于 TiDB Cloud Serverless 集群，TiDB Cloud 通过以下措施保障集群安全：
+
+- 为每个集群创建独立的子账号。
+- 配置防火墙规则，隔离外部连接。
+- 提供集群服务器 TLS 证书，加密集群内传输数据。
+
+### 如何连接 TiDB 集群中的数据库？
 
 <SimpleTab>
 <div label="TiDB Cloud Dedicated">
 
-For a TiDB Cloud Dedicated cluster, the steps to connect to your cluster are simplified as follows:
+对于 TiDB Cloud 专属集群，连接集群的步骤简化如下：
 
-1. Authorize your network.
-2. Set up your database users and login credentials.
-3. Download and configure TLS for your cluster server.
-4. Choose a SQL client, get an auto-generated connection string displayed on the TiDB Cloud UI, and then connect to your cluster through the SQL client using the string.
+1. 授权你的网络。
+2. 设置数据库用户和登录凭证。
+3. 下载并配置集群服务器的 TLS。
+4. 选择 SQL 客户端，在 TiDB Cloud UI 上获取自动生成的连接字符串，然后通过 SQL 客户端使用该字符串连接集群。
 
-For more information, see [Connect to Your TiDB Cloud Dedicated Cluster](/tidb-cloud/connect-to-tidb-cluster.md).
+更多信息请参见 [连接到你的 TiDB Cloud 专属集群](/tidb-cloud/connect-to-tidb-cluster.md)。
 
 </div>
 
 <div label="TiDB Cloud Serverless">
 
-For a TiDB Cloud Serverless cluster, the steps to connect to your cluster are simplified as follows:
+对于 TiDB Cloud Serverless 集群，连接集群的步骤简化如下：
 
-1. Set a database user and login credential.
-2. Choose a SQL client, get an auto-generated connection string displayed on the TiDB Cloud UI, and then connect to your cluster through the SQL client using the string.
+1. 设置数据库用户和登录凭证。
+2. 选择 SQL 客户端，在 TiDB Cloud UI 上获取自动生成的连接字符串，然后通过 SQL 客户端使用该字符串连接集群。
 
-For more information, see [Connect to Your TiDB Cloud Serverless Cluster](/tidb-cloud/connect-to-tidb-cluster-serverless.md).
+更多信息请参见 [连接到你的 TiDB Cloud Serverless 集群](/tidb-cloud/connect-to-tidb-cluster-serverless.md)。
 
 </div>
 </SimpleTab>
 
-## Support FAQ
+## 支持常见问题
 
-### What support is available for customers?
+### 客户可以获得哪些支持？
 
-TiDB Cloud is supported by the same team behind TiDB, which has run mission-critical use cases for over 1500 global enterprises across industries including financial services, e-commerce, enterprise applications, and gaming. TiDB Cloud offers a free basic support plan for each user and you can upgrade to a paid plan for extended services. For more information, see [TiDB Cloud Support](/tidb-cloud/tidb-cloud-support.md).
+TiDB Cloud 由 TiDB 背后的同一团队提供支持，该团队已为全球 1500 多家企业在金融服务、电商、企业应用、游戏等行业的关键业务场景中提供服务。TiDB Cloud 为每位用户提供免费基础支持计划，你也可以升级为付费计划以获得更多服务。更多信息请参见 [TiDB Cloud 支持](/tidb-cloud/tidb-cloud-support.md)。
 
-### How do I check if TiDB Cloud is down?
+### 如何检查 TiDB Cloud 是否宕机？
 
-You can check the current uptime status of TiDB Cloud on the [System Status](https://status.tidbcloud.com/) page.
+你可以在 [系统状态](https://status.tidbcloud.com/) 页面查看 TiDB Cloud 当前的运行状态。

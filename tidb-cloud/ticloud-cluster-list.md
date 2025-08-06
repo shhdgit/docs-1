@@ -1,60 +1,60 @@
 ---
 title: ticloud serverless cluster list
-summary: The reference of `ticloud serverless list`.
+summary: `ticloud serverless list` 的参考文档。
 ---
 
 # ticloud serverless list
 
-List all TiDB Cloud Serverless clusters in a project:
+列出一个项目下所有 TiDB Cloud Serverless 集群：
 
 ```shell
 ticloud serverless list [flags]
 ```
 
-Or use the following alias command:
+或者使用以下别名命令：
 
 ```shell
 ticloud serverless ls [flags]
 ```
 
-## Examples
+## 示例
 
-List all TiDB Cloud Serverless clusters in interactive mode:
+以交互模式列出所有 TiDB Cloud Serverless 集群：
 
 ```shell
 ticloud serverless list
 ```
 
-List all TiDB Cloud Serverless clusters in a specified project in non-interactive mode:
+在非交互模式下，列出指定项目下的所有 TiDB Cloud Serverless 集群：
 
 ```shell
 ticloud serverless list -p <project-id>
 ```
 
-List all TiDB Cloud Serverless clusters in a specified project with the JSON format in non-interactive mode:
+在非交互模式下，以 JSON 格式列出指定项目下的所有 TiDB Cloud Serverless 集群：
 
 ```shell
 ticloud serverless list -p <project-id> -o json
 ```
 
-## Flags
+## 参数
 
-In non-interactive mode, you need to manually enter the required flags. In interactive mode, you can just follow CLI prompts to fill them in.
+在非交互模式下，你需要手动输入所需的参数。在交互模式下，你只需按照 CLI 提示填写即可。
 
-| Flag                    | Description                                                                                                              | Required | Note                                                 |
-|-------------------------|--------------------------------------------------------------------------------------------------------------------------|----------|------------------------------------------------------|
-| -p, --project-id string | Specifies the ID of the project.                                                              | Yes      | Only works in non-interactive mode.                  |
-| -h, --help              | Shows help information for this command.                                                                                       | No       | Works in both non-interactive and interactive modes. |
-| -o, --output string     | Specifies the output format (`human` by default). Valid values are `human` or `json`. To get a complete result, use the `json` format. | No       | Works in both non-interactive and interactive modes. |
+| Flag                    | 描述                                                                                                              | 是否必需 | 备注                                                 |
+|-------------------------|-------------------------------------------------------------------------------------------------------------------|----------|------------------------------------------------------|
+| -p, --project-id string | 指定项目的 ID。                                                                                                   | 是       | 仅在非交互模式下生效。                              |
+| -h, --help              | 显示该命令的帮助信息。                                                                                            | 否       | 在非交互和交互模式下均可用。                        |
+| -o, --output string     | 指定输出格式（默认为 `human`）。可选值为 `human` 或 `json`。如需获取完整结果，请使用 `json` 格式。                | 否       | 在非交互和交互模式下均可用。                        |
 
-## Inherited flags
+## 继承参数
 
-| Flag                 | Description                                                                                          | Required | Note                                                                                                             |
-|----------------------|------------------------------------------------------------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------|
-| --no-color           | Disables color in output.                                                                            | No       | Only works in non-interactive mode. In interactive mode, disabling color might not work with some UI components. |
-| -P, --profile string | Specifies the active [user profile](/tidb-cloud/cli-reference.md#user-profile) used in this command. | No       | Works in both non-interactive and interactive modes.                                                             |
-| -D, --debug          | Enables debug mode.                                                                                    | No       | Works in both non-interactive and interactive modes.                                                             |
+| Flag                 | 描述                                                                                          | 是否必需 | 备注                                                                                                             |
+|----------------------|---------------------------------------------------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------|
+| --no-color           | 禁用输出中的颜色。                                                                           | 否       | 仅在非交互模式下生效。在交互模式下，禁用颜色可能会影响部分 UI 组件的显示。                                       |
+| -P, --profile string | 指定该命令使用的活动 [用户配置文件](/tidb-cloud/cli-reference.md#user-profile)。              | 否       | 在非交互和交互模式下均可用。                                                                                    |
+| -D, --debug          | 启用调试模式。                                                                               | 否       | 在非交互和交互模式下均可用。                                                                                    |
 
-## Feedback
+## 反馈
 
-If you have any questions or suggestions on the TiDB Cloud CLI, feel free to create an [issue](https://github.com/tidbcloud/tidbcloud-cli/issues/new/choose). Also, we welcome any contributions.
+如果你对 TiDB Cloud CLI 有任何问题或建议，欢迎创建 [issue](https://github.com/tidbcloud/tidbcloud-cli/issues/new/choose)。同时，我们也欢迎任何形式的贡献。

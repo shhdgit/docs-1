@@ -1,182 +1,194 @@
 ---
-title: TiDB Cloud Glossary
-summary: Learn the terms used in TiDB Cloud.
+title: TiDB Cloud 术语表
+summary: 了解 TiDB Cloud 中使用的术语。
 category: glossary
 aliases: ['/tidbcloud/glossary']
 ---
 
-# TiDB Cloud Glossary
+# TiDB Cloud 术语表
 
 ## A
 
 ### ACID
 
-ACID refers to the four key properties of a transaction: atomicity, consistency, isolation, and durability. Each of these properties is described below.
+ACID 指的是事务的四个关键特性：原子性（atomicity）、一致性（consistency）、隔离性（isolation）和持久性（durability）。每个特性如下所述。
 
-- **Atomicity** means that either all the changes of an operation are performed, or none of them are. TiDB ensures the atomicity of the [TiDB Region](#region) that stores the Primary Key to achieve the atomicity of transactions.
+- **Atomicity** 表示一个操作的所有更改要么全部执行，要么全部不执行。TiDB 通过保证存储主键的 [TiDB Region](#region) 的原子性来实现事务的原子性。
 
-- **Consistency** means that transactions always bring the database from one consistent state to another. In TiDB, data consistency is ensured before writing data to the memory.
+- **Consistency** 表示事务总是将数据库从一个一致的状态转变为另一个一致的状态。在 TiDB 中，数据在写入内存前会确保一致性。
 
-- **Isolation** means that a transaction in process is invisible to other transactions until it completes. This allows concurrent transactions to read and write data without sacrificing consistency. TiDB currently supports the isolation level of `REPEATABLE READ`.
+- **Isolation** 表示正在进行的事务在完成之前对其他事务是不可见的。这允许并发事务在不牺牲一致性的情况下读写数据。TiDB 目前支持 `REPEATABLE READ` 隔离级别。
 
-- **Durability** means that once a transaction is committed, it remains committed even in the event of a system failure. TiKV uses persistent storage to ensure durability.
+- **Durability** 表示一旦事务提交，即使发生系统故障也会保持提交状态。TiKV 使用持久化存储来保证持久性。
 
 ## C
 
 ### Chat2Query
 
-Chat2Query is an AI-powered feature integrated into SQL Editor that assists users in generating, debugging, or rewriting SQL queries using natural language instructions. For more information, see [Explore your data with AI-assisted SQL Editor](/tidb-cloud/explore-data-with-chat2query.md).
+Chat2Query 是集成在 SQL 编辑器中的 AI 驱动功能，能够帮助用户通过自然语言指令生成、调试或重写 SQL 查询。更多信息，参见 [使用 AI 辅助 SQL 编辑器探索数据](/tidb-cloud/explore-data-with-chat2query.md)。
 
-In addition, TiDB Cloud provides a Chat2Query API for TiDB Cloud Serverless clusters. After it is enabled, TiDB Cloud will automatically create a system Data App called **Chat2Query** and a Chat2Data endpoint in Data Service. You can call this endpoint to let AI generate and execute SQL statements by providing instructions. For more information, see [Get started with Chat2Query API](/tidb-cloud/use-chat2query-api.md).
+此外，TiDB Cloud 为 Serverless 集群提供了 Chat2Query API。启用后，TiDB Cloud 会自动创建一个名为 **Chat2Query** 的系统 Data App，并在 Data Service 中创建一个 Chat2Data 端点。你可以调用该端点，通过提供指令让 AI 生成并执行 SQL 语句。更多信息，参见 [开始使用 Chat2Query API](/tidb-cloud/use-chat2query-api.md)。
 
 ### Credit
 
-TiDB Cloud offers a certain number of credits for Proof of Concept (PoC) users. One credit is equivalent to one U.S. dollar. You can use credits to pay TiDB cluster fees before the credits become expired.
+TiDB Cloud 为概念验证（PoC）用户提供一定数量的 Credit。一个 Credit 等同于一美元。你可以在 Credit 过期前使用它们支付 TiDB 集群费用。
 
 ## D
 
 ### Data App
 
-A Data App in [Data Service (beta)](#data-service) is a collection of endpoints that you can use to access data for a specific application. You can configure authorization settings using API keys to restrict access to endpoints in a Data App.
+[Data Service (beta)](#data-service) 中的 Data App 是一组端点的集合，你可以用它来访问特定应用的数据。你可以通过 API 密钥配置授权设置，限制对 Data App 中端点的访问。
 
-For more information, see [Manage a Data App](/tidb-cloud/data-service-manage-data-app.md).
+更多信息，参见 [管理 Data App](/tidb-cloud/data-service-manage-data-app.md)。
 
 ### Data Service
 
-Data Service (beta) enables you to access TiDB Cloud data via an HTTPS request using a custom API [endpoint](#endpoint). This feature uses a serverless architecture to handle computing resources and elastic scaling, so you can focus on the query logic in endpoints without worrying about infrastructure or maintenance costs.
+Data Service（beta）允许你通过自定义 API [endpoint](#endpoint) 使用 HTTPS 请求访问 TiDB Cloud 数据。该功能采用无服务器架构，自动处理计算资源和弹性扩缩容，因此你可以专注于端点中的查询逻辑，无需担心基础设施或运维成本。
 
-For more information, see [Data Service Overview](/tidb-cloud/data-service-overview.md).
+更多信息，参见 [Data Service 概览](/tidb-cloud/data-service-overview.md)。
 
 ### Direct Customer
 
-A direct customer is an end customer who purchases TiDB Cloud and pays invoices directly from PingCAP. This is distinguished from an [MSP customer](#msp-customer).
+Direct Customer 指直接从 PingCAP 购买 TiDB Cloud 并直接支付账单的终端客户。与 [MSP customer](#msp-customer) 区分。
 
 ## E
 
 ### Endpoint
 
-An endpoint in Data Service is a web API that you can customize to execute SQL statements. You can specify parameters for your SQL statements, such as the value used in the `WHERE` clause. When a client calls an endpoint and provides values for the parameters in a request URL, the endpoint executes the corresponding SQL statement with the provided parameters and returns the results as part of the HTTP response.
+Data Service 中的 endpoint 是你可以自定义以执行 SQL 语句的 Web API。你可以为 SQL 语句指定参数，例如 `WHERE` 子句中使用的值。当客户端调用 endpoint 并在请求 URL 中提供参数值时，endpoint 会使用这些参数执行相应的 SQL 语句，并将结果作为 HTTP 响应的一部分返回。
 
-For more information, see [Manage an endpoint](/tidb-cloud/data-service-manage-endpoint.md).
+更多信息，参见 [管理 endpoint](/tidb-cloud/data-service-manage-endpoint.md)。
+
+## F
+
+### Full-text search
+
+与关注语义相似度的 [Vector Search](/vector-search/vector-search-overview.md) 不同，全文检索允许你根据精确关键词检索文档。在 RAG（Retrieval-Augmented Generation）场景下，你可以将全文检索与向量检索结合使用，以提升检索质量。
+
+更多信息，参见 [使用 SQL 进行全文检索](/tidb-cloud/vector-search-full-text-search-sql.md) 和 [使用 Python 进行全文检索](/tidb-cloud/vector-search-full-text-search-python.md)。
 
 ## M
 
 ### member
 
-A user that has been invited to an organization, with access to the organization and the clusters of this organization.
+被邀请加入某个组织的用户，拥有访问该组织及其集群的权限。
 
 ### MPP
 
-Starting from v5.0, TiDB introduces Massively Parallel Processing (MPP) architecture through TiFlash nodes, which shares the execution workloads of large join queries among TiFlash nodes. When the MPP mode is enabled, TiDB, based on cost, determines whether to use the MPP framework to perform the calculation. In the MPP mode, the join keys are redistributed through the Exchange operation while being calculated, which distributes the calculation pressure to each TiFlash node and speeds up the calculation. For more information, see [Use TiFlash MPP Mode](/tiflash/use-tiflash-mpp-mode.md).
+自 v5.0 起，TiDB 通过 TiFlash 节点引入了大规模并行处理（MPP）架构，将大型 Join 查询的执行负载分摊到多个 TiFlash 节点。当启用 MPP 模式时，TiDB 会根据成本判断是否使用 MPP 框架进行计算。在 MPP 模式下，Join Key 会在计算过程中通过 Exchange 操作重新分布，将计算压力分散到各个 TiFlash 节点，从而加速计算。更多信息，参见 [使用 TiFlash MPP 模式](/tiflash/use-tiflash-mpp-mode.md)。
 
 ### MSP Customer
 
-A managed service provider (MSP) customer is an end customer who purchases TiDB Cloud and pays invoices through the MSP channel. This is distinguished from a [direct customer](#direct-customer).
+MSP customer（托管服务提供商客户）指通过 MSP 渠道购买 TiDB Cloud 并通过 MSP 支付账单的终端客户。与 [direct customer](#direct-customer) 区分。
 
 ### Managed Service Provider (MSP)
 
-A managed service provider (MSP) is a partner who resells TiDB Cloud and provides value-added services, including but not limited to TiDB Cloud organization management, billing services, and technical support.
+托管服务提供商（MSP）是指转售 TiDB Cloud 并提供增值服务的合作伙伴，包括但不限于 TiDB Cloud 组织管理、计费服务和技术支持。
 
 ## N
 
 ### node
 
-Refers to either a data instance (TiKV) or a compute instance (TiDB) or an analytical instance (TiFlash).
+指数据实例（TiKV）、计算实例（TiDB）或分析实例（TiFlash）。
 
 ## O
 
 ### organization
 
-An entity that you create to manage your TiDB Cloud accounts, including a management account with any number of multiple member accounts.
+你创建用于管理 TiDB Cloud 账户的实体，包括一个管理账户和任意数量的成员账户。
 
 ### organization members
 
-Organization members are users who are invited by the organization owner or project owner to join an organization. Organization members can view members of the organization and can be invited to projects within the organization.
+组织成员是由组织所有者或项目所有者邀请加入组织的用户。组织成员可以查看组织成员，并可被邀请加入组织内的项目。
 
 ## P
 
 ### policy
 
-A document that defines permissions applying to a role, user, or organization, such as the access to specific actions or resources.
+定义适用于角色、用户或组织的权限的文档，例如对特定操作或资源的访问权限。
 
 ### project
 
-Based on the projects created by the organization, resources such as personnel, instances, and networks can be managed separately according to projects, and resources between projects do not interfere with each other.
+基于组织创建的项目，可以按项目分别管理人员、实例、网络等资源，项目之间的资源互不干扰。
 
 ### project members
 
-Project members are users who are invited to join one or more projects of the organization. Project members can manage clusters, network access, backups, and other resources.
+项目成员是被邀请加入组织中一个或多个项目的用户。项目成员可以管理集群、网络访问、备份等资源。
 
 ## R
 
 ### Recycle Bin
 
-The place where the data of deleted clusters with valid backups is stored. Once a backed-up TiDB Cloud Dedicated cluster is deleted, the existing backup files of the cluster are moved to the recycle bin. For backup files from automatic backups, the recycle bin will retain them for a specified period. You can configure the backup retention in **Backup Settings**, and the default is 7 days. For backup files from manual backups, there is no expiration date. To avoid data loss, remember to restore the data to a new cluster in time. Note that if a cluster **has no backup**, the deleted cluster will not be displayed here.
+用于存放已删除且有有效备份的集群数据的地方。一旦已备份的 TiDB Cloud 专属集群被删除，该集群现有的备份文件会被移动到回收站。对于自动备份产生的备份文件，回收站会保留指定时间。你可以在 **Backup Setting** 中配置备份保留时间，默认是 7 天。对于手动备份产生的备份文件，则没有过期时间。为避免数据丢失，请及时将数据恢复到新集群。注意，如果集群 **没有备份**，则删除的集群不会显示在此处。
 
 ### region
 
 - TiDB Cloud region
 
-    A geographical area in which a TiDB Cloud cluster is deployed. A TiDB Cloud region comprises of at least 3 Availability Zones, and the cluster is deployed across these zones.
+    部署 TiDB Cloud 集群的地理区域。一个 TiDB Cloud region 至少包含 3 个可用区，集群会跨这些可用区部署。
 
 - TiDB Region
 
-    The basic unit of data in TiDB. TiKV divides the Key-Value space into a series of consecutive Key segments, and each segment is called a Region. The default size limit for each Region is 96 MB and can be configured.
+    TiDB 中数据的基本单元。TiKV 将 Key-Value 空间划分为一系列连续的 Key 段，每个段称为一个 Region。每个 Region 的默认大小限制为 96 MB，可进行配置。
 
 ### replica
 
-A separate database that can be located in the same or different region and contains the same data. A replica is often used for disaster recovery purposes or to improve performance.
+可以位于同一区域或不同区域的独立数据库，包含相同的数据。replica 通常用于灾备或提升性能。
 
 ### Replication Capacity Unit
 
-The replication of changefeed is charged according to the computing resources, which is the TiCDC replication capacity unit.
+变更数据流（changefeed）的复制按计算资源计费，即 TiCDC 复制能力单元。
 
 ### Request Unit
 
-A Request Unit (RU) is a unit of measure used to represent the amount of resources consumed by a single request to the database. The amount of RUs consumed by a request depends on various factors, such as the operation type or the amount of data being retrieved or modified. For more information, see [TiDB Cloud Serverless Pricing Details](https://www.pingcap.com/tidb-cloud-serverless-pricing-details).
+Request Unit（RU）是用于表示单个数据库请求消耗资源量的计量单位。一个请求消耗的 RU 数量取决于多种因素，如操作类型或检索/修改的数据量。更多信息，参见 [TiDB Cloud Serverless 计费详情](https://www.pingcap.com/tidb-cloud-serverless-pricing-details)。
 
 ## S
 
 ### Spending limit
 
-Spending limit refers to the maximum amount of money that you are willing to spend on a particular workload in a month. It is a cost-control mechanism that enables you to set a budget for your TiDB Cloud Serverless clusters. For [scalable clusters](/tidb-cloud/select-cluster-tier.md#scalable-cluster-plan), the spending limit must be set to a minimum of $0.01. Also, the scalable cluster can have a free quota if it meets the qualifications. The scalable cluster with a free quota will consume the free quota first.
+Spending limit 指你每月愿意为某个工作负载支付的最大金额。它是一种成本控制机制，使你可以为 TiDB Cloud Serverless 集群设置预算。对于 [可扩展集群](/tidb-cloud/select-cluster-tier.md#scalable-cluster-plan)，spending limit 至少需设置为 $0.01。此外，若可扩展集群符合条件，可享有免费额度，集群会优先消耗免费额度。
 
 ## T
 
 ### TiDB cluster
 
-The collection of [TiDB](https://docs.pingcap.com/tidb/stable/tidb-computing), [TiKV](https://docs.pingcap.com/tidb/stable/tidb-storage), [the Placement Driver](https://docs.pingcap.com/tidb/stable/tidb-scheduling) (PD), and [TiFlash](https://docs.pingcap.com/tidb/stable/tiflash-overview) nodes that form a functional working database.
+由 [TiDB](https://docs.pingcap.com/tidb/stable/tidb-computing)、[TiKV](https://docs.pingcap.com/tidb/stable/tidb-storage)、[the Placement Driver](https://docs.pingcap.com/tidb/stable/tidb-scheduling)（PD）和 [TiFlash](https://docs.pingcap.com/tidb/stable/tiflash-overview) 节点组成的功能性数据库集群。
 
 ### TiDB node
 
-The computing node that aggregates data from queries returned from transactional or analytical stores. Increasing the number of TiDB nodes will increase the number of concurrent queries that the cluster can handle.
+聚合来自事务型或分析型存储查询结果的计算节点。增加 TiDB 节点数量可以提升集群可处理的并发查询数。
 
 ### TiFlash node
 
-The analytical storage node that replicates data from TiKV in real time and supports real-time analytical workloads.
+实时从 TiKV 复制数据并支持实时分析型负载的分析型存储节点。
 
 ### TiKV node
 
-The storage node that stores the online transactional processing (OLTP) data. It is scaled in multiples of 3 nodes (for example, 3, 6, 9) for high availability, with two nodes acting as replicas. Increasing the number of TiKV nodes will increase the total throughput.
+存储在线事务处理（OLTP）数据的存储节点。为高可用性，按 3 的倍数（如 3、6、9）扩容，其中两个节点作为副本。增加 TiKV 节点数量可以提升总吞吐量。
 
 ### traffic filter
 
-A list of IP addresses and Classless Inter-Domain Routing (CIDR) addresses that are allowed to access the TiDB Cloud cluster via a SQL client. The traffic filter is empty by default.
+允许通过 SQL 客户端访问 TiDB Cloud 集群的 IP 地址和无类别域间路由（CIDR）地址列表。默认情况下，traffic filter 为空。
 
 ## V
 
+### Vector search
+
+[Vector search](/vector-search/vector-search-overview.md) 是一种以数据语义为核心的检索方式，能够返回更相关的结果。与依赖精确关键词匹配和词频的传统全文检索不同，向量检索会将多种数据类型（如文本、图片或音频）转换为高维向量，并基于这些向量之间的相似度进行查询。这种检索方式能够捕捉数据的语义和上下文信息，更准确地理解用户意图。即使检索词与数据库内容不完全匹配，向量检索也能通过分析数据语义，返回符合用户意图的结果。
+
 ### Virtual Private Cloud
 
-A logically isolated virtual network partition that provides managed networking service for your resources.
+逻辑隔离的虚拟网络分区，为你的资源提供托管的网络服务。
 
 ### VPC
 
-Short for Virtual Private Cloud.
+Virtual Private Cloud 的缩写。
 
 ### VPC peering
 
-Enables you to connect Virtual Private Cloud ([VPC](#vpc)) networks so that workloads in different VPC networks can communicate privately.
+允许你连接多个 Virtual Private Cloud（[VPC](#vpc)）网络，使不同 VPC 网络中的工作负载可以私有通信。
 
 ### VPC peering connection
 
-A networking connection between two Virtual Private Clouds (VPCs) that enables you to route traffic between them using private IP addresses and helps you to facilitate data transfer.
+两个 Virtual Private Cloud（VPC）之间的网络连接，使你可以通过私有 IP 地址在它们之间路由流量，便于数据传输。

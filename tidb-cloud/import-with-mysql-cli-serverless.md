@@ -1,42 +1,42 @@
 ---
-title: Import Data into TiDB Cloud Serverless via MySQL CLI
-summary: Learn how to import Data into TiDB Cloud Serverless via MySQL CLI.
+title: 通过 MySQL CLI 向 TiDB Cloud Serverless 导入数据
+summary: 学习如何通过 MySQL CLI 向 TiDB Cloud Serverless 导入数据。
 ---
 
-# Import Data into TiDB Cloud Serverless via MySQL CLI
+# 通过 MySQL CLI 向 TiDB Cloud Serverless 导入数据
 
-This document describes how to import data into TiDB Cloud Serverless via the [MySQL Command-Line Client](https://dev.mysql.com/doc/refman/8.0/en/mysql.html). You can import data from an SQL file or a CSV file. The following sections provide step-by-step instructions for importing data from each type of file.
+本文档介绍了如何通过 [MySQL 命令行客户端](https://dev.mysql.com/doc/refman/8.0/en/mysql.html) 向 TiDB Cloud Serverless 导入数据。你可以从 SQL 文件或 CSV 文件导入数据。以下章节将分别提供从每种文件类型导入数据的分步说明。
 
-## Prerequisites
+## 前置条件
 
-Before you can import data via MySQL CLI to TiDB Cloud Serverless, you need the following prerequisites:
+在你通过 MySQL CLI 向 TiDB Cloud Serverless 导入数据之前，需要满足以下前置条件：
 
-- You have access to your TiDB Cloud Serverless cluster. If you do not have, create one following the instructions in [Build a TiDB Cloud Serverless Cluster](/develop/dev-guide-build-cluster-in-cloud.md).
-- Install MySQL CLI on your local computer.
+- 你可以访问你的 TiDB Cloud Serverless 集群。如果还没有，请按照 [构建 TiDB Cloud Serverless 集群](/develop/dev-guide-build-cluster-in-cloud.md) 的说明创建一个。
+- 在本地计算机上安装 MySQL CLI。
 
-## Step 1. Connect to your TiDB Cloud Serverless cluster
+## 步骤 1. 连接到你的 TiDB Cloud Serverless 集群
 
-Connect to your TiDB cluster.
+连接到你的 TiDB 集群。
 
-1. Navigate to the [**Clusters**](https://tidbcloud.com/project/clusters) page, and then click the name of your target cluster to go to its overview page.
+1. 进入 [**Clusters**](https://tidbcloud.com/project/clusters) 页面，然后点击目标集群的名称，进入其概览页面。
 
-2. Click **Connect** in the upper-right corner. A connection dialog is displayed.
+2. 点击右上角的 **Connect**。此时会弹出连接对话框。
 
-3. Ensure the configurations in the connection dialog match your operating environment.
+3. 确保连接对话框中的配置与你的操作环境一致。
 
-    - **Connection Type** is set to `Public`.
-    - **Connect With** is set to `MySQL CLI`.
-    - **Operating System** matches your environment.
+    - **Connection Type** 设置为 `Public`。
+    - **Connect With** 设置为 `MySQL CLI`。
+    - **Operating System** 与你的环境相匹配。
 
-4. Click **Generate Password** to create a random password.
+4. 点击 **Generate Password** 生成一个随机密码。
 
     > **Tip:**
     >
-    > If you have created a password before, either use the original password or click **Reset Password** to generate a new one.
+    > 如果你之前已经创建过密码，可以继续使用原有密码，或者点击 **Reset Password** 生成新密码。
 
-## Step 2. Define the table and insert sample data
+## 步骤 2. 定义表结构并插入示例数据
 
-Before importing data, you need to prepare the table structure and insert real sample data into it. The following is an example SQL file (`product_data.sql`) that you can use to create a table and insert sample data:
+在导入数据之前，你需要准备表结构，并向其中插入真实的示例数据。以下是一个 SQL 文件（`product_data.sql`）的示例，你可以用它来创建表并插入示例数据：
 
 ```sql
 -- Create a table in your TiDB database
@@ -53,18 +53,18 @@ INSERT INTO products (product_id, product_name, price) VALUES
     (3, 'Tablet', 299.99);
 ```
 
-## Step 3. Import data from a SQL or CSV file
+## 步骤 3. 从 SQL 或 CSV 文件导入数据
 
-You can import data from an SQL file or a CSV file. The following sections provide step-by-step instructions for importing data from each type.
+你可以从 SQL 文件或 CSV 文件导入数据。以下章节将分别提供从每种文件类型导入数据的分步说明。
 
 <SimpleTab>
 <div label="From an SQL file">
 
-Do the following to import data from an SQL file:
+按照以下步骤从 SQL 文件导入数据：
 
-1. Provide a real SQL file (for example, `product_data.sql`) that contains the data you want to import. This SQL file must contain `INSERT` statements with real data.
+1. 准备一个真实的 SQL 文件（例如 `product_data.sql`），其中包含你需要导入的数据。该 SQL 文件必须包含带有真实数据的 `INSERT` 语句。
 
-2. Use the following command to import data from the SQL file:
+2. 使用以下命令从 SQL 文件导入数据：
 
     ```bash
     mysql --comments --connect-timeout 150 -u '<your_username>' -h <your_cluster_host> -P 4000 -D test --ssl-mode=VERIFY_IDENTITY --ssl-ca=<your_ca_path> -p<your_password> < product_data.sql
@@ -72,16 +72,16 @@ Do the following to import data from an SQL file:
 
 > **Note:**
 >
-> The default database name used here is `test`, and you can either manually create your own database or use the `CREATE DATABASE` command in an SQL file.
+> 这里默认使用的数据库名称为 `test`，你可以手动创建自己的数据库，或者在 SQL 文件中使用 `CREATE DATABASE` 命令。
 
 </div>
 <div label="From a CSV file">
 
-Do the following to import data from a CSV file:
+按照以下步骤从 CSV 文件导入数据：
 
-1. Create a database and schema in TiDB to match your data import needs.
+1. 在 TiDB 中创建数据库和表结构，以满足你的数据导入需求。
 
-2. Provide a sample CSV file (for example, `product_data.csv`) that contains the data you want to import. The following is an example of a CSV file:
+2. 准备一个示例 CSV 文件（例如 `product_data.csv`），其中包含你需要导入的数据。以下是一个 CSV 文件的示例：
 
     **product_data.csv:**
 
@@ -92,7 +92,7 @@ Do the following to import data from a CSV file:
     6,Tablet,299.99
     ```
 
-3. Use the following command to import data from the CSV file:
+3. 使用以下命令从 CSV 文件导入数据：
 
     ```bash
     mysql --comments --connect-timeout 150 -u '<your_username>' -h <your_host> -P 4000 -D test --ssl-mode=VERIFY_IDENTITY --ssl-ca=<your_ca_path> -p<your_password> -e "LOAD DATA LOCAL INFILE '<your_csv_path>' INTO TABLE products
@@ -101,11 +101,11 @@ Do the following to import data from a CSV file:
     IGNORE 1 LINES (product_id, product_name, price);"
     ```
 
-    Make sure to replace the paths, table name (`products` in this example), `<your_username>`, `<your_host>`, `<your_password>`, `<your_csv_path>`, `<your_ca_path>`, and other placeholders with your actual information, and replace the sample CSV data with your real dataset as needed.
+    请确保将路径、表名（本例为 `products`）、`<your_username>`、`<your_host>`、`<your_password>`、`<your_csv_path>`、`<your_ca_path>` 以及其他占位符替换为你的实际信息，并根据需要将示例 CSV 数据替换为你的真实数据集。
 
 > **Note:**
 >
-> For more syntax details about `LOAD DATA LOCAL INFILE`, see [`LOAD DATA`](/sql-statements/sql-statement-load-data.md).
+> 关于 `LOAD DATA LOCAL INFILE` 的更多语法细节，请参见 [`LOAD DATA`](/sql-statements/sql-statement-load-data.md)。
 
 </div>
 </SimpleTab>

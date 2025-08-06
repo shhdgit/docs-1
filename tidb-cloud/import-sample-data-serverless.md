@@ -3,43 +3,47 @@ title: Import Sample Data into TiDB Cloud Serverless
 summary: Learn how to import sample data into TiDB Cloud Serverless via the UI.
 ---
 
-# Import Sample Data into TiDB Cloud Serverless
+# 将示例数据导入 TiDB Cloud Serverless
 
-This document describes how to import the sample data into TiDB Cloud Serverless via the UI. The sample data used is the system data from Capital Bikeshare, released under the Capital Bikeshare Data License Agreement. Before importing the sample data, you need to have one TiDB cluster.
+本文档介绍如何通过 UI 将示例数据导入 TiDB Cloud Serverless。所使用的示例数据为 Capital Bikeshare 的系统数据，根据 Capital Bikeshare 数据许可协议发布。在导入示例数据之前，你需要拥有一个 TiDB 集群。
 
-> **Note:**
+> **注意：**
 >
-> TiDB Cloud Serverless currently only supports importing sample data from Amazon S3.
+> TiDB Cloud Serverless 目前仅支持从 Amazon S3 导入示例数据。
 
-1. Open the **Import** page for your target cluster.
+1. 打开目标集群的 **Import** 页面。
 
-    1. Log in to the [TiDB Cloud console](https://tidbcloud.com/) and navigate to the [**Clusters**](https://tidbcloud.com/project/clusters) page of your project.
+    1. 登录 [TiDB Cloud 控制台](https://tidbcloud.com/)，并进入你项目的 [**Clusters**](https://tidbcloud.com/project/clusters) 页面。
 
-        > **Tip:**
+        > **提示：**
         >
-        > You can use the combo box in the upper-left corner to switch between organizations, projects, and clusters.
+        > 你可以使用左上角的下拉框在组织、项目和集群之间切换。
 
-    2. Click the name of your target cluster to go to its overview page, and then click **Data** > **Import** in the left navigation pane.
+    2. 点击目标集群的名称进入其概览页面，然后在左侧导航栏点击 **Data** > **Import**。
 
-2. Select **Import data from Cloud Storage**, and then click **Amazon S3**.
+2. 点击 **Import data from Cloud Storage**。
 
-3. On the **Import Data from Amazon S3** page, configure the following source data information:
+3. 在 **Import Data from Cloud Storage** 页面，填写以下信息：
 
-    - **Import File Count**: for the sample data, select **Multiple files**.
-    - **Included Schema Files**: for the sample data, select **Yes**.
-    - **Data Format**: select **SQL**. 
-    - **Folder URI** or **File URI**: enter the sample data URI `s3://tidbcloud-sample-data/data-ingestion/`.
-    - **Bucket Access**: for the sample data, you can only use a Role ARN to access its bucket. For your own data, you can use either an AWS access key or a Role ARN to access your bucket.
-        - **AWS Role ARN**: enter `arn:aws:iam::801626783489:role/import-sample-access`.
-        - **AWS Access Key**: skip this option for the sample data.
+   - **Storage Provider**：选择 **Amazon S3**。
+   - **Source Files URI**：输入示例数据的 URI `s3://tidbcloud-sample-data/data-ingestion/`。
+   - **Credential**：
+      - **AWS Role ARN**：输入 `arn:aws:iam::801626783489:role/import-sample-access`。
+      - **AWS Access Key**：对于示例数据可跳过此项。
 
-4. Click **Connect** > **Start Import**.
+4. 点击 **Next**。
 
-When the data import progress shows **Completed**, you have successfully imported the sample data and the database schema to your database in TiDB Cloud Serverless.
+5. 在 **Destination Mapping** 部分，保持选中 **Use [File naming conventions](/tidb-cloud/naming-conventions-for-data-import.md) for automatic mapping** 选项，并选择 **SQL** 作为数据格式。
 
-After connecting to the cluster, you can run some queries in your terminal to check the result, for example:
+6. 点击 **Next**。
 
-1. Get the trip records starting at "12th & U St NW":
+7. 查看扫描结果，检查发现的数据文件及其对应的目标表，然后点击 **Start Import**。
+
+8. 当导入进度显示为 **Completed** 时，检查已导入的表。
+
+连接到集群后，你可以在终端中运行一些查询来检查结果，例如：
+
+1. 获取起点为 "12th & U St NW" 的行程记录：
 
     ```sql
     use bikeshare;
@@ -66,7 +70,7 @@ After connecting to the cluster, you can run some queries in your terminal to ch
     +-----------------+---------------+---------------------+---------------------+--------------------+------------------+-------------------------------------------+----------------+-----------+------------+-----------+------------+---------------+
     ```
 
-2. Get the trip records with electric bikes:
+2. 获取使用电动自行车的行程记录：
 
     ```sql
     use bikeshare;

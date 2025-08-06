@@ -1,89 +1,159 @@
 ---
-title: Back Up and Restore TiDB Cloud Serverless Data
-summary: Learn how to back up and restore your TiDB Cloud Serverless cluster.
+title: 备份与恢复 TiDB Cloud Serverless 数据
+summary: 了解如何备份和恢复你的 TiDB Cloud Serverless 集群。
 aliases: ['/tidbcloud/restore-deleted-tidb-cluster']
 ---
 
-# Back Up and Restore TiDB Cloud Serverless Data
+# 备份与恢复 TiDB Cloud Serverless 数据
 
-This document describes how to back up and restore your TiDB Cloud Serverless cluster data on TiDB Cloud.
+本文档介绍了如何在 TiDB Cloud 上备份和恢复你的 TiDB Cloud Serverless 集群数据。
 
 > **Tip:**
 >
-> To learn how to back up and restore TiDB Cloud Dedicated cluster data, see [Back Up and Restore TiDB Cloud Dedicated Data](/tidb-cloud/backup-and-restore.md).
+> 如需了解如何备份和恢复 TiDB Cloud Dedicated 集群数据，请参见 [Back Up and Restore TiDB Cloud Dedicated Data](/tidb-cloud/backup-and-restore.md)。
 
-## Limitations
+## 查看备份页面
 
-- It is important to note that TiDB Cloud Serverless clusters only support in-place restoring from backups. When a restore is performed, tables in the `mysql` schema are also impacted. Hence, any changes made to user credentials and permissions or system variables will be rolled back to the state when the backup was taken.
-- Manual backup is not yet supported.
-- The cluster will be unavailable during the restore process, and existing connections will be terminated. You can establish new connections once the restore is complete.
-- If any TiFlash replica is enabled, the replica will be unavailable for a while after the restore because data needs to be rebuilt in TiFlash.
+1. 在 [**Clusters**](https://tidbcloud.com/project/clusters) 页面，点击目标集群的名称，进入其概览页面。
 
-## Backup
+    > **Tip:**
+    >
+    > 你可以使用左上角的下拉框在组织、项目和集群之间切换。
 
-Automatic backups are scheduled for your TiDB Cloud Serverless clusters according to the backup setting, which can reduce your loss in extreme disaster situations.
+2. 在左侧导航栏，点击 **Data** > **Backup**。
 
-### Automatic backup
+## 自动备份
 
-By the automatic backup, you can back up the TiDB Cloud Serverless cluster data every day at the backup time you have set. To set the backup time, perform the following steps:
+TiDB Cloud Serverless 会自动备份你的集群数据，使你能够从备份快照中恢复数据，以最大程度减少灾难发生时的数据丢失。
 
-1. Navigate to the **Backup** page of a TiDB Cloud Serverless cluster.
+### 了解备份设置
 
-2. Click **Backup Settings**. This will open the **Backup Settings** window, where you can configure the automatic backup settings according to your requirements.
+自动备份设置在免费集群和可扩展集群之间有所不同，如下表所示：
 
-    - In **Backup Time**, schedule a start time for the daily cluster backup.
+| 备份设置         | 免费集群     | 可扩展集群         |
+|------------------|--------------|--------------------|
+| Backup Cycle     | Daily        | Daily              |
+| Backup Retention | 1 day        | 14 days            |
+| Backup Time      | Fixed time   | Configurable       |
 
-        If you do not specify a preferred backup time, TiDB Cloud assigns a default backup time, which is 2:00 AM in the time zone of the region where the cluster is located.
+- **Backup Cycle** 表示备份的频率。
 
-    - In **Backup Retention**, configure the minimum backup data retention period.
+- **Backup Retention** 表示备份的保留时长。过期的备份无法恢复。
+   
+- **Backup Time** 表示备份开始调度的时间。请注意，最终的备份时间可能会滞后于配置的备份时间。
+   
+    - 免费集群：备份时间为随机固定时间。
+    - 可扩展集群：你可以将备份时间配置为每半小时一次。默认值为随机固定时间。
 
-        The backup retention period must be set within a range of 7 to 90 days.
+### 配置备份设置
 
-3. Click **Confirm**.
+如需为可扩展集群设置备份时间，请执行以下步骤：
 
-### Delete backup files
+1. 进入集群的 [**Backup**](#view-the-backup-page) 页面。
 
-To delete an existing backup file, perform the following steps:
+2. 点击 **Backup Setting**。此操作会打开 **Backup Setting** 窗口，你可以根据需求配置自动备份设置。
 
-1. Navigate to the **Backup** tab of a cluster.
+3. 在 **Backup Time** 中，为每日集群备份安排开始时间。
 
-2. Click **Delete** for the backup file that you want to delete.
+4. 点击 **Confirm**。
 
-## Restore
+## 恢复
 
-TiDB Cloud Serverless only supports in-place restoration. To restore your TiDB Cloud Serverless cluster from a backup, follow these steps:
+TiDB Cloud Serverless 集群提供恢复功能，帮助在数据意外丢失或损坏时进行数据恢复。
 
-1. Navigate to the **Backup** page of a cluster.
+### 恢复模式
 
-2. Click **Restore**. The setting window displays.
+TiDB Cloud Serverless 支持快照恢复和时间点恢复。
 
-3. In **Restore Mode**, you can choose to restore from a specific backup or any point in time.
+- **Snapshot Restore**：从指定的备份快照恢复你的集群。
+
+- **Point-in-Time Restore (beta)**：将你的集群恢复到指定时间点。
+
+    - 免费集群：不支持。
+    - 可扩展集群：可恢复到最近 14 天内的任意时间，但不能早于集群创建时间，也不能晚于当前时间减去 1 分钟。
+
+### 恢复目标
+
+TiDB Cloud Serverless 支持原地恢复和恢复到新集群。
+
+**原地恢复**
+
+恢复到当前集群会覆盖现有数据。请注意以下事项：
+
+- 恢复开始后，现有连接会被终止。
+- 恢复过程中，集群将不可用，新的连接会被阻塞。
+- 恢复会影响 `mysql` schema 下的表。任何用户凭证、权限或系统变量的更改都会被还原到备份时的状态。
+
+**恢复到新集群**
+
+创建并恢复到新集群。请注意以下事项：
+
+- 源集群的用户凭证和权限不会恢复到新集群。
+
+### 恢复超时
+
+恢复过程通常会在几分钟内完成。如果恢复超过三小时仍未完成，将会被自动取消。被取消的恢复结果取决于恢复目标：
+
+- **In-place restore**：集群状态会从 **Restoring** 变为 **Available**，集群恢复可访问。
+- **Restore to a new cluster**：新集群会被删除，源集群保持不变。
+
+如果恢复被取消后数据损坏且无法恢复，请联系 [TiDB Cloud Support](/tidb-cloud/tidb-cloud-support.md) 获取帮助。
+
+### 执行恢复操作
+
+如需恢复你的 TiDB Cloud Serverless 集群，请按照以下步骤操作：
+
+1. 进入集群的 [**Backup**](#view-the-backup-page) 页面。
+
+2. 点击 **Restore**。将显示设置窗口。
+
+3. 在 **Restore Mode** 中，你可以选择从指定备份或任意时间点进行恢复。
 
     <SimpleTab>
-    <div label="Basic Snapshot Restore">
+    <div label="Snapshot Restore">
 
-    To restore from a selected backup snapshot, take the following steps:
+    如需从选定的备份快照恢复，请执行以下步骤：
 
-    1. Click **Basic Snapshot Restore**.
-    2. Select the backup snapshot you want to restore to.
+    1. 点击 **Snapshot Restore**。
+    2. 选择你要恢复的备份快照。
 
     </div>
     <div label="Point-in-Time Restore">
 
-    This feature lets you restore a cluster to a specific state from any time within the last 90 days.
+    如需为可扩展集群恢复到指定时间点，请执行以下步骤：
 
-    > **Note:**
-    >
-    > The **Point-in-Time Restore** feature is currently in beta.
-
-    To restore from a specific point in time, take the following steps:
-
-    1. Click **Point-in-Time Restore**.
-    2. Select the date and time you want to restore to.
+    1. 点击 **Point-in-Time Restore**。
+    2. 选择你要恢复到的日期和时间。
 
     </div>
     </SimpleTab>
 
-4. Click **Restore** to begin the restoration process.
+4. 在 **Destination** 中，你可以选择恢复到新集群或原地恢复。
 
-   After initiating the restore process, the cluster status changes to **Restoring**. The cluster will be unavailable during the restore process and existing connections will be terminated. Once the restore process completes successfully, you can access the cluster as usual.
+    <SimpleTab>
+    <div label="Restore to a new cluster">
+
+    如需恢复到新集群，请执行以下步骤：
+
+    1. 点击 **Restore to a New Cluster**。
+    2. 输入新集群的名称。
+    3. 选择新集群的集群方案。
+    4. 如果你选择的是可扩展集群，请设置每月消费上限，并根据需要配置高级设置。否则跳过此步骤。
+
+    </div>
+    <div label="Restore in-place">
+
+    如需原地恢复，点击 **In-place Restore**。
+
+    </div>
+    </SimpleTab>
+
+5. 点击 **Restore** 开始恢复流程。
+
+恢复流程开始后，集群状态会变为 **Restoring**。在恢复完成并状态变为 **Available** 之前，集群将保持不可用。
+
+## 限制
+
+- 如果启用了 TiFlash 副本，恢复后 TiFlash 会有一段时间不可用，因为数据需要在 TiFlash 中重建。
+- TiDB Cloud Serverless 集群不支持手动备份。
+- 数据量超过 1 TiB 的集群默认不支持恢复到新集群。如需处理更大数据集，请联系 [TiDB Cloud Support](/tidb-cloud/tidb-cloud-support.md) 获取帮助。

@@ -1,63 +1,68 @@
 ---
-title: Connect to TiDB Cloud Serverless via Public Endpoint
-summary: Learn how to connect to your TiDB Cloud Serverless cluster via public endpoint.
+title: 通过 Public Endpoint 连接 TiDB Cloud Serverless
+summary: 了解如何通过 public endpoint 连接到你的 TiDB Cloud Serverless 集群。
 ---
 
-# Connect to TiDB Cloud Serverless via Public Endpoint
+# 通过 Public Endpoint 连接 TiDB Cloud Serverless
 
-This document describes how to connect to your TiDB Cloud Serverless cluster via a public endpoint, using a SQL client from your computer, as well as how to disable a public endpoint.
+本文档介绍了如何通过 public endpoint，使用你电脑上的 SQL 客户端连接到 TiDB Cloud Serverless 集群，以及如何禁用 public endpoint。
 
-## Connect via a public endpoint
+## 通过 public endpoint 连接
 
 > **Tip:**
 >
-> To learn how to connect to a TiDB Cloud Dedicated cluster via public endpoint, see [Connect to TiDB Cloud Dedicated via Public Connection](/tidb-cloud/connect-via-standard-connection.md).
+> 如果你想了解如何通过 public endpoint 连接到 TiDB Cloud Dedicated 集群，请参见 [Connect to TiDB Cloud Dedicated via Public Connection](/tidb-cloud/connect-via-standard-connection.md)。
 
-To connect to a TiDB Cloud Serverless cluster via public endpoint, take the following steps:
+要通过 public endpoint 连接到 TiDB Cloud Serverless 集群，请按照以下步骤操作：
 
-1. Navigate to the [**Clusters**](https://tidbcloud.com/console/clusters) page, and then click the name of your target cluster to go to its overview page.
+1. 进入 [**Clusters**](https://tidbcloud.com/project/clusters) 页面，然后点击目标集群的名称，进入其概览页面。
 
-2. Click **Connect** in the upper-right corner. A connection dialog is displayed.
+2. 点击右上角的 **Connect**。此时会弹出连接对话框。
 
-3. In the dialog, keep the default setting of the connection type as `Public`, and select your preferred connection method and operating system to get the corresponding connection string.
-
-    > **Note:**
-    >
-    > - Keeping the connection type as `Public` means the connection is via standard TLS connection. For more information, see [TLS Connection to TiDB Cloud Serverless](/tidb-cloud/secure-connections-to-serverless-clusters.md).
-    > - If you choose **Private Endpoint** in the **Connection Type** drop-down list, it means that the connection is via private endpoint. For more information, see [Connect to TiDB Cloud Serverless via Private Endpoint](/tidb-cloud/set-up-private-endpoint-connections-serverless.md).
-
-4. TiDB Cloud Serverless lets you create [branches](/tidb-cloud/branch-overview.md) for your cluster. After a branch is created, you can choose to connect to the branch via the **Branch** drop-down list. `main` represents the cluster itself.
-
-5. If you have not set a password yet, click **Generate Password** to generate a random password. The generated password will not show again, so save your password in a secure location.
-
-6. Connect to your cluster with the connection string.
+3. 在对话框中，保持连接类型的默认设置为 `Public`，并选择你偏好的连接方式和操作系统，以获取对应的连接字符串。
 
     > **Note:**
     >
-    > When you connect to a TiDB Cloud Serverless cluster, you must include the prefix for your cluster in the user name and wrap the name with quotation marks. For more information, see [User name prefix](/tidb-cloud/select-cluster-tier.md#user-name-prefix).
+    > - 保持连接类型为 `Public`，表示通过标准 TLS 连接进行连接。更多信息，请参见 [TLS Connection to TiDB Cloud Serverless](/tidb-cloud/secure-connections-to-serverless-clusters.md)。
+    > - 如果你在 **Connection Type** 下拉列表中选择 **Private Endpoint**，则表示通过私有 endpoint 进行连接。更多信息，请参见 [Connect to TiDB Cloud Serverless via Private Endpoint](/tidb-cloud/set-up-private-endpoint-connections-serverless.md)。
 
-## Disable a public endpoint
+4. TiDB Cloud Serverless 支持为你的集群创建 [branches](/tidb-cloud/branch-overview.md)。创建 branch 后，你可以通过 **Branch** 下拉列表选择连接到指定 branch。`main` 代表集群本身。
 
-If you do not need to use a public endpoint of a TiDB Cloud Serverless cluster, you can disable it to prevent connections from the internet:
+5. 如果你还没有设置密码，点击 **Generate Password** 生成一个随机密码。生成的密码只会显示一次，请务必将密码保存在安全的位置。
 
-1. Navigate to the [**Clusters**](https://tidbcloud.com/console/clusters) page, and then click the name of your target cluster to go to its overview page.
+6. 使用连接字符串连接到你的集群。
 
-2. Click **Networking** in the left navigation pane and click **Disable** in the right pane. A confirmation dialog is displayed.
+    > **Note:**
+    >
+    > 连接到 TiDB Cloud Serverless 集群时，必须在用户名中包含集群的前缀，并用引号包裹用户名。更多信息，请参见 [User name prefix](/tidb-cloud/select-cluster-tier.md#user-name-prefix)。
+    > 你的客户端 IP 必须在集群 public endpoint 的允许 IP 规则中。更多信息，请参见 [Configure TiDB Cloud Serverless Firewall Rules for Public Endpoints](/tidb-cloud/configure-serverless-firewall-rules-for-public-endpoints.md)。
 
-3. Click **Disable** in the confirmation dialog.
+## 禁用 public endpoint
 
-After disabling the public endpoint, the `Public` entry in the **Connection Type** drop-down list of the connect dialog is disabled. If users are still trying to access the cluster from the public endpoint, they will get an error.
+如果你不需要使用 TiDB Cloud Serverless 集群的 public endpoint，可以将其禁用，以防止来自互联网的连接：
+
+1. 进入 [**Clusters**](https://tidbcloud.com/project/clusters) 页面，然后点击目标集群的名称，进入其概览页面。
+
+2. 在左侧导航栏，点击 **Settings** > **Networking**。
+
+3. 在 **Networking** 页面，点击 **Disable**。此时会弹出确认对话框。
+
+4. 在确认对话框中点击 **Disable**。
+
+禁用 public endpoint 后，连接对话框中 **Connection Type** 下拉列表的 `Public` 选项会被禁用。如果用户仍尝试通过 public endpoint 访问集群，将会收到错误提示。
 
 > **Note:**
 >
-> Disabling the public endpoint does not affect existing connections. It only prevents new connections from the internet.
+> 禁用 public endpoint 不会影响已有的连接，只会阻止新的互联网连接。
 
-You can re-enable the public endpoint after disabling it:
+你可以在禁用后重新启用 public endpoint：
 
-1. Navigate to the [**Clusters**](https://tidbcloud.com/console/clusters) page, and then click the name of your target cluster to go to its overview page.
+1. 进入 [**Clusters**](https://tidbcloud.com/project/clusters) 页面，然后点击目标集群的名称，进入其概览页面。
 
-2. Click **Networking** in the left navigation pane and click **Enable** in the right pane.
+2. 在左侧导航栏，点击 **Settings** > **Networking**。
 
-## What's next
+3. 在 **Networking** 页面，点击 **Enable**。
 
-After you have successfully connected to your TiDB cluster, you can [explore SQL statements with TiDB](/basic-sql-operations.md).
+## 后续操作
+
+成功连接到 TiDB 集群后，你可以 [使用 TiDB 探索 SQL 语句](/basic-sql-operations.md)。

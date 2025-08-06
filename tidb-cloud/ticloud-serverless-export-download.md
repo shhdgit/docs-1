@@ -1,50 +1,51 @@
 ---
 title: ticloud serverless export download
-summary: The reference of `ticloud serverless export download`.
+summary: `ticloud serverless export download` 的参考文档。
 ---
 
 # ticloud serverless export download
 
-Download the exported data from a TiDB Cloud Serverless cluster to your local storage:
+将 TiDB Cloud Serverless 集群中导出的数据下载到本地存储：
 
 ```shell
 ticloud serverless export download [flags]
 ```
 
-## Examples
+## 示例
 
-Download the exported data in interactive mode:
+以交互模式下载导出的数据：
 
 ```shell
 ticloud serverless export download
 ```
 
-Download the exported data in non-interactive mode:
+以非交互模式下载导出的数据：
 
 ```shell
 ticloud serverless export download -c <cluster-id> -e <export-id>
 ```
 
-## Flags
+## 参数说明
 
-In non-interactive mode, you need to manually enter the required flags. In interactive mode, you can just follow CLI prompts to fill them in.
+在非交互模式下，你需要手动输入所需的参数。在交互模式下，你只需按照 CLI 的提示填写即可。
 
-| Flag                    | Description                                                                        | Required | Note                                                 |
-|-------------------------|------------------------------------------------------------------------------------|----------|------------------------------------------------------|
-| -c, --cluster-id string | Specifies the ID of the cluster.                                                       | Yes      | Only works in non-interactive mode.                  |
-| -e, --export-id string  | Specifies the ID of the export task.                                                               | Yes      | Only works in non-interactive mode.                  |
-| --output-path string    | Specifies the destination path for saving the downloaded data. If not specified, the data is downloaded to the current directory. | No       | Only works in non-interactive mode.                  |
-| --force                 | Downloads the exported data without confirmation.                                                      | No       | Works in both non-interactive and interactive modes. |
-| -h, --help              | Shows help information for this command.                                                  | No       | Works in both non-interactive and interactive modes. |
+| 参数                      | 说明                                                                                                                        | 是否必需 | 备注                                               |
+|---------------------------|-----------------------------------------------------------------------------------------------------------------------------|----------|----------------------------------------------------|
+| -c, --cluster-id string   | 指定集群的 ID。                                                                                                             | 是       | 仅在非交互模式下生效。                            |
+| -e, --export-id string    | 指定导出任务的 ID。                                                                                                         | 是       | 仅在非交互模式下生效。                            |
+| --output-path string      | 指定下载数据的目标保存路径。如果未指定，则数据会下载到当前目录。                                                            | 否       | 仅在非交互模式下生效。                            |
+| --concurrency int         | 指定下载的并发数。默认值为 `3`。                                                                                            | 否       | 在非交互和交互模式下均可用。                      |
+| --force                   | 无需确认，直接下载导出的数据。                                                                                              | 否       | 在非交互和交互模式下均可用。                      |
+| -h, --help                | 显示该命令的帮助信息。                                                                                                      | 否       | 在非交互和交互模式下均可用。                      |
 
-## Inherited flags
+## 继承参数
 
-| Flag                 | Description                                                                                          | Required | Note                                                                                                             |
-|----------------------|------------------------------------------------------------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------|
-| --no-color           | Disables color in output.                                                                            | No       | Only works in non-interactive mode. In interactive mode, disabling color might not work with some UI components. |
-| -P, --profile string | Specifies the active [user profile](/tidb-cloud/cli-reference.md#user-profile) used in this command. | No       | Works in both non-interactive and interactive modes.                                                             |
-| -D, --debug          | Enables debug mode.                                                                                   | No       | Works in both non-interactive and interactive modes.                                                             |
+| 参数                   | 说明                                                                                                   | 是否必需 | 备注                                                                                   |
+|------------------------|--------------------------------------------------------------------------------------------------------|----------|----------------------------------------------------------------------------------------|
+| --no-color             | 禁用输出中的颜色。                                                                                     | 否       | 仅在非交互模式下生效。在交互模式下，禁用颜色可能会影响部分 UI 组件的显示。             |
+| -P, --profile string   | 指定该命令使用的活动 [用户配置文件](/tidb-cloud/cli-reference.md#user-profile)。                       | 否       | 在非交互和交互模式下均可用。                                                          |
+| -D, --debug            | 启用调试模式。                                                                                         | 否       | 在非交互和交互模式下均可用。                                                          |
 
-## Feedback
+## 反馈
 
-If you have any questions or suggestions on the TiDB Cloud CLI, feel free to create an [issue](https://github.com/tidbcloud/tidbcloud-cli/issues/new/choose). Also, we welcome any contributions.
+如果你对 TiDB Cloud CLI 有任何问题或建议，欢迎创建 [issue](https://github.com/tidbcloud/tidbcloud-cli/issues/new/choose)。我们也欢迎任何形式的贡献。

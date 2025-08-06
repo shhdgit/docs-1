@@ -1,50 +1,50 @@
 ---
-title: Full-Text Search with SQL
-summary: Full-text search lets you retrieve documents for exact keywords. In Retrieval-Augmented Generation (RAG) scenarios, you can use full-text search together with vector search to improve the retrieval quality.
+title: 使用 SQL 进行全文检索
+summary: 全文检索允许你根据精确关键词检索文档。在 RAG（Retrieval-Augmented Generation，检索增强生成）场景中，你可以将全文检索与向量检索结合使用，以提升检索质量。
 aliases: ['/tidb/stable/vector-search-full-text-search-sql']
 ---
 
-# Full-Text Search with SQL
+# 使用 SQL 进行全文检索
 
-Unlike [Vector Search](/vector-search/vector-search-overview.md), which focuses on semantic similarity, full-text search lets you retrieve documents for exact keywords. In Retrieval-Augmented Generation (RAG) scenarios, you can use full-text search together with vector search to improve the retrieval quality.
+与关注语义相似度的 [Vector Search](/vector-search/vector-search-overview.md) 不同，全文检索允许你根据精确关键词检索文档。在 RAG（检索增强生成）场景中，你可以将全文检索与向量检索结合使用，以提升检索质量。
 
-The full-text search feature in TiDB provides the following capabilities:
+TiDB 的全文检索功能提供以下能力：
 
-- **Query text data directly**: you can search any string columns directly without the embedding process.
+- **直接查询文本数据**：你可以直接在任意字符串列上进行检索，无需进行嵌入处理。
 
-- **Support for multiple languages**: no need to specify the language for high-quality search. The text analyzer in TiDB supports documents in multiple languages mixed in the same table and automatically chooses the best analyzer for each document.
+- **支持多语言**：无需指定语言即可获得高质量检索。TiDB 的文本分析器支持同一张表中多种语言混合的文档，并会自动为每个文档选择最佳分析器。
 
-- **Order by relevance**: the search result can be ordered by relevance using the widely adopted [BM25 ranking](https://en.wikipedia.org/wiki/Okapi_BM25) algorithm.
+- **按相关性排序**：检索结果可通过广泛采用的 [BM25 排序](https://en.wikipedia.org/wiki/Okapi_BM25) 算法按相关性排序。
 
-- **Fully compatible with SQL**: all SQL features, such as pre-filtering, post-filtering, grouping, and joining, can be used with full-text search.
+- **与 SQL 完全兼容**：所有 SQL 特性，如前置过滤、后置过滤、分组和关联查询等，都可以与全文检索结合使用。
 
 > **Tip:**
 >
-> For Python usage, see [Full-Text Search with Python](/tidb-cloud/vector-search-full-text-search-python.md).
+> 关于 Python 的用法，请参见 [Full-Text Search with Python](/tidb-cloud/vector-search-full-text-search-python.md)。
 >
-> To use full-text search and vector search together in your AI apps, see [Hybrid Search](/tidb-cloud/vector-search-hybrid-search.md).
+> 如需在 AI 应用中同时使用全文检索和向量检索，请参见 [Hybrid Search](/tidb-cloud/vector-search-hybrid-search.md)。
 
-## Get started
+## 快速开始
 
-Full-text search is still in the early stages, and we are continuously rolling it out to more customers. Currently, Full-text search is only available for the following product option and regions:
+全文检索目前仍处于早期阶段，我们正在持续向更多用户开放。目前，全文检索仅在以下产品选项和区域可用：
 
-- TiDB Cloud Serverless: `Frankfurt (eu-central-1)` and `Singapore (ap-southeast-1)`
+- TiDB Cloud Serverless：`Frankfurt (eu-central-1)` 和 `Singapore (ap-southeast-1)`
 
-Before using full-text search, make sure your TiDB Cloud Serverless cluster is created in a supported region. If you don't have one, follow [Creating a TiDB Cloud Serverless cluster](/develop/dev-guide-build-cluster-in-cloud.md) to create it.
+在使用全文检索前，请确保你的 TiDB Cloud Serverless 集群已创建在支持的区域。如果还没有，请按照 [创建 TiDB Cloud Serverless 集群](/develop/dev-guide-build-cluster-in-cloud.md) 进行创建。
 
-To perform a full-text search, follow these steps:
+要进行全文检索，请按照以下步骤操作：
 
-1. [**Create a full-text index**](#create-a-full-text-index): create a table with a full-text index, or add a full-text index to an existing table.
+1. [**创建全文索引**](#create-a-full-text-index)：创建带有全文索引的表，或为已有表添加全文索引。
 
-2. [**Insert text data**](#insert-text-data): insert text data into the table.
+2. [**插入文本数据**](#insert-text-data)：向表中插入文本数据。
 
-3. [**Perform a full-text search**](#perform-a-full-text-search): perform a full-text search using text queries and full-text search functions.
+3. [**执行全文检索**](#perform-a-full-text-search)：使用文本查询和全文检索函数进行全文检索。
 
-### Create a full-text index
+### 创建全文索引
 
-To perform full-text search, a full-text index is required as it provides the necessary data structure for efficient searching and ranking. Full-text indexes can be created on new tables or added to existing tables.
+要进行全文检索，需要创建全文索引，它为高效检索和排序提供必要的数据结构。全文索引既可以在新表上创建，也可以添加到已有表中。
 
-Create a table with a full-text index:
+创建带有全文索引的表：
 
 ```sql
 CREATE TABLE stock_items(
@@ -54,7 +54,7 @@ CREATE TABLE stock_items(
 );
 ```
 
-Or add a full-text index to an existing table:
+或者为已有表添加全文索引：
 
 ```sql
 CREATE TABLE stock_items(
@@ -62,23 +62,23 @@ CREATE TABLE stock_items(
     title TEXT
 );
 
--- You might insert some data here.
--- The full-text index can be created even if data is already in the table.
+-- 你可以在这里插入一些数据。
+-- 即使表中已有数据，也可以创建全文索引。
 
 ALTER TABLE stock_items ADD FULLTEXT INDEX (title) WITH PARSER MULTILINGUAL ADD_COLUMNAR_REPLICA_ON_DEMAND;
 ```
 
-The following parsers are accepted in the `WITH PARSER <PARSER_NAME>` clause:
+`WITH PARSER <PARSER_NAME>` 子句中支持以下解析器：
 
-- `STANDARD`: fast, works for English contents, splitting words by spaces and punctuation.
+- `STANDARD`：速度快，适用于英文内容，通过空格和标点分词。
 
-- `MULTILINGUAL`: supports multiple languages, including English, Chinese, Japanese, and Korean.
+- `MULTILINGUAL`：支持多种语言，包括英文、中文、日文和韩文。
 
-### Insert text data
+### 插入文本数据
 
-Inserting data into a table with a full-text index is identical to inserting data into any other tables.
+向带有全文索引的表插入数据，与向其他表插入数据完全相同。
 
-For example, you can execute the following SQL statements to insert data in multiple languages. The multilingual parser in TiDB automatically processes the text.
+例如，你可以执行以下 SQL 语句插入多种语言的数据。TiDB 的多语言解析器会自动处理这些文本。
 
 ```sql
 INSERT INTO stock_items VALUES (1, "イヤホン bluetooth ワイヤレスイヤホン ");
@@ -98,11 +98,11 @@ INSERT INTO stock_items VALUES (14, "无线蓝牙耳机超长续航42小时快�
 INSERT INTO stock_items VALUES (15, "皎月银 国家补贴 心率血氧监测 蓝牙通话 智能手表 男女表");
 ```
 
-### Perform a full-text search
+### 执行全文检索
 
-To perform a full-text search, you can use the `FTS_MATCH_WORD()` function.
+要进行全文检索，你可以使用 `FTS_MATCH_WORD()` 函数。
 
-**Example: search for most relevant 10 documents**
+**示例：检索最相关的 10 个文档**
 
 ```sql
 SELECT * FROM stock_items
@@ -110,7 +110,7 @@ SELECT * FROM stock_items
     ORDER BY fts_match_word("bluetoothイヤホン", title)
     DESC LIMIT 10;
 
--- Results are ordered by relevance, with the most relevant documents first.
+-- 结果按相关性排序，最相关的文档排在最前面。
 
 +------+-----------------------------------------------------------------------------------------------------------+
 | id   | title                                                                                                     |
@@ -119,16 +119,16 @@ SELECT * FROM stock_items
 |    6 | Lightweight Bluetooth Earbuds with 48 Hours Playtime                                                      |
 |    2 | 完全ワイヤレスイヤホン/ウルトラノイズキャンセリング 2.0                                                           |
 |    3 | ワイヤレス ヘッドホン Bluetooth 5.3 65時間再生 ヘッドホン 40mm HD                                               |
-|    5 | ワイヤレスイヤホン ハイブリッドANC搭載 40dBまでアクティブノイズキャンセル                                            |
+|    5 | ワイヤレスイヤホン ハイブリッドANC搭载 40dBまでアクティブノイズキャンセル                                            |
 +------+-----------------------------------------------------------------------------------------------------------+
 
--- Try searching in another language:
+-- 尝试用另一种语言进行检索：
 SELECT * FROM stock_items
     WHERE fts_match_word("蓝牙耳机", title)
     ORDER BY fts_match_word("蓝牙耳机", title)
     DESC LIMIT 10;
 
--- Results are ordered by relevance, with the most relevant documents first.
+-- 结果按相关性排序，最相关的文档排在最前面。
 
 +------+---------------------------------------------------------------------------------------------------------------+
 | id   | title                                                                                                         |
@@ -139,7 +139,7 @@ SELECT * FROM stock_items
 +------+---------------------------------------------------------------------------------------------------------------+
 ```
 
-**Example: count the number of documents matching the user query**
+**示例：统计与用户查询匹配的文档数量**
 
 ```sql
 SELECT COUNT(*) FROM stock_items
@@ -152,11 +152,11 @@ SELECT COUNT(*) FROM stock_items
 +----------+
 ```
 
-## Advanced example: Join search results with other tables
+## 进阶示例：与其他表联合检索
 
-You can combine full-text search with other SQL features such as joins and subqueries.
+你可以将全文检索与其他 SQL 特性（如关联查询和子查询）结合使用。
 
-Assume you have a `users` table and a `tickets` table, and want to find tickets created by authors based on a full-text search of their names:
+假设你有一张 `users` 表和一张 `tickets` 表，想要基于作者姓名的全文检索结果查找其创建的工单：
 
 ```sql
 CREATE TABLE users(
@@ -179,7 +179,7 @@ INSERT INTO tickets VALUES (2, "Ticket 2", 1);
 INSERT INTO tickets VALUES (3, "Ticket 3", 2);
 ```
 
-You can use a subquery to find matching user IDs based on the author's name, and then use these IDs in the outer query to retrieve and join related ticket information:
+你可以通过子查询根据作者姓名检索匹配的用户 ID，然后在外层查询中使用这些 ID 关联并获取相关工单信息：
 
 ```sql
 SELECT t.title AS TICKET_TITLE, u.id AS AUTHOR_ID, u.name AS AUTHOR_NAME FROM tickets t
@@ -198,23 +198,23 @@ WHERE t.author_id IN
 +--------------+-----------+-------------+
 ```
 
-## See also
+## 参见
 
 - [Hybrid Search](/tidb-cloud/vector-search-hybrid-search.md)
 
-## Feedback & help
+## 反馈与帮助
 
-Full-text search is still in the early stages with limited accessibility. If you would like to try full-text search in a region that is not yet available, or if you have feedback or need help, feel free to reach out to us:
+全文检索目前仍处于早期阶段，开放范围有限。如果你希望在尚未开放的区域体验全文检索，或有任何反馈与帮助需求，欢迎联系我们：
 
 <CustomContent platform="tidb">
 
-- [Join our Discord](https://discord.gg/zcqexutz2R)
+- [加入我们的 Discord](https://discord.gg/zcqexutz2R)
 
 </CustomContent>
 
 <CustomContent platform="tidb-cloud">
 
-- [Join our Discord](https://discord.gg/zcqexutz2R)
-- [Visit our Support Portal](https://tidb.support.pingcap.com/)
+- [加入我们的 Discord](https://discord.gg/zcqexutz2R)
+- [访问我们的支持门户](https://tidb.support.pingcap.com/)
 
 </CustomContent>

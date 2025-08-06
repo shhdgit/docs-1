@@ -1,48 +1,56 @@
 ---
 title: ticloud serverless branch create
-summary: The reference of `ticloud serverless branch create`.
+summary: `ticloud serverless branch create` 的参考文档。
 ---
 
 # ticloud serverless branch create
 
-Create a [branch](/tidb-cloud/branch-overview.md) for a TiDB Cloud Serverless cluster:
+为 TiDB Cloud Serverless 集群创建一个 [分支](/tidb-cloud/branch-overview.md)：
 
 ```shell
 ticloud serverless branch create [flags]
 ```
 
-## Examples
+## 示例
 
-Create a branch for a TiDB Cloud Serverless cluster in interactive mode:
+以交互模式为 TiDB Cloud Serverless 集群创建分支：
 
 ```shell
 ticloud serverless branch create
 ```
 
-Create a branch for a TiDB Cloud Serverless cluster in non-interactive mode:
+以非交互模式为 TiDB Cloud Serverless 集群创建分支：
 
 ```shell
 ticloud serverless branch create --cluster-id <cluster-id> --display-name <branch-name>
 ```
 
-## Flags
+以非交互模式从另一个分支的指定时间点创建分支：
 
-In non-interactive mode, you need to manually enter the required flags. In interactive mode, you can just follow CLI prompts to fill them in.
+```shell
+ticloud serverless branch create --cluster-id <cluster-id> --display-name <branch-name> --parent-id <parent-branch-id> --parent-timestamp <parent-timestamp>
+```
 
-| Flag                      | Description                                                | Required | Note                                                |
-|---------------------------|------------------------------------------------------------|----------|-----------------------------------------------------|
-| -c, --cluster-id string   | Specifies the ID of the cluster, in which the branch will be created. | Yes      | Only works in non-interactive mode.                 |
-| -n, --display-name string | Specifies the name of the branch to be created.               | Yes      | Only works in non-interactive mode.                 |
-| -h, --help                | Shows help information for this command.                     | No       | Works in both non-interactive and interactive modes |
+## 参数说明
 
-## Inherited flags
+在非交互模式下，你需要手动输入所需的参数。在交互模式下，你只需按照 CLI 的提示填写即可。
 
-| Flag                 | Description                                                                                          | Required | Note                                                                                                             |
-|----------------------|------------------------------------------------------------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------|
-| --no-color           | Disables color in output.                                                                            | No       | Only works in non-interactive mode. In interactive mode, disabling color might not work with some UI components. |
-| -P, --profile string | Specifies the active [user profile](/tidb-cloud/cli-reference.md#user-profile) used in this command. | No       | Works in both non-interactive and interactive modes.                                                             |
-| -D, --debug          | Enables debug mode.                                                                                   | No       | Works in both non-interactive and interactive modes.                                                             |
+| 参数                        | 说明                                                                                                   | 是否必需 | 备注                                                |
+|-----------------------------|--------------------------------------------------------------------------------------------------------|----------|-----------------------------------------------------|
+| -c, --cluster-id string     | 指定要创建分支的集群 ID。                                                                              | 是       | 仅在非交互模式下生效。                             |
+| -n, --display-name string   | 指定要创建的分支名称。                                                                                 | 是       | 仅在非交互模式下生效。                             |
+| --parent-id string          | 指定分支的父分支 ID。默认值为集群 ID。                                                                 | 否       | 仅在非交互模式下生效。                             |
+| --parent-timestamp string   | 指定父分支的时间戳，格式为 RFC3339，例如 `2024-01-01T00:00:00Z`。默认值为当前时间。                    | 否       | 仅在非交互模式下生效。                             |
+| -h, --help                  | 显示该命令的帮助信息。                                                                                 | 否       | 在非交互和交互模式下均可用。                       |
 
-## Feedback
+## 继承参数
 
-If you have any questions or suggestions on the TiDB Cloud CLI, feel free to create an [issue](https://github.com/tidbcloud/tidbcloud-cli/issues/new/choose). Also, we welcome any contributions.
+| 参数                   | 说明                                                                                                   | 是否必需 | 备注                                                                                      |
+|------------------------|--------------------------------------------------------------------------------------------------------|----------|-------------------------------------------------------------------------------------------|
+| --no-color             | 禁用输出中的颜色。                                                                                     | 否       | 仅在非交互模式下生效。在交互模式下，禁用颜色可能会影响部分 UI 组件的显示。                |
+| -P, --profile string   | 指定该命令使用的活动 [用户配置文件](/tidb-cloud/cli-reference.md#user-profile)。                       | 否       | 在非交互和交互模式下均可用。                                                              |
+| -D, --debug            | 启用调试模式。                                                                                         | 否       | 在非交互和交互模式下均可用。                                                              |
+
+## 反馈
+
+如果你对 TiDB Cloud CLI 有任何问题或建议，欢迎创建 [issue](https://github.com/tidbcloud/tidbcloud-cli/issues/new/choose)。同时，我们也欢迎任何形式的贡献。

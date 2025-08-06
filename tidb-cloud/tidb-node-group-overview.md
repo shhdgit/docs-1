@@ -1,61 +1,61 @@
 ---
-title: Overview of TiDB Node Group 
-summary: Learn about the implementation and usage scenarios of the TiDB Node Group feature.
+title: TiDB 节点组概述 
+summary: 了解 TiDB 节点组功能的实现方式及使用场景。
 ---
 
-# Overview of TiDB Node Group
+# TiDB 节点组概述
 
-You can create TiDB node groups for [TiDB Cloud Dedicated](/tidb-cloud/select-cluster-tier.md#tidb-cloud-dedicated) clusters. A TiDB node group physically groups the computing nodes (TiDB layer) of a cluster, with each group containing a specific number of TiDB nodes. This configuration provides physical isolation of computing resources between groups, enabling efficient resource allocation in multi-business scenarios.
+你可以为 [TiDB Cloud 专属版](/tidb-cloud/select-cluster-tier.md#tidb-cloud-dedicated)集群创建 TiDB 节点组。TiDB 节点组会将集群的计算节点（TiDB 层）进行物理分组，每个组包含特定数量的 TiDB 节点。该配置为各组之间的计算资源提供物理隔离，从而在多业务场景下实现高效的资源分配。
 
-With TiDB node groups, you can divide computing nodes into multiple TiDB node groups based on business requirements and configure unique connection endpoints for each TiDB node group. Your applications connect to the cluster through their respective endpoints, and requests route to the corresponding node group for processing. This ensures that resource overuse in one group does not affect other groups.
+通过 TiDB 节点组，你可以根据业务需求将计算节点划分为多个 TiDB 节点组，并为每个 TiDB 节点组配置独立的连接端点。你的应用程序通过各自的端点连接到集群，请求会路由到对应的节点组进行处理。这样可以确保某一组的资源过度使用不会影响其他组。
 
 > **Note**:
 >
-> The TiDB Node Group feature is **NOT** available for TiDB Cloud Serverless clusters.
+> TiDB 节点组功能 **不** 支持 TiDB Cloud Serverless 集群。
 
-## Implementation
+## 实现方式
 
-TiDB node groups manage the grouping of TiDB nodes and maintain the mapping between endpoints and their corresponding TiDB nodes.
+TiDB 节点组负责管理 TiDB 节点的分组，并维护端点与其对应 TiDB 节点之间的映射关系。
 
-Each TiDB node group is associated with a dedicated load balancer. When a user sends a SQL request to the endpoint of a TiDB node group, the request first passes through that group's load balancer, which then routes it exclusively to TiDB nodes within the group.
+每个 TiDB 节点组都关联有一个专用的负载均衡器。当用户将 SQL 请求发送到某个 TiDB 节点组的端点时，请求会首先经过该组的负载均衡器，然后被专门路由到该组内的 TiDB 节点。
 
-The following diagram illustrates the implementation of the TiDB Node Group feature.
+下图展示了 TiDB 节点组功能的实现方式。
 
 ![The implementation of the TiDB Node Group feature](/media/tidb-cloud/implementation-of-tidb-node-group.png)
 
-All nodes in a TiDB node group respond to requests from the corresponding endpoint. You can perform the following tasks:
+TiDB 节点组中的所有节点都会响应来自对应端点的请求。你可以执行以下操作：
 
-- Create a TiDB node group and assign TiDB nodes to it.
-- Set up connection endpoints for each group. Supported connection types include [public connection](/tidb-cloud/tidb-node-group-management.md#connect-via-public-connection), [private endpoint](/tidb-cloud/tidb-node-group-management.md#connect-via-private-endpoint), and [VPC peering](/tidb-cloud/tidb-node-group-management.md#connect-via-vpc-peering).
-- Route applications to specific groups using distinct endpoints to achieve resource isolation.
+- 创建 TiDB 节点组并为其分配 TiDB 节点。
+- 为每个组设置连接端点。支持的连接类型包括 [公网连接](/tidb-cloud/tidb-node-group-management.md#connect-via-public-connection)、[私有端点](/tidb-cloud/tidb-node-group-management.md#connect-via-private-endpoint) 和 [VPC Peering](/tidb-cloud/tidb-node-group-management.md#connect-via-vpc-peering)。
+- 通过不同的端点将应用程序路由到指定的节点组，实现资源隔离。
 
-## Scenarios
+## 使用场景
 
-The TiDB Node Group feature significantly enhances resource allocation for TiDB Cloud Dedicated clusters. TiDB nodes are dedicated to computation and do not store data. By organizing nodes into multiple physical groups, the feature ensures that resource overuse in one group does not impact other groups.
+TiDB 节点组功能大幅提升了 TiDB Cloud 专属版集群的资源分配能力。TiDB 节点专注于计算，不存储数据。通过将节点划分为多个物理组，该功能确保某一组的资源过度使用不会影响其他组。
 
-With this feature, you can:
+借助该功能，你可以：
 
-- Consolidate multiple applications from different systems into a single TiDB Cloud Dedicated cluster. As an application's workload grows, it will not affect the normal operation of other applications. The TiDB Node Group feature ensures that the response time of transactional applications is not impacted by data analysis or batch applications.
+- 将来自不同系统的多个应用整合到同一个 TiDB Cloud 专属版集群中。即使某个应用的负载增加，也不会影响其他应用的正常运行。TiDB 节点组功能确保事务型应用的响应时间不会受到数据分析或批量应用的影响。
 
-- Perform import or DDL tasks on the TiDB Cloud Dedicated cluster without affecting the performance of existing production workloads. You can create a separate TiDB node group for importing or DDL tasks. Even though these tasks consume significant CPU or memory resources, they only use the resources in their own TiDB node group, ensuring the workloads in other TiDB node groups are not impacted. 
+- 在 TiDB Cloud 专属版集群上执行导入或 DDL 任务，而不会影响现有生产业务的性能。你可以为导入或 DDL 任务单独创建一个 TiDB 节点组。即使这些任务消耗大量 CPU 或内存资源，也只会占用其所属 TiDB 节点组的资源，确保其他 TiDB 节点组的业务不受影响。
 
-- Combine all test environments into a single TiDB cluster or group resource-intensive batch tasks into a dedicated TiDB node group. This approach improves hardware utilization, reduces operating costs, and ensures that critical applications always have access to necessary resources.
+- 将所有测试环境整合到一个 TiDB 集群中，或将资源消耗较大的批量任务分配到专用的 TiDB 节点组。这样可以提升硬件利用率，降低运维成本，并确保关键应用始终能够获得所需资源。
 
-In addition, TiDB node groups are easy to scale in or out. For key applications with high performance requirements, you can allocate TiDB nodes to the group as needed. For less demanding applications, you can start with a small number of TiDB nodes and scale out as needed. Efficient use of the TiDB Node Group feature reduces the number of clusters, simplifies operations and maintenance, and lowers management costs.
+此外，TiDB 节点组易于扩缩容。对于高性能要求的关键应用，你可以按需为其分配 TiDB 节点。对于资源需求较低的应用，可以从较少的 TiDB 节点起步，按需扩容。高效利用 TiDB 节点组功能可以减少集群数量，简化运维，降低管理成本。
 
-## Limitations and quotas
+## 限制与配额
 
-Currently, the TiDB Node Group feature is free of charge. The following are limitations and quotas:
+目前，TiDB 节点组功能免费。具体限制与配额如下：
 
-- You can only create TiDB node groups for TiDB Cloud Dedicated clusters on AWS or Google Cloud. Support for other cloud providers is planned for the near future.
-- TiDB clusters with 4 vCPUs and 16 GiB of memory do not support the TiDB Node Group feature.
-- By default, you can create up to five TiDB node groups for a TiDB Cloud Dedicated cluster. If you need more groups, contact [TiDB Cloud Support](/tidb-cloud/tidb-cloud-support.md). 
-- Each TiDB node group must contain at least one TiDB node. While there is no limit to the number of nodes in a group, the total number of TiDB nodes in a TiDB Cloud Dedicated cluster must not exceed 150.
-- TiDB Cloud runs automatic statistics collection tasks on the TiDB owner node, regardless of node group boundaries. These tasks cannot be isolated within individual TiDB node groups.
-- For TiDB clusters of versions earlier than v8.1.2, `ADD INDEX` tasks cannot be isolated within individual TiDB node groups. 
+- 你只能在 AWS 或 Google Cloud 上的 TiDB Cloud 专属版集群中创建 TiDB 节点组。其他云服务商的支持计划在近期推出。
+- 配置为 4 vCPU 和 16 GiB 内存的 TiDB 集群不支持 TiDB 节点组功能。
+- 默认情况下，你最多可以为一个 TiDB Cloud 专属版集群创建 5 个 TiDB 节点组。如需更多节点组，请联系 [TiDB Cloud Support](/tidb-cloud/tidb-cloud-support.md)。
+- 每个 TiDB 节点组至少包含 1 个 TiDB 节点。虽然单个组的节点数量没有限制，但整个 TiDB Cloud 专属版集群的 TiDB 节点总数不能超过 150。
+- TiDB Cloud 会在 TiDB owner 节点上自动运行统计信息收集任务，该任务不受节点组边界影响，无法在单独的 TiDB 节点组内隔离。
+- 对于 v8.1.2 之前版本的 TiDB 集群，`ADD INDEX` 任务无法在单独的 TiDB 节点组内隔离。
 
-## SLA impact
+## SLA 影响
 
-According to TiDB Cloud [Service Level Agreement (SLA)](https://www.pingcap.com/legal/service-level-agreement-for-tidb-cloud-services/), the Monthly Uptime Percentage of TiDB Cloud Dedicated clusters with multiple TiDB nodes deployment can reach up to 99.99%. However, after introducing TiDB Node Group, if you create multiple TiDB Node Groups with only 1 TiDB node in each group, you will lose the high availability for the groups and your cluster's monthly uptime percentage will downgrade to a single TiDB node deployment model (namely, up to 99.9%).  
+根据 TiDB Cloud [服务等级协议 (SLA)](https://www.pingcap.com/legal/service-level-agreement-for-tidb-cloud-services/)，多 TiDB 节点部署的 TiDB Cloud 专属版集群的月可用性最高可达 99.99%。但在引入 TiDB 节点组后，如果你为每个 TiDB 节点组仅分配 1 个 TiDB 节点，则会失去各组的高可用性，集群的月可用性将降级为单 TiDB 节点部署模式（即最高 99.9%）。
 
-For high availability, it is recommended that you configure at least two TiDB nodes for each TiDB node group.
+为保证高可用性，建议你为每个 TiDB 节点组至少配置 2 个 TiDB 节点。

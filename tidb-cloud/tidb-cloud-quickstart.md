@@ -1,86 +1,86 @@
 ---
-title: TiDB Cloud Quick Start
-summary: Sign up quickly to try TiDB Cloud and create your TiDB cluster.
+title: TiDB Cloud 快速入门
+summary: 快速注册体验 TiDB Cloud 并创建你的 TiDB 集群。
 category: quick start
 ---
 
-# TiDB Cloud Quick Start
+# TiDB Cloud 快速入门
 
-*Estimated completion time: 20 minutes*
+*预计完成时间：20 分钟*
 
-This tutorial guides you through an easy way to get started with TiDB Cloud. You can also follow the step-by-step tutorials on the [**Getting Started**](https://tidbcloud.com/console/getting-started) page in the TiDB Cloud console.
+本教程将引导你以简单的方式快速上手 TiDB Cloud。
 
-Additionally, you can try out TiDB features on [TiDB Playground](https://play.tidbcloud.com/?utm_source=docs&utm_medium=tidb_cloud_quick_start).
+此外，你还可以在 [TiDB Playground](https://play.tidbcloud.com/?utm_source=docs&utm_medium=tidb_cloud_quick_start) 上体验 TiDB 的相关功能。
 
-## Step 1: Create a TiDB cluster
+## 第 1 步：创建 TiDB 集群
 
-[TiDB Cloud Serverless](/tidb-cloud/select-cluster-tier.md#tidb-cloud-serverless) is the best way to get started with TiDB Cloud. To create a TiDB Cloud Serverless cluster, follow these steps:
+[TiDB Cloud Serverless](/tidb-cloud/select-cluster-tier.md#tidb-cloud-serverless) 是体验 TiDB Cloud 的最佳方式。要创建 TiDB Cloud Serverless 集群，请按照以下步骤操作：
 
-1. If you do not have a TiDB Cloud account, click [here](https://tidbcloud.com/free-trial) to sign up.
+1. 如果你还没有 TiDB Cloud 账号，请点击[这里](https://tidbcloud.com/free-trial)注册。
 
-    You can sign up with your email and password to manage your password using TiDB Cloud, or choose to sign in with your Google, GitHub, or Microsoft account for single sign-on (SSO) to TiDB Cloud.
+    你可以使用邮箱和密码注册并通过 TiDB Cloud 管理密码，或者选择使用 Google、GitHub 或 Microsoft 账号进行单点登录（SSO）到 TiDB Cloud。
 
-2. [Log in](https://tidbcloud.com/) to your TiDB Cloud account.
+2. [登录](https://tidbcloud.com/)你的 TiDB Cloud 账号。
 
-    The [**Clusters**](https://tidbcloud.com/console/clusters) page is displayed by default.
+    默认会显示 [**Clusters**](https://tidbcloud.com/project/clusters) 页面。
 
-3. For new sign-up users, TiDB Cloud automatically creates a default TiDB Cloud Serverless cluster named `Cluster0` for you.
+3. 对于新注册用户，TiDB Cloud 会自动为你创建一个名为 `Cluster0` 的默认 TiDB Cloud Serverless 集群。
 
-    - To instantly try out TiDB Cloud features with this default cluster, proceed to [Step 2: Try AI-assisted SQL Editor](#step-2-try-ai-assisted-sql-editor).
-    - To create a new TiDB Cloud Serverless cluster on your own, follow these steps:
+    - 如果你想立即使用该默认集群体验 TiDB Cloud 的功能，请继续查看 [第 2 步：体验 AI 辅助 SQL 编辑器](#step-2-try-ai-assisted-sql-editor)。
+    - 如果你想自行创建新的 TiDB Cloud Serverless 集群，请按照以下步骤操作：
 
-        1. Click **Create Cluster**.
-        2. On the **Create Cluster** page, **Serverless** is selected by default. Select the target region for your cluster, update the default cluster name if necessary, select your [cluster plan](/tidb-cloud/select-cluster-tier.md#cluster-plans), and then click **Create**. Your TiDB Cloud Serverless cluster will be created in approximately 30 seconds.
+        1. 点击 **Create Cluster**。
+        2. 在 **Create Cluster** 页面，**Serverless** 会被默认选中。选择你的集群目标区域，如有需要可修改默认集群名称，选择你的 [集群方案](/tidb-cloud/select-cluster-tier.md#cluster-plans)，然后点击 **Create**。你的 TiDB Cloud Serverless 集群将在大约 30 秒内创建完成。
 
-## Step 2: Try AI-assisted SQL Editor
+## 第 2 步：体验 AI 辅助 SQL 编辑器
 
-You can use the built-in AI-assisted SQL Editor in the TiDB Cloud console to maximize your data value. This enables you to run SQL queries against databases without a local SQL client. You can intuitively view the query results in tables or charts and easily check the query logs.
+你可以在 TiDB Cloud 控制台中使用内置的 AI 辅助 SQL 编辑器，最大化数据价值。这样你无需本地 SQL 客户端即可对数据库运行 SQL 查询，并可直观地在表格或图表中查看查询结果，轻松查看查询日志。
 
-1. On the [**Clusters**](https://tidbcloud.com/console/clusters) page, click on a cluster name to go to its overview page, and then click **SQL Editor** in the left navigation pane.
+1. 在 [**Clusters**](https://tidbcloud.com/project/clusters) 页面，点击某个集群名称进入其概览页面，然后在左侧导航栏点击 **SQL Editor**。
 
-2. To try the AI capacity of TiDB Cloud, follow the on-screen instructions to allow PingCAP and OpenAI to use your code snippets for research and service improvement, and then click **Save and Get Started**.
+2. 若要体验 TiDB Cloud 的 AI 能力，请按照屏幕提示允许 PingCAP 和 AWS Bedrock 使用你的代码片段进行研究和服务改进，然后点击 **Save and Get Started**。
 
-3. In SQL Editor, press <kbd>⌘</kbd> + <kbd>I</kbd> on macOS (or <kbd>Control</kbd> + <kbd>I</kbd> on Windows or Linux) to instruct [Chat2Query (beta)](/tidb-cloud/tidb-cloud-glossary.md#chat2query) to generate SQL queries automatically.
+3. 在 SQL Editor 中，按下 macOS 的 <kbd>⌘</kbd> + <kbd>I</kbd>（或 Windows/Linux 的 <kbd>Control</kbd> + <kbd>I</kbd>），即可指示 [Chat2Query (beta)](/tidb-cloud/tidb-cloud-glossary.md#chat2query) 自动生成 SQL 查询。
 
-    For example, to create a new table `test.t` with two columns (column `id` and column `name`), you can type `use test;` to specify the database, press <kbd>⌘</kbd> + <kbd>I</kbd>, type `create a new table t with id and name` as the instruction, and then press **Enter** to let AI generate a SQL statement accordingly. 
-    
-    For the generated statement, you can accept it by clicking **Accept** and then further edit it if needed, or reject it by clicking **Discard**.
+    例如，若要创建一个包含两列（`id` 和 `name`）的新表 `test.t`，你可以输入 `use test;` 指定数据库，按下 <kbd>⌘</kbd> + <kbd>I</kbd>，输入 `create a new table t with id and name` 作为指令，然后按 **Enter**，让 AI 自动生成相应的 SQL 语句。
 
-    > **Note:**
+    对于生成的语句，你可以点击 **Accept** 接受并根据需要进一步编辑，或点击 **Discard** 拒绝。
+
+    > **注意：**
     >
-    > SQL queries generated by AI are not 100% accurate and might still require further tweaking.
+    > AI 生成的 SQL 查询并非 100% 准确，可能仍需进一步调整。
 
-4. Run the SQL queries.
+4. 运行 SQL 查询。
 
     <SimpleTab>
     <div label="macOS">
 
-    For macOS:
+    对于 macOS：
 
-    - If you have only one query in the editor, press **⌘ + Enter** or click <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.70001 20.7756C6.01949 20.3926 6.00029 19.5259 6.00034 19.0422L6.00034 12.1205L6 5.33028C6 4.75247 6.00052 3.92317 6.38613 3.44138C6.83044 2.88625 7.62614 2.98501 7.95335 3.05489C8.05144 3.07584 8.14194 3.12086 8.22438 3.17798L19.2865 10.8426C19.2955 10.8489 19.304 10.8549 19.3126 10.8617C19.4069 10.9362 20 11.4314 20 12.1205C20 12.7913 19.438 13.2784 19.3212 13.3725C19.307 13.3839 19.2983 13.3902 19.2831 13.4002C18.8096 13.7133 8.57995 20.4771 8.10002 20.7756C7.60871 21.0812 7.22013 21.0683 6.70001 20.7756Z" fill="currentColor"></path></svg>**Run** to execute it.
+    - 如果编辑器中只有一个查询，按下 **⌘ + Enter** 或点击 <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.70001 20.7756C6.01949 20.3926 6.00029 19.5259 6.00034 19.0422L6.00034 12.1205L6 5.33028C6 4.75247 6.00052 3.92317 6.38613 3.44138C6.83044 2.88625 7.62614 2.98501 7.95335 3.05489C8.05144 3.07584 8.14194 3.12086 8.22438 3.17798L19.2865 10.8426C19.2955 10.8489 19.304 10.8549 19.3126 10.8617C19.4069 10.9362 20 11.4314 20 12.1205C20 12.7913 19.438 13.2784 19.3212 13.3725C19.307 13.3839 19.2983 13.3902 19.2831 13.4002C18.8096 13.7133 8.57995 20.4771 8.10002 20.7756C7.60871 21.0812 7.22013 21.0683 6.70001 20.7756Z" fill="currentColor"></path></svg>**Run** 执行。
 
-    - If you have multiple queries in the editor, select the lines of the target queries with your cursor, and then press **⌘ + Enter** or click **Run** to execute them sequentially.
+    - 如果编辑器中有多个查询，使用光标选中目标查询的行，然后按 **⌘ + Enter** 或点击 **Run** 顺序执行它们。
 
-    - To run all queries in the editor sequentially, press **⇧ + ⌘ + Enter**, or select the lines of all queries with your cursor and click **Run**.
+    - 若要顺序执行编辑器中的所有查询，按 **⇧ + ⌘ + Enter**，或用光标选中所有查询的行后点击 **Run**。
 
     </div>
 
     <div label="Windows/Linux">
 
-    For Windows or Linux:
+    对于 Windows 或 Linux：
 
-    - If you have only one query in the editor, press **Ctrl + Enter** or click <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.70001 20.7756C6.01949 20.3926 6.00029 19.5259 6.00034 19.0422L6.00034 12.1205L6 5.33028C6 4.75247 6.00052 3.92317 6.38613 3.44138C6.83044 2.88625 7.62614 2.98501 7.95335 3.05489C8.05144 3.07584 8.14194 3.12086 8.22438 3.17798L19.2865 10.8426C19.2955 10.8489 19.304 10.8549 19.3126 10.8617C19.4069 10.9362 20 11.4314 20 12.1205C20 12.7913 19.438 13.2784 19.3212 13.3725C19.307 13.3839 19.2983 13.3902 19.2831 13.4002C18.8096 13.7133 8.57995 20.4771 8.10002 20.7756C7.60871 21.0812 7.22013 21.0683 6.70001 20.7756Z" fill="currentColor"></path></svg>**Run** to execute it.
+    - 如果编辑器中只有一个查询，按下 **Ctrl + Enter** 或点击 <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.70001 20.7756C6.01949 20.3926 6.00029 19.5259 6.00034 19.0422L6.00034 12.1205L6 5.33028C6 4.75247 6.00052 3.92317 6.38613 3.44138C6.83044 2.88625 7.62614 2.98501 7.95335 3.05489C8.05144 3.07584 8.14194 3.12086 8.22438 3.17798L19.2865 10.8426C19.2955 10.8489 19.304 10.8549 19.3126 10.8617C19.4069 10.9362 20 11.4314 20 12.1205C20 12.7913 19.438 13.2784 19.3212 13.3725C19.307 13.3839 19.2983 13.3902 19.2831 13.4002C18.8096 13.7133 8.57995 20.4771 8.10002 20.7756C7.60871 21.0812 7.22013 21.0683 6.70001 20.7756Z" fill="currentColor"></path></svg>**Run** 执行。
 
-    - If you have multiple queries in the editor, select the lines of the target queries with your cursor, and then press **Ctrl + Enter** or click **Run** to execute them sequentially.
+    - 如果编辑器中有多个查询，使用光标选中目标查询的行，然后按 **Ctrl + Enter** 或点击 **Run** 顺序执行它们。
 
-    - To run all queries in the editor sequentially, press **Shift + Ctrl + Enter**, or select the lines of all queries with your cursor and click **Run**.
+    - 若要顺序执行编辑器中的所有查询，按 **Shift + Ctrl + Enter**，或用光标选中所有查询的行后点击 **Run**。
 
     </div>
     </SimpleTab>
 
-After running the queries, you can immediately see the query logs and results at the bottom of the page. 
+运行查询后，你可以在页面底部立即看到查询日志和结果。
 
-To let AI generate more SQL statements, you can type more instructions as shown in the following example:
+如果想让 AI 生成更多 SQL 语句，可以像下面的示例一样输入更多指令：
 
 ```sql
 use test;
@@ -105,18 +105,18 @@ FROM
   `t`;
 ```
 
-## Step 3: Try interactive tutorials
+## 第 3 步：体验交互式教程
 
-TiDB Cloud offers interactive tutorials with carefully crafted sample datasets to help you quickly get started with TiDB Cloud. You can try these tutorials to learn how to use TiDB Cloud for high-performance data analytics.
+TiDB Cloud 提供了配套示例数据集的交互式教程，帮助你快速上手 TiDB Cloud。你可以通过这些教程学习如何使用 TiDB Cloud 进行高性能数据分析。
 
-1. Click on the **?** icon in the lower-right corner of the console and select **Interactive Tutorials**.
-2. In the tutorials list, select a tutorial card to start, such as **Steam Game Stats**.
-3. Choose a TiDB Cloud Serverless cluster that you want to use for the tutorial, and click **Import Dataset**. The import process might take approximately one minute.
-4. Once the sample data is imported, follow the on-screen instructions to complete the tutorial.
+1. 点击控制台右下角的 **?** 图标，选择 **Interactive Tutorials**。
+2. 在教程列表中，选择一个教程卡片开始，例如 **Steam Game Stats**。
+3. 选择你想用于本教程的 TiDB Cloud Serverless 集群，点击 **Import Dataset**。导入过程大约需要 1 分钟。
+4. 示例数据导入完成后，按照屏幕提示完成教程。
 
-## What's next
+## 后续操作
 
-- To learn how to connect to your cluster using different methods, see [Connect to a TiDB Cloud Serverless cluster](/tidb-cloud/connect-to-tidb-cluster-serverless.md).
-- For more information about how to use SQL Editor and Chat2Query to explore your data, see [Explore your data with AI-assisted SQL Editor](/tidb-cloud/explore-data-with-chat2query.md).
-- For TiDB SQL usage, see [Explore SQL with TiDB](/basic-sql-operations.md).
-- For production use with the benefits of cross-zone high availability, horizontal scaling, and [HTAP](https://en.wikipedia.org/wiki/Hybrid_transactional/analytical_processing), see [Create a TiDB Cloud Dedicated cluster](/tidb-cloud/create-tidb-cluster.md).
+- 了解如何通过不同方式连接到你的集群，请参见 [连接到 TiDB Cloud Serverless 集群](/tidb-cloud/connect-to-tidb-cluster-serverless.md)。
+- 获取更多关于如何使用 SQL Editor 和 Chat2Query 探索数据的信息，请参见 [使用 AI 辅助 SQL 编辑器探索数据](/tidb-cloud/explore-data-with-chat2query.md)。
+- 了解 TiDB SQL 的用法，请参见 [使用 TiDB 探索 SQL](/basic-sql-operations.md)。
+- 若需生产环境下具备跨可用区高可用、水平扩展和 [HTAP](https://en.wikipedia.org/wiki/Hybrid_transactional/analytical_processing) 优势的能力，请参见 [创建 TiDB Cloud 专属集群](/tidb-cloud/create-tidb-cluster.md)。

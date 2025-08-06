@@ -1,61 +1,61 @@
 ---
-title: Import CSV Files from Amazon S3, GCS, Azure Blob Storage, or Alibaba Cloud OSS into TiDB Cloud Serverless
-summary: Learn how to import CSV files from Amazon S3, GCS, Azure Blob Storage, or Alibaba Cloud Object Storage Service (OSS) into TiDB Cloud Serverless.
+title: 将 CSV 文件从 Amazon S3、GCS、Azure Blob Storage 或阿里云 OSS 导入 TiDB Cloud Serverless
+summary: 了解如何将 CSV 文件从 Amazon S3、GCS、Azure Blob Storage 或阿里云对象存储服务（OSS）导入 TiDB Cloud Serverless。
 ---
 
-# Import CSV Files from Amazon S3, GCS, Azure Blob Storage, or Alibaba Cloud OSS into TiDB Cloud Serverless
+# 将 CSV 文件从 Amazon S3、GCS、Azure Blob Storage 或阿里云 OSS 导入 TiDB Cloud Serverless
 
-This document describes how to import CSV files from Amazon Simple Storage Service (Amazon S3), Google Cloud Storage (GCS), Azure Blob Storage, or Alibaba Cloud Object Storage Service (OSS) into TiDB Cloud Serverless.
+本文档介绍如何将 CSV 文件从 Amazon Simple Storage Service（Amazon S3）、Google Cloud Storage（GCS）、Azure Blob Storage 或阿里云对象存储服务（OSS）导入 TiDB Cloud Serverless。
 
-## Limitations
+## 限制
 
-- To ensure data consistency, TiDB Cloud Serverless allows to import CSV files into empty tables only. To import data into an existing table that already contains data, you can use TiDB Cloud Serverless to import the data into a temporary empty table by following this document, and then use the `INSERT SELECT` statement to copy the data to the target existing table.
+- 为保证数据一致性，TiDB Cloud Serverless 仅允许将 CSV 文件导入到空表中。若需将数据导入已存在且包含数据的表，可以按照本文档的步骤，先将数据导入一个临时空表，然后使用 `INSERT SELECT` 语句将数据复制到目标表中。
 
-## Step 1. Prepare the CSV files
+## 第 1 步：准备 CSV 文件
 
-1. If a CSV file is larger than 256 MB, consider splitting it into smaller files, each with a size around 256 MB.
+1. 如果单个 CSV 文件大于 256 MB，建议将其拆分为多个小文件，每个文件大小约为 256 MB。
 
-    TiDB Cloud Serverless supports importing very large CSV files but performs best with multiple input files around 256 MB in size. This is because TiDB Cloud Serverless can process multiple files in parallel, which can greatly improve the import speed.
+    TiDB Cloud Serverless 支持导入超大 CSV 文件，但在多个约 256 MB 的输入文件时性能最佳。这是因为 TiDB Cloud Serverless 能并行处理多个文件，从而大幅提升导入速度。
 
-2. Name the CSV files as follows:
+2. 按如下方式命名 CSV 文件：
 
-    - If a CSV file contains all data of an entire table, name the file in the `${db_name}.${table_name}.csv` format, which maps to the `${db_name}.${table_name}` table when you import the data.
-    - If the data of one table is separated into multiple CSV files, append a numeric suffix to these CSV files. For example, `${db_name}.${table_name}.000001.csv` and `${db_name}.${table_name}.000002.csv`. The numeric suffixes can be inconsecutive but must be in ascending order. You also need to add extra zeros before the number to ensure all the suffixes are in the same length.
-    - TiDB Cloud Serverless supports importing compressed files in the following formats: `.gzip`, `.gz`, `.zstd`, `.zst` and `.snappy`. If you want to import compressed CSV files, name the files in the `${db_name}.${table_name}.${suffix}.csv.${compress}` format, in which `${suffix}` is optional and can be any integer such as '000001'. For example, if you want to import the `trips.000001.csv.gz` file to the `bikeshare.trips` table, you need to rename the file as `bikeshare.trips.000001.csv.gz`.
+    - 如果一个 CSV 文件包含整个表的所有数据，文件名应采用 `${db_name}.${table_name}.csv` 格式，导入时会映射到 `${db_name}.${table_name}` 表。
+    - 如果一个表的数据被拆分为多个 CSV 文件，应在这些文件名后添加数字后缀。例如，`${db_name}.${table_name}.000001.csv` 和 `${db_name}.${table_name}.000002.csv`。数字后缀可以不连续，但必须递增，并且需要在数字前补零，保证所有后缀长度一致。
+    - TiDB Cloud Serverless 支持导入以下格式的压缩文件：`.gzip`、`.gz`、`.zstd`、`.zst` 和 `.snappy`。如需导入压缩的 CSV 文件，文件名应采用 `${db_name}.${table_name}.${suffix}.csv.${compress}` 格式，其中 `${suffix}` 可选，可以是任意整数如 '000001'。例如，若需将 `trips.000001.csv.gz` 文件导入 `bikeshare.trips` 表，需要将文件重命名为 `bikeshare.trips.000001.csv.gz`。
 
-    > **Note:**
+    > **注意：**
     >
-    > - To achieve better performance, it is recommended to limit the size of each compressed file to 100 MiB.
-    > - The Snappy compressed file must be in the [official Snappy format](https://github.com/google/snappy). Other variants of Snappy compression are not supported.
-    > - For uncompressed files, if you cannot update the CSV filenames according to the preceding rules in some cases (for example, the CSV file links are also used by your other programs), you can keep the filenames unchanged and use the **Mapping Settings** in [Step 4](#step-4-import-csv-files-to-tidb-cloud-serverless) to import your source data to a single target table.
+    > - 为获得更佳性能，建议每个压缩文件大小不超过 100 MiB。
+    > - Snappy 压缩文件必须为 [官方 Snappy 格式](https://github.com/google/snappy)。不支持其他 Snappy 压缩变体。
+    > - 对于未压缩文件，如果在某些场景下无法按上述规则修改 CSV 文件名（例如，CSV 文件链接也被其他程序使用），可以保持文件名不变，并在 [第 4 步](#step-4-import-csv-files) 的 **Mapping Settings** 中将源数据导入到单一目标表。
 
-## Step 2. Create the target table schemas
+## 第 2 步：创建目标表结构
 
-Because CSV files do not contain schema information, before importing data from CSV files into TiDB Cloud Serverless, you need to create the table schemas using either of the following methods:
+由于 CSV 文件不包含表结构信息，在将 CSV 文件数据导入 TiDB Cloud Serverless 前，需要通过以下任一方式创建表结构：
 
-- Method 1: In TiDB Cloud Serverless, create the target databases and tables for your source data.
+- 方法一：在 TiDB Cloud Serverless 中，为源数据创建目标数据库和数据表。
 
-- Method 2: In the Amazon S3, GCS, Azure Blob Storage, or Alibaba Cloud Object Storage Service directory where the CSV files are located, create the target table schema files for your source data as follows:
+- 方法二：在存放 CSV 文件的 Amazon S3、GCS、Azure Blob Storage 或阿里云对象存储服务目录下，为源数据创建目标表结构文件：
 
-    1. Create database schema files for your source data.
+    1. 为源数据创建数据库结构文件。
 
-        If your CSV files follow the naming rules in [Step 1](#step-1-prepare-the-csv-files), the database schema files are optional for the data import. Otherwise, the database schema files are mandatory.
+        如果你的 CSV 文件遵循 [第 1 步](#step-1-prepare-the-csv-files) 的命名规则，则数据库结构文件为可选，否则为必需。
 
-        Each database schema file must be in the `${db_name}-schema-create.sql` format and contain a `CREATE DATABASE` DDL statement. With this file, TiDB Cloud Serverless will create the `${db_name}` database to store your data when you import the data.
+        每个数据库结构文件必须采用 `${db_name}-schema-create.sql` 格式，并包含一个 `CREATE DATABASE` DDL 语句。通过该文件，TiDB Cloud Serverless 会在导入数据时创建 `${db_name}` 数据库以存储数据。
 
-        For example, if you create a `mydb-scehma-create.sql` file that contains the following statement, TiDB Cloud Serverless will create the `mydb` database when you import the data.
+        例如，若你创建了一个包含如下语句的 `mydb-scehma-create.sql` 文件，TiDB Cloud Serverless 会在导入数据时创建 `mydb` 数据库。
 
         ```sql
         CREATE DATABASE mydb;
         ```
 
-    2. Create table schema files for your source data.
+    2. 为源数据创建数据表结构文件。
 
-        If you do not include the table schema files in the Amazon S3, GCS, Azure Blob Storage, or Alibaba Cloud Object Storage Service directory where the CSV files are located, TiDB Cloud Serverless will not create the corresponding tables for you when you import the data.
+        如果你未在存放 CSV 文件的 Amazon S3、GCS、Azure Blob Storage 或阿里云对象存储服务目录下包含表结构文件，TiDB Cloud Serverless 在导入数据时不会为你创建对应的数据表。
 
-        Each table schema file must be in the `${db_name}.${table_name}-schema.sql` format and contain a `CREATE TABLE` DDL statement. With this file, TiDB Cloud Serverless will create the `${db_table}` table in the `${db_name}` database when you import the data.
+        每个表结构文件必须采用 `${db_name}.${table_name}-schema.sql` 格式，并包含一个 `CREATE TABLE` DDL 语句。通过该文件，TiDB Cloud Serverless 会在导入数据时于 `${db_name}` 数据库中创建 `${db_table}` 表。
 
-        For example, if you create a `mydb.mytable-schema.sql` file that contains the following statement, TiDB Cloud Serverless will create the `mytable` table in the `mydb` database when you import the data.
+        例如，若你创建了一个包含如下语句的 `mydb.mytable-schema.sql` 文件，TiDB Cloud Serverless 会在导入数据时于 `mydb` 数据库中创建 `mytable` 表。
 
         ```sql
         CREATE TABLE mytable (
@@ -64,250 +64,254 @@ Because CSV files do not contain schema information, before importing data from 
         COUNT INT );
         ```
 
-        > **Note:**
+        > **注意：**
         >
-        > Each `${db_name}.${table_name}-schema.sql` file should only contain a single DDL statement. If the file contains multiple DDL statements, only the first one takes effect.
+        > 每个 `${db_name}.${table_name}-schema.sql` 文件只能包含一个 DDL 语句。如果文件中有多个 DDL 语句，仅第一个生效。
 
-## Step 3. Configure cross-account access
+## 第 3 步：配置跨账号访问
 
-To allow TiDB Cloud Serverless to access the CSV files in the Amazon S3, GCS, Azure Blob Storage, or Alibaba Cloud Object Storage Service bucket, do one of the following:
+为使 TiDB Cloud Serverless 能访问 Amazon S3、GCS、Azure Blob Storage 或阿里云对象存储服务桶中的 CSV 文件，请按以下方式操作：
 
-- If your CSV files are located in Amazon S3, [configure external storage access for TiDB Cloud Serverless](/tidb-cloud/serverless-external-storage.md#configure-amazon-s3-access).
+- 如果你的 CSV 文件位于 Amazon S3，[为 TiDB Cloud Serverless 配置外部存储访问](/tidb-cloud/serverless-external-storage.md#configure-amazon-s3-access)。
 
-    You can use either an AWS access key or a Role ARN to access your bucket. Once finished, make a note of the access key (including the access key ID and secret access key) or the Role ARN value as you will need it in [Step 4](#step-4-import-csv-files-to-tidb-cloud-serverless).
+    你可以使用 AWS 访问密钥或 Role ARN 访问桶。配置完成后，请记录访问密钥（包括访问密钥 ID 和密钥）或 Role ARN 值，后续在 [第 4 步](#step-4-import-csv-files) 中会用到。
 
-- If your CSV files are located in GCS, [configure external storage access for TiDB Cloud Serverless](/tidb-cloud/serverless-external-storage.md#configure-gcs-access).
+- 如果你的 CSV 文件位于 GCS，[为 TiDB Cloud Serverless 配置外部存储访问](/tidb-cloud/serverless-external-storage.md#configure-gcs-access)。
 
-- If your CSV files are located in Azure Blob Storage, [configure external storage access for TiDB Cloud Serverless](/tidb-cloud/serverless-external-storage.md#configure-azure-blob-storage-access).
+- 如果你的 CSV 文件位于 Azure Blob Storage，[为 TiDB Cloud Serverless 配置外部存储访问](/tidb-cloud/serverless-external-storage.md#configure-azure-blob-storage-access)。
 
-- If your CSV files are located in Alibaba Cloud Object Storage Service (OSS), [configure external storage access for TiDB Cloud Serverless](/tidb-cloud/serverless-external-storage.md#configure-alibaba-cloud-object-storage-service-oss-access).
+- 如果你的 CSV 文件位于阿里云对象存储服务（OSS），[为 TiDB Cloud Serverless 配置外部存储访问](/tidb-cloud/serverless-external-storage.md#configure-alibaba-cloud-object-storage-service-oss-access)。
 
-## Step 4. Import CSV files to TiDB Cloud Serverless
+## 第 4 步：导入 CSV 文件
 
-To import the CSV files to TiDB Cloud Serverless, take the following steps:
+要将 CSV 文件导入 TiDB Cloud Serverless，请按以下步骤操作：
 
 <SimpleTab>
 <div label="Amazon S3">
 
-1. Open the **Import** page for your target cluster.
+1. 打开目标集群的 **Import** 页面。
 
-    1. Log in to the [TiDB Cloud console](https://tidbcloud.com/) and navigate to the [**Clusters**](https://tidbcloud.com/project/clusters) page of your project.
+    1. 登录 [TiDB Cloud 控制台](https://tidbcloud.com/)，进入项目的 [**Clusters**](https://tidbcloud.com/project/clusters) 页面。
 
-        > **Tip:**
+        > **提示：**
         >
-        > You can use the combo box in the upper-left corner to switch between organizations, projects, and clusters.
+        > 你可以使用左上角的下拉框切换组织、项目和集群。
 
-    2. Click the name of your target cluster to go to its overview page, and then click **Data** > **Import** in the left navigation pane.
+    2. 点击目标集群名称进入概览页，然后在左侧导航栏点击 **Data** > **Import**。
 
-2. Select **Import data from Cloud Storage**, and then click **Amazon S3**.
+2. 点击 **Import data from Cloud Storage**。
 
-3. On the **Import Data from Amazon S3** page, provide the following information for the source CSV files:
+3. 在 **Import Data from Cloud Storage** 页面，填写以下信息：
 
-    - **Import File Count**: select **One file** or **Multiple files** as needed.
-    - **Included Schema Files**: this field is only visible when importing multiple files. If the source folder contains the target table schemas, select **Yes**. Otherwise, select **No**.
-    - **Data Format**: select **CSV**.
-    - **File URI** or **Folder URI**:
-        - When importing one file, enter the source file URI and name in the following format `s3://[bucket_name]/[data_source_folder]/[file_name].csv`. For example, `s3://sampledata/ingest/TableName.01.csv`.
-        - When importing multiple files, enter the source file URI and name in the following format `s3://[bucket_name]/[data_source_folder]/`. For example, `s3://sampledata/ingest/`.
-    - **Bucket Access**: you can use either an AWS Role ARN or an AWS access key to access your bucket. For more information, see [Configure Amazon S3 access](/tidb-cloud/serverless-external-storage.md#configure-amazon-s3-access).
-        - **AWS Role ARN**: enter the AWS Role ARN value.
-        - **AWS Access Key**: enter the AWS access key ID and AWS secret access key.
+    - **Storage Provider**：选择 **Amazon S3**。
+    - **Source Files URI**：
+        - 导入单个文件时，输入源文件 URI，格式为 `s3://[bucket_name]/[data_source_folder]/[file_name].csv`。例如：`s3://sampledata/ingest/TableName.01.csv`。
+        - 导入多个文件时，输入源文件夹 URI，格式为 `s3://[bucket_name]/[data_source_folder]/`。例如：`s3://sampledata/ingest/`。
+    - **Credential**：你可以使用 AWS Role ARN 或 AWS 访问密钥访问桶。详情参见 [Configure Amazon S3 access](/tidb-cloud/serverless-external-storage.md#configure-amazon-s3-access)。
+        - **AWS Role ARN**：输入 AWS Role ARN 值。
+        - **AWS Access Key**：输入 AWS 访问密钥 ID 和 AWS 密钥。
 
-4. Click **Connect**.
+4. 点击 **Next**。
 
-5. In the **Destination** section, select the target database and table.
+5. 在 **Destination Mapping** 部分，指定源文件与目标表的映射方式。
 
-    When importing multiple files, you can use **Advanced Settings** > **Mapping Settings** to define a custom mapping rule for each target table and its corresponding CSV file. After that, the data source files will be re-scanned using the provided custom mapping rule.
+    当 **Source Files URI** 指定为目录时，**Use [File naming conventions](/tidb-cloud/naming-conventions-for-data-import.md) for automatic mapping** 选项默认被选中。
 
-    When you enter the source file URI and name in **Source File URIs and Names**, make sure it is in the following format `s3://[bucket_name]/[data_source_folder]/[file_name].csv`. For example, `s3://sampledata/ingest/TableName.01.csv`.
-
-    You can also use wildcards to match the source files. For example:
-
-    - `s3://[bucket_name]/[data_source_folder]/my-data?.csv`: all CSV files starting with `my-data` followed by one character (such as `my-data1.csv` and `my-data2.csv`) in that folder will be imported into the same target table.
-
-    - `s3://[bucket_name]/[data_source_folder]/my-data*.csv`: all CSV files in the folder starting with `my-data` will be imported into the same target table.
-
-    Note that only `?` and `*` are supported.
-
-    > **Note:**
+    > **注意：**
     >
-    > The URI must contain the data source folder.
+    > 当 **Source Files URI** 指定为单个文件时，不显示 **Use [File naming conventions](/tidb-cloud/naming-conventions-for-data-import.md) for automatic mapping** 选项，TiDB Cloud 会自动将 **Source** 字段填充为文件名。此时你只需选择目标数据库和表进行数据导入。
 
-6. Click **Start Import**.
+    - 若希望 TiDB Cloud 自动将所有遵循 [File naming conventions](/tidb-cloud/naming-conventions-for-data-import.md) 的源文件映射到对应表，保持该选项选中，并选择 **CSV** 作为数据格式。
 
-7. When the import progress shows **Completed**, check the imported tables.
+    - 若需手动配置映射规则，将源 CSV 文件关联到目标数据库和表，取消选中该选项，然后填写以下字段：
+
+        - **Source**：输入文件名模式，格式为 `[file_name].csv`。例如：`TableName.01.csv`。你也可以使用通配符匹配多个文件，仅支持 `*` 和 `?` 通配符。
+
+            - `my-data?.csv`：匹配所有以 `my-data` 开头，后跟单个字符的 CSV 文件，如 `my-data1.csv` 和 `my-data2.csv`。
+            - `my-data*.csv`：匹配所有以 `my-data` 开头的 CSV 文件，如 `my-data-2023.csv` 和 `my-data-final.csv`。
+
+        - **Target Database** 和 **Target Table**：选择要导入数据的目标数据库和表。
+
+6. 点击 **Next**。TiDB Cloud 会相应扫描源文件。
+
+7. 审核扫描结果，检查找到的数据文件及对应目标表，然后点击 **Start Import**。
+
+8. 当导入进度显示 **Completed** 时，检查已导入的表。
 
 </div>
 
 <div label="Google Cloud">
 
-1. Open the **Import** page for your target cluster.
+1. 打开目标集群的 **Import** 页面。
 
-    1. Log in to the [TiDB Cloud console](https://tidbcloud.com/) and navigate to the [**Clusters**](https://tidbcloud.com/project/clusters) page of your project.
+    1. 登录 [TiDB Cloud 控制台](https://tidbcloud.com/)，进入项目的 [**Clusters**](https://tidbcloud.com/project/clusters) 页面。
 
-        > **Tip:**
+        > **提示：**
         >
-        > You can use the combo box in the upper-left corner to switch between organizations, projects, and clusters.
+        > 你可以使用左上角的下拉框切换组织、项目和集群。
 
-    2. Click the name of your target cluster to go to its overview page, and then click **Data** > **Import** in the left navigation pane.
+    2. 点击目标集群名称进入概览页，然后在左侧导航栏点击 **Data** > **Import**。
 
-2. Select **Import data from Cloud Storage**, and then click **Google Cloud Storage**.
+2. 点击 **Import data from Cloud Storage**。
 
-3. On the **Import Data from Google Cloud Storage** page, provide the following information for the source CSV files:
+3. 在 **Import Data from Cloud Storage** 页面，填写以下信息：
 
-    - **Import File Count**: select **One file** or **Multiple files** as needed.
-    - **Included Schema Files**: this field is only visible when importing multiple files. If the source folder contains the target table schemas, select **Yes**. Otherwise, select **No**.
-    - **Data Format**: select **CSV**.
-    - **File URI** or **Folder URI**:
-        - When importing one file, enter the source file URI and name in the following format `[gcs|gs]://[bucket_name]/[data_source_folder]/[file_name].csv`. For example, `[gcs|gs]://sampledata/ingest/TableName.01.csv`.
-        - When importing multiple files, enter the source file URI and name in the following format `[gcs|gs]://[bucket_name]/[data_source_folder]/`. For example, `[gcs|gs]://sampledata/ingest/`.
-    - **Bucket Access**: you can use a service account key to access your bucket. For more information, see [Configure GCS access](/tidb-cloud/serverless-external-storage.md#configure-gcs-access).
+    - **Storage Provider**：选择 **Google Cloud Storage**。
+    - **Source Files URI**：
+        - 导入单个文件时，输入源文件 URI，格式为 `[gcs|gs]://[bucket_name]/[data_source_folder]/[file_name].csv`。例如：`[gcs|gs]://sampledata/ingest/TableName.01.csv`。
+        - 导入多个文件时，输入源文件夹 URI，格式为 `[gcs|gs]://[bucket_name]/[data_source_folder]/`。例如：`[gcs|gs]://sampledata/ingest/`。
+    - **Credential**：你可以使用 GCS IAM Role Service Account key 访问桶。详情参见 [Configure GCS access](/tidb-cloud/serverless-external-storage.md#configure-gcs-access)。
 
-4. Click **Connect**.
+4. 点击 **Next**。
 
-5. In the **Destination** section, select the target database and table.
+5. 在 **Destination Mapping** 部分，指定源文件与目标表的映射方式。
 
-    When importing multiple files, you can use **Advanced Settings** > **Mapping Settings** to define a custom mapping rule for each target table and its corresponding CSV file. After that, the data source files will be re-scanned using the provided custom mapping rule.
+    当 **Source Files URI** 指定为目录时，**Use [File naming conventions](/tidb-cloud/naming-conventions-for-data-import.md) for automatic mapping** 选项默认被选中。
 
-    When you enter the source file URI and name in **Source File URIs and Names**, make sure it is in the following format `[gcs|gs]://[bucket_name]/[data_source_folder]/[file_name].csv`. For example, `[gcs|gs]://sampledata/ingest/TableName.01.csv`.
-
-    You can also use wildcards to match the source files. For example:
-
-    - `[gcs|gs]://[bucket_name]/[data_source_folder]/my-data?.csv`: all CSV files starting with `my-data` followed by one character (such as `my-data1.csv` and `my-data2.csv`) in that folder will be imported into the same target table.
-
-    - `[gcs|gs]://[bucket_name]/[data_source_folder]/my-data*.csv`: all CSV files in the folder starting with `my-data` will be imported into the same target table.
-
-    Note that only `?` and `*` are supported.
-
-    > **Note:**
+    > **注意：**
     >
-    > The URI must contain the data source folder.
+    > 当 **Source Files URI** 指定为单个文件时，不显示 **Use [File naming conventions](/tidb-cloud/naming-conventions-for-data-import.md) for automatic mapping** 选项，TiDB Cloud 会自动将 **Source** 字段填充为文件名。此时你只需选择目标数据库和表进行数据导入。
 
-6. Click **Start Import**.
+    - 若希望 TiDB Cloud 自动将所有遵循 [File naming conventions](/tidb-cloud/naming-conventions-for-data-import.md) 的源文件映射到对应表，保持该选项选中，并选择 **CSV** 作为数据格式。
 
-7. When the import progress shows **Completed**, check the imported tables.
+    - 若需手动配置映射规则，将源 CSV 文件关联到目标数据库和表，取消选中该选项，然后填写以下字段：
+
+        - **Source**：输入文件名模式，格式为 `[file_name].csv`。例如：`TableName.01.csv`。你也可以使用通配符匹配多个文件，仅支持 `*` 和 `?` 通配符。
+
+            - `my-data?.csv`：匹配所有以 `my-data` 开头，后跟单个字符的 CSV 文件，如 `my-data1.csv` 和 `my-data2.csv`。
+            - `my-data*.csv`：匹配所有以 `my-data` 开头的 CSV 文件，如 `my-data-2023.csv` 和 `my-data-final.csv`。
+
+        - **Target Database** 和 **Target Table**：选择要导入数据的目标数据库和表。
+
+6. 点击 **Next**。TiDB Cloud 会相应扫描源文件。
+
+7. 审核扫描结果，检查找到的数据文件及对应目标表，然后点击 **Start Import**。
+
+8. 当导入进度显示 **Completed** 时，检查已导入的表。
 
 </div>
 
 <div label="Azure Blob Storage">
 
-1. Open the **Import** page for your target cluster.
+1. 打开目标集群的 **Import** 页面。
 
-    1. Log in to the [TiDB Cloud console](https://tidbcloud.com/) and navigate to the [**Clusters**](https://tidbcloud.com/project/clusters) page of your project.
+    1. 登录 [TiDB Cloud 控制台](https://tidbcloud.com/)，进入项目的 [**Clusters**](https://tidbcloud.com/project/clusters) 页面。
 
-        > **Tip:**
+        > **提示：**
         >
-        > You can use the combo box in the upper-left corner to switch between organizations, projects, and clusters.
+        > 你可以使用左上角的下拉框切换组织、项目和集群。
 
-    2. Click the name of your target cluster to go to its overview page, and then click **Data** > **Import** in the left navigation pane.
+    2. 点击目标集群名称进入概览页，然后在左侧导航栏点击 **Data** > **Import**。
 
-2. Select **Import data from Cloud Storage**, and then click **Azure Blob Storage**.
+2. 点击 **Import data from Cloud Storage**。
 
-3. On the **Import Data from Azure Blob Storage** page, provide the following information for the source CSV files:
+3. 在 **Import Data from Cloud Storage** 页面，填写以下信息：
 
-    - **Import File Count**: select **One file** or **Multiple files** as needed.
-    - **Included Schema Files**: this field is only visible when importing multiple files. If the source folder contains the target table schemas, select **Yes**. Otherwise, select **No**.
-    - **Data Format**: select **CSV**.
-    - **File URI** or **Folder URI**:
-        - When importing one file, enter the source file URI and name in the following format `[azure|https]://[bucket_name]/[data_source_folder]/[file_name].csv`. For example, `[azure|https]://sampledata/ingest/TableName.01.csv`.
-        - When importing multiple files, enter the source file URI and name in the following format `[azure|https]://[bucket_name]/[data_source_folder]/`. For example, `[azure|https]://sampledata/ingest/`.
-    - **Bucket Access**: you can use a shared access signature (SAS) token to access your bucket. For more information, see [Configure Azure Blob Storage access](/tidb-cloud/serverless-external-storage.md#configure-azure-blob-storage-access).
+    - **Storage Provider**：选择 **Azure Blob Storage**。
+    - **Source Files URI**：
+        - 导入单个文件时，输入源文件 URI，格式为 `[azure|https]://[bucket_name]/[data_source_folder]/[file_name].csv`。例如：`[azure|https]://sampledata/ingest/TableName.01.csv`。
+        - 导入多个文件时，输入源文件夹 URI，格式为 `[azure|https]://[bucket_name]/[data_source_folder]/`。例如：`[azure|https]://sampledata/ingest/`。
+    - **Credential**：你可以使用共享访问签名（SAS）令牌访问桶。详情参见 [Configure Azure Blob Storage access](/tidb-cloud/serverless-external-storage.md#configure-azure-blob-storage-access)。
 
-4. Click **Connect**.
+4. 点击 **Next**。
 
-5. In the **Destination** section, select the target database and table.
+5. 在 **Destination Mapping** 部分，指定源文件与目标表的映射方式。
 
-    When importing multiple files, you can use **Advanced Settings** > **Mapping Settings** to define a custom mapping rule for each target table and its corresponding CSV file. After that, the data source files will be re-scanned using the provided custom mapping rule.
+    当 **Source Files URI** 指定为目录时，**Use [File naming conventions](/tidb-cloud/naming-conventions-for-data-import.md) for automatic mapping** 选项默认被选中。
 
-    When you enter the source file URI and name in **Source File URIs and Names**, make sure it is in the following format `[azure|https]://[bucket_name]/[data_source_folder]/[file_name].csv`. For example, `[azure|https]://sampledata/ingest/TableName.01.csv`.
-
-    You can also use wildcards to match the source files. For example:
-
-    - `[azure|https]://[bucket_name]/[data_source_folder]/my-data?.csv`: all CSV files starting with `my-data` followed by one character (such as `my-data1.csv` and `my-data2.csv`) in that folder will be imported into the same target table.
-
-    - `[azure|https]://[bucket_name]/[data_source_folder]/my-data*.csv`: all CSV files in the folder starting with `my-data` will be imported into the same target table.
-
-    Note that only `?` and `*` are supported.
-
-    > **Note:**
+    > **注意：**
     >
-    > The URI must contain the data source folder.
+    > 当 **Source Files URI** 指定为单个文件时，不显示 **Use [File naming conventions](/tidb-cloud/naming-conventions-for-data-import.md) for automatic mapping** 选项，TiDB Cloud 会自动将 **Source** 字段填充为文件名。此时你只需选择目标数据库和表进行数据导入。
 
-6. Click **Start Import**.
+    - 若希望 TiDB Cloud 自动将所有遵循 [File naming conventions](/tidb-cloud/naming-conventions-for-data-import.md) 的源文件映射到对应表，保持该选项选中，并选择 **CSV** 作为数据格式。
 
-7. When the import progress shows **Completed**, check the imported tables.
+    - 若需手动配置映射规则，将源 CSV 文件关联到目标数据库和表，取消选中该选项，然后填写以下字段：
+
+        - **Source**：输入文件名模式，格式为 `[file_name].csv`。例如：`TableName.01.csv`。你也可以使用通配符匹配多个文件，仅支持 `*` 和 `?` 通配符。
+
+            - `my-data?.csv`：匹配所有以 `my-data` 开头，后跟单个字符的 CSV 文件，如 `my-data1.csv` 和 `my-data2.csv`。
+            - `my-data*.csv`：匹配所有以 `my-data` 开头的 CSV 文件，如 `my-data-2023.csv` 和 `my-data-final.csv`。
+
+        - **Target Database** 和 **Target Table**：选择要导入数据的目标数据库和表。
+
+6. 点击 **Next**。TiDB Cloud 会相应扫描源文件。
+
+7. 审核扫描结果，检查找到的数据文件及对应目标表，然后点击 **Start Import**。
+
+8. 当导入进度显示 **Completed** 时，检查已导入的表。
 
 </div>
 
 <div label="Alibaba Cloud Object Storage Service (OSS)">
 
-1. Open the **Import** page for your target cluster.
+1. 打开目标集群的 **Import** 页面。
 
-    1. Log in to the [TiDB Cloud console](https://tidbcloud.com/) and navigate to the [**Clusters**](https://tidbcloud.com/project/clusters) page of your project.
+    1. 登录 [TiDB Cloud 控制台](https://tidbcloud.com/)，进入项目的 [**Clusters**](https://tidbcloud.com/project/clusters) 页面。
 
-        > **Tip:**
+        > **提示：**
         >
-        > You can use the combo box in the upper-left corner to switch between organizations, projects, and clusters.
+        > 你可以使用左上角的下拉框切换组织、项目和集群。
 
-    2. Click the name of your target cluster to go to its overview page, and then click **Data** > **Import** in the left navigation pane.
+    2. 点击目标集群名称进入概览页，然后在左侧导航栏点击 **Data** > **Import**。
 
-2. Select **Import data from Cloud Storage**, and then click **Alibaba Cloud OSS**.
+2. 点击 **Import data from Cloud Storage**。
 
-3. On the **Import Data from Alibaba Cloud OSS** page, provide the following information for the source CSV files:
+3. 在 **Import Data from Cloud Storage** 页面，填写以下信息：
 
-    - **Import File Count**: select **One file** or **Multiple files** as needed.
-    - **Included Schema Files**: this field is only visible when importing multiple files. If the source folder contains the target table schemas, select **Yes**. Otherwise, select **No**.
-    - **Data Format**: select **CSV**.
-    - **File URI** or **Folder URI**:
-        - When importing one file, enter the source file URI and name in the following format `oss://[bucket_name]/[data_source_folder]/[file_name].csv`. For example, `oss://sampledata/ingest/TableName.01.csv`.
-        - When importing multiple files, enter the source file URI and name in the following format `oss://[bucket_name]/[data_source_folder]/`. For example, `oss://sampledata/ingest/`.
-    - **Bucket Access**: you can use an AccessKey pair to access your bucket. For more information, see [Configure Alibaba Cloud Object Storage Service (OSS) access](/tidb-cloud/serverless-external-storage.md#configure-alibaba-cloud-object-storage-service-oss-access).
+    - **Storage Provider**：选择 **Alibaba Cloud OSS**。
+    - **Source Files URI**：
+        - 导入单个文件时，输入源文件 URI，格式为 `oss://[bucket_name]/[data_source_folder]/[file_name].csv`。例如：`oss://sampledata/ingest/TableName.01.csv`。
+        - 导入多个文件时，输入源文件夹 URI，格式为 `oss://[bucket_name]/[data_source_folder]/`。例如：`oss://sampledata/ingest/`。
+    - **Credential**：你可以使用 AccessKey 对访问桶。详情参见 [Configure Alibaba Cloud Object Storage Service (OSS) access](/tidb-cloud/serverless-external-storage.md#configure-alibaba-cloud-object-storage-service-oss-access)。
 
-4. Click **Connect**.
+4. 点击 **Next**。
 
-5. In the **Destination** section, select the target database and table.
+5. 在 **Destination Mapping** 部分，指定源文件与目标表的映射方式。
 
-    When importing multiple files, you can use **Advanced Settings** > **Mapping Settings** to define a custom mapping rule for each target table and its corresponding CSV file. After that, the data source files will be re-scanned using the provided custom mapping rule.
+    当 **Source Files URI** 指定为目录时，**Use [File naming conventions](/tidb-cloud/naming-conventions-for-data-import.md) for automatic mapping** 选项默认被选中。
 
-    When you enter the source file URI and name in **Source File URIs and Names**, make sure it is in the following format `oss://[bucket_name]/[data_source_folder]/[file_name].csv`. For example, `oss://sampledata/ingest/TableName.01.csv`.
-
-    You can also use wildcards to match the source files. For example:
-
-    - `oss://[bucket_name]/[data_source_folder]/my-data?.csv`: all CSV files starting with `my-data` followed by one character (such as `my-data1.csv` and `my-data2.csv`) in that folder will be imported into the same target table.
-
-    - `oss://[bucket_name]/[data_source_folder]/my-data*.csv`: all CSV files in the folder starting with `my-data` will be imported into the same target table.
-
-    Note that only `?` and `*` are supported.
-
-    > **Note:**
+    > **注意：**
     >
-    > The URI must contain the data source folder.
+    > 当 **Source Files URI** 指定为单个文件时，不显示 **Use [File naming conventions](/tidb-cloud/naming-conventions-for-data-import.md) for automatic mapping** 选项，TiDB Cloud 会自动将 **Source** 字段填充为文件名。此时你只需选择目标数据库和表进行数据导入。
 
-6. Click **Start Import**.
+    - 若希望 TiDB Cloud 自动将所有遵循 [File naming conventions](/tidb-cloud/naming-conventions-for-data-import.md) 的源文件映射到对应表，保持该选项选中，并选择 **CSV** 作为数据格式。
 
-7. When the import progress shows **Completed**, check the imported tables.
+    - 若需手动配置映射规则，将源 CSV 文件关联到目标数据库和表，取消选中该选项，然后填写以下字段：
+
+        - **Source**：输入文件名模式，格式为 `[file_name].csv`。例如：`TableName.01.csv`。你也可以使用通配符匹配多个文件，仅支持 `*` 和 `?` 通配符。
+
+            - `my-data?.csv`：匹配所有以 `my-data` 开头，后跟单个字符的 CSV 文件，如 `my-data1.csv` 和 `my-data2.csv`。
+            - `my-data*.csv`：匹配所有以 `my-data` 开头的 CSV 文件，如 `my-data-2023.csv` 和 `my-data-final.csv`。
+
+        - **Target Database** 和 **Target Table**：选择要导入数据的目标数据库和表。
+
+6. 点击 **Next**。TiDB Cloud 会相应扫描源文件。
+
+7. 审核扫描结果，检查找到的数据文件及对应目标表，然后点击 **Start Import**。
+
+8. 当导入进度显示 **Completed** 时，检查已导入的表。
 
 </div>
 
 </SimpleTab>
 
-When you run an import task, if any unsupported or invalid conversions are detected, TiDB Cloud Serverless terminates the import job automatically and reports an importing error.
+当你运行导入任务时，如果检测到任何不支持或无效的转换，TiDB Cloud Serverless 会自动终止导入作业并报告导入错误。
 
-If you get an importing error, do the following:
+如果遇到导入错误，请按以下步骤操作：
 
-1. Drop the partially imported table.
-2. Check the table schema file. If there are any errors, correct the table schema file.
-3. Check the data types in the CSV files.
-4. Try the import task again.
+1. 删除部分导入的表。
+2. 检查表结构文件，如有错误请修正。
+3. 检查 CSV 文件中的数据类型。
+4. 重新尝试导入任务。
 
-## Troubleshooting
+## 故障排查
 
-### Resolve warnings during data import
+### 解决数据导入过程中的警告
 
-After clicking **Start Import**, if you see a warning message such as `can't find the corresponding source files`, resolve this by providing the correct source file, renaming the existing one according to [Naming Conventions for Data Import](/tidb-cloud/naming-conventions-for-data-import.md), or using **Advanced Settings** to make changes.
+点击 **Start Import** 后，如果看到如 `can't find the corresponding source files` 的警告信息，请通过提供正确的源文件、按 [Naming Conventions for Data Import](/tidb-cloud/naming-conventions-for-data-import.md) 重命名现有文件，或使用 **Advanced Settings** 进行调整来解决。
 
-After resolving these issues, you need to import the data again.
+解决后需要重新导入数据。
 
-### Zero rows in the imported tables
+### 导入表中行数为零
 
-After the import progress shows **Completed**, check the imported tables. If the number of rows is zero, it means no data files matched the Bucket URI that you entered. In this case, resolve this issue by providing the correct source file, renaming the existing one according to [Naming Conventions for Data Import](/tidb-cloud/naming-conventions-for-data-import.md), or using **Advanced Settings** to make changes. After that, import those tables again.
+导入进度显示 **Completed** 后，检查已导入的表。如果行数为零，说明没有数据文件匹配你输入的 Bucket URI。此时请通过提供正确的源文件、按 [Naming Conventions for Data Import](/tidb-cloud/naming-conventions-for-data-import.md) 重命名现有文件，或使用 **Advanced Settings** 进行调整来解决。之后重新导入这些表。

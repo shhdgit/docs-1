@@ -1,153 +1,153 @@
 ---
-title: TiDB Cloud Serverless FAQs
-summary: Learn about the most frequently asked questions (FAQs) relating to TiDB Cloud Serverless.
+title: TiDB Cloud Serverless 常见问题
+summary: 了解与 TiDB Cloud Serverless 相关的最常见问题（FAQ）。
 aliases: ['/tidbcloud/serverless-tier-faqs']
 ---
 
-# TiDB Cloud Serverless FAQs
+# TiDB Cloud Serverless 常见问题
 
 <!-- markdownlint-disable MD026 -->
 
-This document lists the most frequently asked questions about TiDB Cloud Serverless.
+本文档列出了关于 TiDB Cloud Serverless 的最常见问题。
 
-## General FAQs
+## 通用常见问题
 
-### What is TiDB Cloud Serverless?
+### 什么是 TiDB Cloud Serverless？
 
-TiDB Cloud Serverless offers the TiDB database with full HTAP capabilities for you and your organization. It is a fully managed, auto-scaling deployment of TiDB that lets you start using your database immediately, develop and run your application without caring about the underlying nodes, and automatically scale based on your application's workload changes.
+TiDB Cloud Serverless 为你和你的组织提供具备完整 HTAP 能力的 TiDB 数据库。它是 TiDB 的全托管、自动弹性伸缩的部署方式，让你可以立即开始使用数据库，开发和运行应用程序时无需关心底层节点，并且能够根据应用负载变化自动扩缩容。
 
-### How do I get started with TiDB Cloud Serverless?
+### 如何开始使用 TiDB Cloud Serverless？
 
-Get started with the 5-minute [TiDB Cloud Quick Start](/tidb-cloud/tidb-cloud-quickstart.md).
+请参考 5 分钟上手的 [TiDB Cloud 快速入门](/tidb-cloud/tidb-cloud-quickstart.md)。
 
-### How many TiDB Cloud Serverless clusters can I create in TiDB Cloud?
+### 在 TiDB Cloud 中，我最多可以创建多少个 TiDB Cloud Serverless 集群？
 
-For each organization in TiDB Cloud, you can create a maximum of five [free clusters](/tidb-cloud/select-cluster-tier.md#free-cluster-plan) by default. To create more TiDB Cloud Serverless clusters, you need to add a credit card and create [scalable clusters](/tidb-cloud/select-cluster-tier.md#scalable-cluster-plan) for the usage.
+对于 TiDB Cloud 中的每个组织，默认最多可以创建五个 [免费集群](/tidb-cloud/select-cluster-tier.md#free-cluster-plan)。如需创建更多 TiDB Cloud Serverless 集群，你需要添加信用卡并创建 [可扩展集群](/tidb-cloud/select-cluster-tier.md#scalable-cluster-plan) 以供使用。
 
-### Are all TiDB Cloud features fully supported on TiDB Cloud Serverless?
+### TiDB Cloud 的所有功能在 TiDB Cloud Serverless 上都完全支持吗？
 
-Some of TiDB Cloud features are partially supported or not supported on TiDB Cloud Serverless. For more information, see [TiDB Cloud Serverless Limitations and Quotas](/tidb-cloud/serverless-limitations.md).
+部分 TiDB Cloud 功能在 TiDB Cloud Serverless 上仅部分支持或暂不支持。详细信息请参见 [TiDB Cloud Serverless 限制与配额](/tidb-cloud/serverless-limitations.md)。
 
-### When will TiDB Cloud Serverless be available on cloud platforms other than AWS, such as Google Cloud or Azure?
+### TiDB Cloud Serverless 何时会支持除 AWS 以外的云平台，如 Google Cloud 或 Azure？
 
-We are actively working on expanding TiDB Cloud Serverless to other cloud platforms, including Google Cloud and Azure. However, we do not have an exact timeline for now as we currently focus on filling gaps and ensuring seamless functionality across all environments. Rest assured, we are working hard to make TiDB Cloud Serverless available on more cloud platforms, and we will keep our community updated as we progress.
+我们正在积极推进 TiDB Cloud Serverless 向 Google Cloud 和 Azure 等其他云平台的扩展。但目前尚无确切时间表，因为我们当前专注于弥补差距并确保所有环境下的无缝功能。请放心，我们正在努力让 TiDB Cloud Serverless 支持更多云平台，并会在进展过程中及时向社区更新。
 
-### I created a Developer Tier cluster before TiDB Cloud Serverless was available. Can I still use my cluster?
+### 在 TiDB Cloud Serverless 推出前，我创建了 Developer Tier 集群。还能继续使用该集群吗？
 
-Yes, your Developer Tier cluster has been automatically migrated to the TiDB Cloud Serverless cluster, providing you with an improved user experience without any disruptions to your prior usage.
+可以，你的 Developer Tier 集群已自动迁移为 TiDB Cloud Serverless 集群，无需中断即可获得更好的用户体验。
 
-### What is columnar storage in TiDB Cloud Serverless?
+### 什么是 TiDB Cloud Serverless 的列式存储？
 
-Columnar storage in TiDB Cloud Serverless acts as an additional replica of row-based storage, ensuring strong consistency. Unlike traditional row-based storage, which stores data in rows, columnar storage organizes data in columns, optimizing it for data analytics tasks.
+TiDB Cloud Serverless 的列式存储作为行存储的额外副本，确保强一致性。与传统的行存储（按行存储数据）不同，列式存储按列组织数据，优化了数据分析任务。
 
-Columnar storage is a key feature that enables the Hybrid Transactional and Analytical Processing (HTAP) capabilities of TiDB by seamlessly blending transactional and analytical workloads.
+列式存储是实现 TiDB HTAP（混合事务与分析处理）能力的关键特性，通过无缝融合事务型和分析型负载。
 
-To efficiently manage columnar storage data, TiDB Cloud Serverless uses a separate elastic TiFlash engine. During query execution, the optimizer guides the cluster to automatically decide whether to retrieve data from row-based or columnar storage.
+为高效管理列式存储数据，TiDB Cloud Serverless 使用独立的弹性 TiFlash 引擎。在查询执行时，优化器会引导集群自动决定是从行存储还是列存储读取数据。
 
-### When should I use columnar storage in TiDB Cloud Serverless?
+### 在哪些场景下应使用 TiDB Cloud Serverless 的列式存储？
 
-Consider using columnar storage in TiDB Cloud Serverless in the following scenarios:
+在以下场景下建议使用 TiDB Cloud Serverless 的列式存储：
 
-- Your workload involves analytical tasks that require efficient data scanning and aggregation.
-- You prioritize improved performance, especially for analytics workloads.
-- You want to isolate analytical processing from transactional processing to prevent performance impact on your transactional processing (TP) workload. The separate columnar storage helps optimize these distinct workload patterns.
+- 你的负载包含需要高效数据扫描和聚合的分析型任务。
+- 你优先考虑分析型负载的性能提升。
+- 你希望将分析处理与事务处理隔离，避免对 TP（事务处理）负载产生性能影响。独立的列式存储有助于优化不同负载模式。
 
-In these scenarios, columnar storage can significantly improve query performance and provide a seamless experience for mixed workloads in your system.
+在这些场景下，列式存储可以显著提升查询性能，并为系统中的混合负载提供无缝体验。
 
-### How to use columnar storage in TiDB Cloud Serverless?
+### 如何在 TiDB Cloud Serverless 中使用列式存储？
 
-Using columnar storage in TiDB Cloud Serverless is similar to using it in TiFlash. You can enable columnar storage at both the table and database levels:
+在 TiDB Cloud Serverless 中使用列式存储的方式与 TiFlash 类似。你可以在表级或数据库级启用列式存储：
 
-- Table level: Assign a TiFlash replica to a table to enable columnar storage for that specific table.
-- Database level: Configure TiFlash replicas for all tables in a database to use columnar storage across the entire database.
+- 表级：为某个表分配 TiFlash 副本，为该表启用列式存储。
+- 数据库级：为数据库中的所有表配置 TiFlash 副本，实现整个数据库的列式存储。
 
-Once a TiFlash replica is set up for a table, TiDB automatically replicates data from the row-based storage to the columnar storage for that table. This ensures data consistency and optimizes performance for analytical queries.
+为表设置 TiFlash 副本后，TiDB 会自动将该表的数据从行存储同步到列式存储，确保数据一致性并优化分析型查询的性能。
 
-For more information about how to set up TiFlash replicas, see [Create TiFlash replicas](/tiflash/create-tiflash-replicas.md).
+关于如何设置 TiFlash 副本，详见 [创建 TiFlash 副本](/tiflash/create-tiflash-replicas.md)。
 
-## Billing and metering FAQs
+## 计费与用量常见问题
 
-### What are Request Units?
+### 什么是 Request Units？
 
-TiDB Cloud Serverless adopts a pay-as-you-go model, meaning that you only pay for the storage space and cluster usage. In this model, all cluster activities such as SQL queries, bulk operations, and background jobs are quantified in [Request Units (RUs)](/tidb-cloud/tidb-cloud-glossary.md#request-unit). RU is an abstract measurement for the size and intricacy of requests initiated on your cluster. For more information, see [TiDB Cloud Serverless Pricing Details](https://www.pingcap.com/tidb-cloud-serverless-pricing-details/).
+TiDB Cloud Serverless 采用按需付费模式，你只需为存储空间和集群用量付费。在该模式下，所有集群活动（如 SQL 查询、批量操作和后台任务）都以 [Request Units（RUs）](/tidb-cloud/tidb-cloud-glossary.md#request-unit) 进行量化。RU 是对集群请求规模和复杂度的抽象度量。详细信息请参见 [TiDB Cloud Serverless 价格详情](https://www.pingcap.com/tidb-cloud-serverless-pricing-details/)。
 
-### Is there any free plan available for TiDB Cloud Serverless?
+### TiDB Cloud Serverless 是否有免费套餐？
 
-For the first five TiDB Cloud Serverless clusters in your organization, TiDB Cloud provides a free usage quota for each of them as follows:
+对于你所在组织的前五个 TiDB Cloud Serverless 集群，TiDB Cloud 为每个集群提供如下免费用量配额：
 
-- Row-based storage: 5 GiB
-- Columnar storage: 5 GiB
-- [Request Units (RUs)](/tidb-cloud/tidb-cloud-glossary.md#request-unit): 50 million RUs per month
+- 行存储：5 GiB
+- 列存储：5 GiB
+- [Request Units（RUs）](/tidb-cloud/tidb-cloud-glossary.md#request-unit)：每月 5000 万 RU
 
-If you are using a scalable cluster, usage beyond the free quota will be charged. For a free cluster, once the free quota is reached, the read and write operations on this cluster will be throttled until you upgrade to a scalable cluster or the usage is reset upon the start of a new month.
+如果你使用的是可扩展集群，超出免费配额的用量将会计费。对于免费集群，达到免费配额后，该集群的读写操作将被限流，直到你升级为可扩展集群或新月初用量重置。
 
-For more information, see [TiDB Cloud Serverless usage quota](/tidb-cloud/select-cluster-tier.md#usage-quota).
+详细信息请参见 [TiDB Cloud Serverless 用量配额](/tidb-cloud/select-cluster-tier.md#usage-quota)。
 
-### What are the limitations of the free plan?
+### 免费套餐有哪些限制？
 
-Under the free plan, cluster performance is limited due to non-scalable resources. This results in a restriction on memory allocation per query to 256 MiB and might cause observable bottlenecks in request units (RUs) per second. To maximize cluster performance and avoid these limitations, you can upgrade to a [scalable cluster](/tidb-cloud/select-cluster-tier.md#scalable-cluster-plan).
+在免费套餐下，由于资源不可扩展，集群性能受到限制。每个查询的内存分配被限制为 256 MiB，并且每秒 Request Units（RUs）可能出现明显瓶颈。为最大化集群性能并避免这些限制，你可以升级为 [可扩展集群](/tidb-cloud/select-cluster-tier.md#scalable-cluster-plan)。
 
-### How can I estimate the number of RUs required by my workloads and plan my monthly budget?
+### 如何评估我的工作负载所需的 RU 数量并规划月度预算？
 
-To get the RU consumption of individual SQL statements, you can use the [`EXPLAIN ANALYZE`](/sql-statements/sql-statement-explain-analyze.md#ru-request-unit-consumption) SQL statement. However, it is important to note that the RUs usage returned in `EXPLAIN ANALYZE` does not incorporate egress RUs, as egress usage is measured separately in the gateway, which is unknown to the TiDB server.
+你可以使用 [`EXPLAIN ANALYZE`](/sql-statements/sql-statement-explain-analyze.md#ru-request-unit-consumption) SQL 语句获取单条 SQL 语句的 RU 消耗。但需要注意，`EXPLAIN ANALYZE` 返回的 RU 用量不包含出口（egress）RUs，因为出口用量在网关单独计量，TiDB 服务器无法获知。
 
-To get the RUs and storage used by your cluster, view the **Usage this month** pane on your cluster overview page. With your past resource usage data and real-time resource usage in this pane, you can track your cluster's resource consumption and estimate a reasonable spending limit. If the free quota cannot meet your requirement, you can upgrade to a [scalable cluster](/tidb-cloud/select-cluster-tier.md#scalable-cluster-plan) and edit the spending limit. For more information, see [TiDB Cloud Serverless usage quota](/tidb-cloud/select-cluster-tier.md#usage-quota).
+要查看集群的 RU 和存储用量，请在集群概览页面查看 **Usage this month** 面板。结合历史资源用量和该面板的实时用量数据，你可以跟踪集群资源消耗并合理预估支出上限。如果免费配额无法满足需求，你可以升级为 [可扩展集群](/tidb-cloud/select-cluster-tier.md#scalable-cluster-plan) 并编辑支出上限。详细信息请参见 [TiDB Cloud Serverless 用量配额](/tidb-cloud/select-cluster-tier.md#usage-quota)。
 
-### How can I optimize my workload to minimize the number of RUs consumed?
+### 如何优化工作负载以最小化 RU 消耗？
 
-Ensure that your queries have been carefully optimized for optimal performance by following the guidelines in [Optimizing SQL Performance](/develop/dev-guide-optimize-sql-overview.md). To identify the SQL statements that consume the most RUs, navigate to **Diagnosis > SQL Statements** on your cluster overview page, where you can observe SQL execution and view the top statements sorted by **Total RU** or **Mean RU**. For more information, see [Statement Analysis](/tidb-cloud/tune-performance.md#statement-analysis). In addition, minimizing the amount of egress traffic is also crucial for reducing RUs consumption. To achieve this, it is recommended to return only the necessary columns and rows in your query, which in turn helps reduce network egress traffic. This can be achieved by carefully selecting and filtering the columns and rows to be returned, thereby optimizing network utilization.
+请确保你的查询已根据 [SQL 性能优化](/develop/dev-guide-optimize-sql-overview.md) 指南进行优化，以获得最佳性能。要识别消耗 RU 最多的 SQL 语句，请进入集群的 [**Diagnosis**](/tidb-cloud/tune-performance.md#view-the-diagnosis-page) 页面，查看 **SQL Statements** 标签页，在此可按 **Total RU** 或 **Mean RU** 排序查看 SQL 执行情况和高消耗语句。详细信息请参见 [语句分析](/tidb-cloud/tune-performance.md#statement-analysis)。此外，减少出口流量对于降低 RU 消耗也至关重要。建议查询时仅返回必要的列和行，从而减少网络出口流量。通过精确选择和过滤返回的列与行，可以优化网络利用率。
 
-### How storage is metered for TiDB Cloud Serverless？
+### TiDB Cloud Serverless 的存储如何计量？
 
-The storage is metered based on the amount of data stored in a TiDB Cloud Serverless cluster, measured in GiB per month. It is calculated by multiplying the total size of all the tables and indexes (excluding data compression or replicas) with the number of hours the data is stored in that month.
+存储用量按 TiDB Cloud Serverless 集群中存储的数据量计量，单位为 GiB/月。其计算方式为：所有表和索引的总大小（不含数据压缩或副本）乘以该月内数据存储的小时数。
 
-### Why does the storage usage size remain unchanged after dropping a table or database immediately?
+### 为什么在立即删除表或数据库后，存储用量没有变化？
 
-This is because TiDB retains dropped tables and databases for a certain period of time. This retention period ensures that transactions dependent on these tables can continue execution without disruption. Additionally, the retention period makes the [`FLASHBACK TABLE`](/sql-statements/sql-statement-flashback-table.md)/[`FLASHBACK DATABASE`](/sql-statements/sql-statement-flashback-database.md) feature feasible, which allows you to recover dropped tables and databases if they were mistakenly deleted.
+这是因为 TiDB 会在一段时间内保留已删除的表和数据库。该保留期确保依赖这些表的事务可以继续执行不受影响。此外，保留期也使 [`FLASHBACK TABLE`](/sql-statements/sql-statement-flashback-table.md)/[`FLASHBACK DATABASE`](/sql-statements/sql-statement-flashback-database.md) 功能成为可能，便于你在误删时恢复表和数据库。
 
-### Why are there RU consumptions when I'm not actively running any queries?
+### 为什么在没有主动运行查询时仍有 RU 消耗？
 
-RU consumptions can occur in various scenarios. One common scenario is during background queries, such as synchronizing schema changes between TiDB instances. Another scenario is when certain web console features generate queries, like loading schemas. These processes use RUs even without explicit user triggers.
+在多种场景下会产生 RU 消耗。常见场景包括后台查询（如在 TiDB 实例间同步模式变更），以及某些 Web 控制台功能生成的查询（如加载模式）。这些过程即使没有用户显式触发，也会消耗 RU。
 
-### Why is there a spike in RU usage when my workload is steady?
+### 为什么在负载稳定时会出现 RU 用量突增？
 
-A spike in RU usage can occur due to necessary background jobs in TiDB. These jobs, such as automatically analyzing tables and rebuilding statistics, are required for generating optimized query plans.
+RU 用量突增可能由 TiDB 的必要后台任务引起。这些任务（如自动分析表和重建统计信息）是生成优化查询计划所必需的。
 
-### What happens when my cluster exhausts its free quota or exceeds its spending limit?
+### 当集群用尽免费配额或超出支出上限时会发生什么？
 
-Once a cluster reaches its free quota or spending limit, the cluster immediately denies any new connection attempts until the quota is increased or the usage is reset at the start of a new month. Existing connections established before reaching the quota will remain active but will experience throttling. For more information, see [TiDB Cloud Serverless Limitations and Quotas](/tidb-cloud/serverless-limitations.md#usage-quota).
+一旦集群达到免费配额或支出上限，系统会立即拒绝任何新的连接请求，直到配额增加或新月初用量重置。已建立的连接在达到配额前会保持活跃，但会受到限流。详细信息请参见 [TiDB Cloud Serverless 限制与配额](/tidb-cloud/serverless-limitations.md#usage-quota)。
 
-### Why do I observe spikes in RU usage while importing data?
+### 为什么在导入数据时会观察到 RU 用量突增？
 
-During the data import process of a TiDB Cloud Serverless cluster, RU consumption occurs only when the data is successfully imported, which leads to spikes in RU usage.
+在 TiDB Cloud Serverless 集群的数据导入过程中，只有数据成功导入时才会产生 RU 消耗，因此会出现 RU 用量的突增。
 
-### What costs are involved when using columnar storage in TiDB Cloud Serverless?
+### 在 TiDB Cloud Serverless 中使用列式存储会产生哪些费用？
 
-The pricing for columnar storage in TiDB Cloud Serverless is similar to that for row-based storage. When you use columnar storage, an additional replica is created to store your data (without indexes). The replication of data from row-based to columnar storage does not incur extra charges.
+TiDB Cloud Serverless 的列式存储计费方式与行存储类似。使用列式存储时，会额外创建一个副本用于存储数据（不含索引）。从行存储到列式存储的数据同步不会产生额外费用。
 
-For detailed pricing information, see [TiDB Cloud Serverless pricing details](https://www.pingcap.com/tidb-serverless-pricing-details/).
+详细价格信息请参见 [TiDB Cloud Serverless 价格详情](https://www.pingcap.com/tidb-serverless-pricing-details/)。
 
-### Is using columnar storage more expensive?
+### 使用列式存储会更贵吗？
 
-Columnar storage in TiDB Cloud Serverless incurs additional costs due to the extra replica, which requires more storage and resources for data replication. However, columnar storage becomes more cost-effective when running analytical queries.
+TiDB Cloud Serverless 的列式存储由于额外副本，会产生更多存储和数据同步资源的费用。但在运行分析型查询时，列式存储更具性价比。
 
-According to the TPC-H benchmark test, the cost of running analytic queries on columnar storage is about one-third of the cost when using row-based storage.
+根据 TPC-H 基准测试，在列式存储上运行分析型查询的成本约为行存储的三分之一。
 
-Therefore, while there might be an initial cost due to the extra replica, the reduced computational costs during analytics can make it more cost-effective for specific use cases. Especially for users with analytical demands, columnar storage can significantly reduce costs, offering considerable cost savings opportunities.
+因此，虽然初期因额外副本会有一定成本，但分析型查询时的计算成本降低，使其在特定场景下更具成本效益。尤其对于有分析需求的用户，列式存储可大幅降低成本，带来显著的节省空间。
 
-## Security FAQs
+## 安全性常见问题
 
-### Is my TiDB Cloud Serverless shared or dedicated?
+### 我的 TiDB Cloud Serverless 是共享还是专用的？
 
-The serverless technology is designed for multi-tenancy and the resources used by all clusters are shared. To get managed TiDB service with isolated infrastructure and resources, you can upgrade it to [TiDB Cloud Dedicated](/tidb-cloud/select-cluster-tier.md#tidb-cloud-dedicated).
+Serverless 技术为多租户设计，所有集群使用的资源是共享的。如需获得基础设施和资源隔离的托管 TiDB 服务，你可以升级为 [TiDB Cloud Dedicated](/tidb-cloud/select-cluster-tier.md#tidb-cloud-dedicated)。
 
-### How does TiDB Cloud Serverless ensure security?
+### TiDB Cloud Serverless 如何保障安全性？
 
-- Your connections are encrypted by Transport Layer Security (TLS). For more information about using TLS to connect to TiDB Cloud Serverless, see [TLS Connection to TiDB Cloud Serverless](/tidb-cloud/secure-connections-to-serverless-clusters.md).
-- All persisted data on TiDB Cloud Serverless is encrypted-at-rest using the tool of the cloud provider that your cluster is running in.
+- 你的连接通过传输层安全协议（TLS）加密。关于如何使用 TLS 连接 TiDB Cloud Serverless，详见 [TLS 连接到 TiDB Cloud Serverless](/tidb-cloud/secure-connections-to-serverless-clusters.md)。
+- TiDB Cloud Serverless 上所有持久化数据均采用集群所在云服务商的工具进行静态加密。
 
-## Maintenance FAQ
+## 运维常见问题
 
-### Can I upgrade the version of TiDB that my cluster is running on?
+### 我可以升级集群运行的 TiDB 版本吗？
 
-No. TiDB Cloud Serverless clusters are upgraded automatically as we roll out new TiDB versions on TiDB Cloud. You can see what version of TiDB your cluster is running in the [TiDB Cloud console](https://tidbcloud.com/console/clusters) or in the latest [release note](https://docs.pingcap.com/tidbcloud/tidb-cloud-release-notes). Alternatively, you can also connect to your cluster and use `SELECT version()` or `SELECT tidb_version()` to check the TiDB version.
+不可以。TiDB Cloud Serverless 集群会随着 TiDB Cloud 推出新版本自动升级。你可以在 [TiDB Cloud 控制台](https://tidbcloud.com/project/clusters) 或最新的 [发布说明](https://docs.pingcap.com/tidbcloud/tidb-cloud-release-notes) 中查看集群当前运行的 TiDB 版本。你也可以连接到集群，使用 `SELECT version()` 或 `SELECT tidb_version()` 查询 TiDB 版本。

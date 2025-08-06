@@ -1,80 +1,90 @@
 ---
-title: Analyze and Tune Performance
-summary: Learn how to analyze and tune performance of your TiDB Cloud cluster.
+title: 分析与调优性能
+summary: 了解如何分析和调优你的 TiDB Cloud 集群的性能。
 ---
 
-# Analyze and Tune Performance
+# 分析与调优性能
 
-TiDB Cloud provides [Slow Query](#slow-query), [Statement Analysis](#statement-analysis), [Key Visualizer](#key-visualizer), and [Index Insight (beta)](#index-insight-beta) to analyze performance.
+TiDB Cloud 提供了 [慢查询](#slow-query)、[语句分析](#statement-analysis)、[Key Visualizer](#key-visualizer) 和 [Index Insight (beta)](#index-insight-beta) 等功能用于性能分析。
 
-- Slow Query lets you search and view all slow queries in your TiDB cluster, and explore the bottlenecks of each slow query by viewing its execution plan, SQL execution information, and other details.
+- 慢查询允许你搜索和查看 TiDB 集群中的所有慢查询，并通过查看其执行计划、SQL 执行信息及其他细节，深入分析每条慢查询的瓶颈。
 
-- Statement Analysis enables you to directly observe the SQL execution on the page, and easily locate performance problems without querying the system tables.
+- 语句分析使你可以直接在页面上观察 SQL 的执行情况，无需查询系统表即可轻松定位性能问题。
 
-- Key Visualizer helps you observe TiDB's data access patterns and data hotspots.
+- Key Visualizer 帮助你观察 TiDB 的数据访问模式和数据热点。
 
-- Index Insight provides you with meaningful and actionable index recommendations.
+- Index Insight 为你提供有意义且可操作的索引推荐。
 
 > **Note:**
 >
-> Currently, **Key Visualizer** and **Index Insight (beta)** are unavailable for [TiDB Cloud Serverless](/tidb-cloud/select-cluster-tier.md#tidb-cloud-serverless) clusters.
+> 目前，**Key Visualizer** 和 **Index Insight (beta)** 不支持 [TiDB Cloud Serverless](/tidb-cloud/select-cluster-tier.md#tidb-cloud-serverless) 集群。
 
-## Slow Query
+## 查看 Diagnosis 页面
 
-By default, SQL queries that take more than 300 milliseconds are considered as slow queries.
+1. 在你的项目的 [**Clusters**](https://tidbcloud.com/project/clusters) 页面，点击目标集群的名称进入其概览页面。
 
-To view slow queries in a cluster, perform the following steps:
+    > **Tip:**
+    >
+    > 你可以使用左上角的下拉框在组织、项目和集群之间切换。
 
-1. Navigate to the **Diagnosis** page of a cluster.
+2. 在左侧导航栏，点击 **Monitoring** > **Diagnosis**。
 
-2. Click the **Slow Query** tab.
+## 慢查询
 
-3. Click any slow query in the list to display its detailed execution information.
+默认情况下，执行时间超过 300 毫秒的 SQL 查询会被视为慢查询。
 
-4. (Optional) You can filter slow queries based on the target time range, the related databases, and SQL keywords. You can also limit the number of slow queries to be displayed.
+要在集群中查看慢查询，请执行以下步骤：
 
-The results are displayed in the form of a table, and you can sort the results by different columns.
+1. 进入集群的 [**Diagnosis**](#view-the-diagnosis-page) 页面。
 
-For more information, see [Slow Queries in TiDB Dashboard](https://docs.pingcap.com/tidb/stable/dashboard-slow-query).
+2. 点击 **Slow Query** 标签页。
 
-## Statement Analysis
+3. 点击列表中的任意慢查询以显示其详细的执行信息。
 
-To use the statement analysis, perform the following steps:
+4. （可选）你可以根据目标时间范围、相关数据库和 SQL 关键字筛选慢查询。你也可以限制显示的慢查询数量。
 
-1. Navigate to the **Diagnosis** page of a cluster.
+结果以表格形式展示，你可以根据不同的列对结果进行排序。
 
-2. Click the **SQL Statement** tab.
+更多信息，请参见 [TiDB Dashboard 中的慢查询](https://docs.pingcap.com/tidb/stable/dashboard-slow-query)。
 
-3. Select the time period to be analyzed in the time interval box. Then you can get the execution statistics of SQL statements of all databases in this period.
+## 语句分析
 
-4. (Optional) If you only care about certain databases, you can select the corresponding schema(s) in the next box to filter the results.
+要使用语句分析功能，请执行以下步骤：
 
-The results are displayed in the form of a table, and you can sort the results by different columns.
+1. 进入集群的 [**Diagnosis**](#view-the-diagnosis-page) 页面。
 
-For more information, see [Statement Execution Details in TiDB Dashboard](https://docs.pingcap.com/tidb/stable/dashboard-statement-details).
+2. 点击 **SQL Statement** 标签页。
+
+3. 在时间区间选择框中选择需要分析的时间段。然后你可以获得该时间段内所有数据库的 SQL 语句执行统计信息。
+
+4. （可选）如果你只关注某些数据库，可以在下一个选择框中选择对应的 schema 以筛选结果。
+
+结果以表格形式展示，你可以根据不同的列对结果进行排序。
+
+更多信息，请参见 [TiDB Dashboard 中的语句执行详情](https://docs.pingcap.com/tidb/stable/dashboard-statement-details)。
 
 ## Key Visualizer
 
 > **Note:**
 >
-> Key Visualizer is only available for [TiDB Cloud Dedicated](/tidb-cloud/select-cluster-tier.md#tidb-cloud-dedicated) clusters.
+> Key Visualizer 仅适用于 [TiDB Cloud Dedicated](/tidb-cloud/select-cluster-tier.md#tidb-cloud-dedicated) 集群。
 
-To view the key analytics, perform the following steps:
+要查看关键分析，请执行以下步骤：
 
-1. Navigate to the **Diagnosis** page of a cluster.
+1. 进入集群的 [**Diagnosis**](#view-the-diagnosis-page) 页面。
 
-2. Click the **Key Visualizer** tab.
+2. 点击 **Key Visualizer** 标签页。
 
-On the **Key Visualizer** page, a large heat map shows changes on access traffic over time. The average values ​​along each axis of the heat map are shown below and on the right side. The left side is the table name, index name and other information.
+在 **Key Visualizer** 页面上，会显示一个大型热力图，展示访问流量随时间的变化。热力图每个轴的平均值分别显示在下方和右侧。左侧显示表名、索引名等信息。
 
-For more information, see [Key Visualizer](https://docs.pingcap.com/tidb/stable/dashboard-key-visualizer).
+更多信息，请参见 [Key Visualizer](https://docs.pingcap.com/tidb/stable/dashboard-key-visualizer)。
 
 ## Index Insight (beta)
 
-The Index Insight feature in TiDB Cloud provides powerful capabilities to optimize query performance by offering recommended indexes for slow queries that are not utilizing indexes effectively.
+TiDB Cloud 的 Index Insight 功能通过为未有效利用索引的慢查询提供推荐索引，帮助你优化查询性能。
 
 > **Note:**
 >
-> Index Insight is currently in beta and only available for [TiDB Cloud Dedicated](/tidb-cloud/select-cluster-tier.md#tidb-cloud-dedicated) clusters.
+> Index Insight 目前处于 beta 阶段，仅适用于 [TiDB Cloud Dedicated](/tidb-cloud/select-cluster-tier.md#tidb-cloud-dedicated) 集群。
 
-For more information, see [Index Insight](/tidb-cloud/index-insight.md).
+更多信息，请参见 [Index Insight](/tidb-cloud/index-insight.md)。

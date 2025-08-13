@@ -1,41 +1,41 @@
 ---
-title: Use the OpenAPI Specification of a Data App with Next.js
-summary: Learn how to use the OpenAPI Specification of a Data App to generate client code and develop a Next.js application.
+title: 在 Next.js 中使用 Data App 的 OpenAPI 规范
+summary: 学习如何使用 Data App 的 OpenAPI 规范生成客户端代码并开发 Next.js 应用。
 ---
 
-# Use the OpenAPI Specification of a Data App with Next.js
+# 在 Next.js 中使用 Data App 的 OpenAPI 规范
 
-This document introduces how to use the OpenAPI Specification of a [Data App](/tidb-cloud/tidb-cloud-glossary.md#data-app) to generate client code and develop a Next.js application.
+本文介绍如何使用 [Data App](/tidb-cloud/tidb-cloud-glossary.md#data-app) 的 OpenAPI 规范生成客户端代码，并开发 Next.js 应用。
 
-## Before you begin
+## 在开始之前
 
-Before using OpenAPI Specification with Next.js, make sure that you have the following:
+在将 OpenAPI 规范与 Next.js 一起使用之前，请确保你已具备以下条件：
 
-- A TiDB cluster. For more information, see [Create a TiDB Cloud Serverless cluster](/tidb-cloud/create-tidb-cluster-serverless.md) or [Create a TiDB Cloud Dedicated cluster](/tidb-cloud/create-tidb-cluster.md).
+- 一个 TiDB 集群。更多信息，参见 [创建 TiDB Cloud Starter 或 Essential 集群](/tidb-cloud/create-tidb-cluster-serverless.md) 或 [创建 TiDB Cloud Dedicated 集群](/tidb-cloud/create-tidb-cluster.md)。
 - [Node.js](https://nodejs.org/en/download)
 - [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 - [yarn](https://yarnpkg.com/getting-started/install)
 
-This document uses a TiDB Cloud Serverless cluster as an example.
+本文以 TiDB Cloud Starter 集群为例。
 
-## Step 1. Prepare data
+## 步骤 1. 准备数据
 
-To begin with, create a table `test.repository` in your TiDB cluster and insert some sample data into it. The following example inserts some open source projects developed by PingCAP as data for demonstration purposes.
+首先，在你的 TiDB 集群中创建表 `test.repository`，并插入一些示例数据。以下示例插入了由 PingCAP 开发的一些开源项目，作为演示数据。
 
-To execute the SQL statements, you can use [SQL Editor](/tidb-cloud/explore-data-with-chat2query.md) in the [TiDB Cloud console](https://tidbcloud.com).
+你可以在 [TiDB Cloud 控制台](https://tidbcloud.com)的 [SQL Editor](/tidb-cloud/explore-data-with-chat2query.md) 中执行这些 SQL 语句。
 
 ```sql
--- Select the database
+-- 选择数据库
 USE test;
 
--- Create the table
+-- 创建表
 CREATE TABLE repository (
         id int NOT NULL PRIMARY KEY AUTO_INCREMENT,
         name varchar(64) NOT NULL,
         url varchar(256) NOT NULL
 );
 
--- Insert some sample data into the table
+-- 向表中插入一些示例数据
 INSERT INTO repository (name, url)
 VALUES ('tidb', 'https://github.com/pingcap/tidb'),
         ('tikv', 'https://github.com/tikv/tikv'),
@@ -43,53 +43,53 @@ VALUES ('tidb', 'https://github.com/pingcap/tidb'),
         ('tiflash', 'https://github.com/pingcap/tiflash');
 ```
 
-## Step 2. Create a Data App
+## 步骤 2. 创建 Data App
 
-After the data is inserted, navigate to the [**Data Service**](https://tidbcloud.com/console/data-service) page in the [TiDB Cloud console](https://tidbcloud.com). Create a Data App that links to your TiDB cluster, create an API key for the Data App, and then create a `GET /repositories` endpoint in the Data App. The corresponding SQL statement for this endpoint is as follows, which fetches all rows from the `test.repository` table:
+数据插入完成后，前往 [TiDB Cloud 控制台](https://tidbcloud.com)的 [**Data Service**](https://tidbcloud.com/project/data-service) 页面。创建一个关联到你的 TiDB 集群的 Data App，为该 Data App 创建一个 API key，然后在 Data App 中创建一个 `GET /repositories` 的 endpoint。该 endpoint 对应的 SQL 语句如下，用于查询 `test.repository` 表中的所有行：
 
 ```sql
 SELECT * FROM test.repository;
 ```
 
-For more information, see [Get started with Data Service](/tidb-cloud/data-service-get-started.md).
+更多信息，参见 [快速开始使用 Data Service](/tidb-cloud/data-service-get-started.md)。
 
-## Step 3. Generate client code
+## 步骤 3. 生成客户端代码
 
-The following uses Next.js as an example to demonstrate how to generate client code using the OpenAPI Specification of a Data App.
+以下以 Next.js 为例，演示如何使用 Data App 的 OpenAPI 规范生成客户端代码。
 
-1. Create a Next.js project named `hello-repos`.
+1. 创建名为 `hello-repos` 的 Next.js 项目。
 
-    To create a Next.js project using the official template, use the following command and keep all the default options when prompted:
+    要使用官方模板创建 Next.js 项目，请执行以下命令，并在提示时保持所有默认选项：
 
     ```shell
     yarn create next-app hello-repos
     ```
 
-    Change the directory to the newly created project using the following command:
+    使用以下命令切换到新创建的项目目录：
 
     ```shell
     cd hello-repos
     ```
 
-2. Install dependencies.
+2. 安装依赖。
 
-    This document uses [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator) to automatically generate API client libraries from the OpenAPI Specification.
+    本文使用 [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator) 根据 OpenAPI 规范自动生成 API 客户端库。
 
-    To install OpenAPI Generator as a development dependency, run the following command:
+    通过以下命令将 OpenAPI Generator 作为开发依赖安装：
 
     ```shell
     yarn add @openapitools/openapi-generator-cli --dev
     ```
 
-3. Download the OpenAPI Specification and save it as `oas/doc.json`.
+3. 下载 OpenAPI 规范并保存为 `oas/doc.json`。
 
-    1. On the TiDB Cloud [**Data Service**](https://tidbcloud.com/console/data-service) page, click your Data App name in the left pane to view the App settings.
-    2. In the **API Specification** area, click **Download**, select the JSON format, and then click **Authorize** if prompted.
-    3. Save the downloaded file as `oas/doc.json` in the `hello-repos` project directory.
+    1. 在 TiDB Cloud [**Data Service**](https://tidbcloud.com/project/data-service) 页面，点击左侧面板中的 Data App 名称，进入 App 设置页面。
+    2. 在 **API Specification** 区域，点击 **Download**，选择 JSON 格式，如有提示点击 **Authorize**。
+    3. 将下载的文件保存为 `hello-repos` 项目目录下的 `oas/doc.json`。
 
-    For more information, see [Download the OpenAPI Specification](/tidb-cloud/data-service-manage-data-app.md#download-the-openapi-specification).
+    更多信息，参见 [下载 OpenAPI 规范](/tidb-cloud/data-service-manage-data-app.md#download-the-openapi-specification)。
 
-    The structure of the `oas/doc.json` file is as follows:
+    `oas/doc.json` 文件的结构如下：
 
     ```json
     {
@@ -133,28 +133,28 @@ The following uses Next.js as an example to demonstrate how to generate client c
     ...
     ```
 
-4. Generate the client code:
+4. 生成客户端代码：
 
     ```shell
     yarn run openapi-generator-cli generate -i oas/doc.json --generator-name typescript-fetch -o gen/api
     ```
 
-    This command generates the client code using the `oas/doc.json` specification as input and outputs the client code to the `gen/api` directory.
+    该命令以 `oas/doc.json` 规范为输入，生成客户端代码并输出到 `gen/api` 目录。
 
-## Step 4. Develop your Next.js application
+## 步骤 4. 开发你的 Next.js 应用
 
-You can use the generated client code to develop your Next.js application.
+你可以使用生成的客户端代码开发 Next.js 应用。
 
-1. In the `hello-repos` project directory, create a `.env.local` file with the following variables, and then set the variable values to the public key and private key of your Data App.
+1. 在 `hello-repos` 项目目录下，创建 `.env.local` 文件，并添加以下变量，然后将变量值设置为你的 Data App 的 public key 和 private key。
 
     ```
     TIDBCLOUD_DATA_SERVICE_PUBLIC_KEY=YOUR_PUBLIC_KEY
     TIDBCLOUD_DATA_SERVICE_PRIVATE_KEY=YOUR_PRIVATE_KEY
     ```
 
-    To create an API key for a Data App, see [Create an API key](/tidb-cloud/data-service-api-key.md#create-an-api-key).
+    有关如何为 Data App 创建 API key，参见 [创建 API key](/tidb-cloud/data-service-api-key.md#create-an-api-key)。
 
-2. In the `hello-repos` project directory, replace the content of `app/page.tsx` with the following code, which fetches data from the `GET /repositories` endpoint and renders it:
+2. 在 `hello-repos` 项目目录下，将 `app/page.tsx` 的内容替换为以下代码，该代码会从 `GET /repositories` endpoint 获取数据并进行渲染：
 
     ```js
     import {DefaultApi, Configuration} from "../gen/api"
@@ -182,7 +182,7 @@ You can use the generated client code to develop your Next.js application.
 
     > **Note:**
     >
-    > If the linked clusters of your Data App are hosted in different regions, you will see multiple items in the `servers` section of the downloaded OpenAPI Specification file. In this case, you also need to configure the endpoint path in the `config` object as follows:
+    > 如果你的 Data App 关联的集群分布在不同区域，你会在下载的 OpenAPI 规范文件的 `servers` 部分看到多个项。在这种情况下，你还需要在 `config` 对象中配置 endpoint 路径，如下所示：
     >
     >  ```js
     >  const config = new Configuration({
@@ -192,18 +192,18 @@ You can use the generated client code to develop your Next.js application.
     >    });
     >  ```
     >
-    > Make sure to replace `basePath` with the actual endpoint path of your Data App. To get `${YOUR_REGION}` and `{YOUR_DATA_APP_ID}`, check the **Endpoint URL** in the endpoint **Properties** panel.
+    > 请确保将 `basePath` 替换为你的 Data App 实际的 endpoint 路径。要获取 `${YOUR_REGION}` 和 `{YOUR_DATA_APP_ID}`，请在 endpoint 的 **Properties** 面板中查看 **Endpoint URL**。
 
-## Step 5. Preview your Next.js application
+## 步骤 5. 预览你的 Next.js 应用
 
 > **Note:**
 >
-> Make sure that all required dependencies are installed and correctly configured before previewing.
+> 在预览前，请确保所有必需的依赖已安装并正确配置。
 
-To preview your application in a local development server, run the following command:
+要在本地开发服务器中预览你的应用，运行以下命令：
 
 ```shell
 yarn dev
 ```
 
-You can then open [http://localhost:3000](http://localhost:3000) in your browser and see the data from the `test.repository` database displayed on the page.
+然后你可以在浏览器中打开 [http://localhost:3000](http://localhost:3000)，即可在页面上看到来自 `test.repository` 数据库的数据。

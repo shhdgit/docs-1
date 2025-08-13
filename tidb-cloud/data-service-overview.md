@@ -1,38 +1,38 @@
 ---
 title: TiDB Cloud Data Service (Beta) Overview
-summary: Learn about Data Service in TiDB Cloud and its scenarios.
+summary: 了解 TiDB Cloud 中的 Data Service 及其应用场景。
 ---
 
-# TiDB Cloud Data Service (Beta) Overview
+# TiDB Cloud Data Service (Beta) 概述
 
-TiDB Cloud [Data Service (beta)](https://tidbcloud.com/console/data-service) is a fully managed low-code backend-as-a-service solution that simplifies backend application development, empowering developers to rapidly build highly scalable, secure, data-driven applications.
+TiDB Cloud [Data Service (beta)](https://tidbcloud.com/project/data-service) 是一款全托管的低代码后端即服务（backend-as-a-service）解决方案，简化了后端应用开发，帮助开发者快速构建高可扩展性、安全、数据驱动的应用。
 
-Data Service enables you to access TiDB Cloud data via an HTTPS request using a custom API endpoint. This feature uses a serverless architecture to handle computing resources and elastic scaling, so you can focus on the query logic in endpoints without worrying about infrastructure or maintenance costs.
+Data Service 允许你通过自定义 API 端点，以 HTTPS 请求的方式访问 TiDB Cloud 数据。该功能采用无服务器架构，自动处理计算资源和弹性扩展，因此你只需专注于端点中的查询逻辑，无需担心基础设施或运维成本。
 
 > **Note:**
 >
-> Data Service is available for [TiDB Cloud Serverless](/tidb-cloud/select-cluster-tier.md#tidb-cloud-serverless) clusters. To use Data Service in TiDB Cloud Dedicated clusters, contact [TiDB Cloud Support](/tidb-cloud/tidb-cloud-support.md).
+> Data Service 仅适用于托管在 AWS 上的 TiDB Cloud Starter（原 Serverless）。如需在 TiDB Cloud Dedicated 集群中使用 Data Service，请联系 [TiDB Cloud Support](/tidb-cloud/tidb-cloud-support.md)。
 
-An endpoint in Data Service is a web API that you can customize to execute SQL statements. You can specify parameters for your SQL statements, such as the value used in the `WHERE` clause. When a client calls an endpoint and provides values for the parameters in a request URL, the endpoint executes the corresponding SQL statement with the provided parameters and returns the results as part of the HTTP response.
+Data Service 中的端点是你可以自定义以执行 SQL 语句的 Web API。你可以为 SQL 语句指定参数，例如 `WHERE` 子句中使用的值。当客户端调用端点并在请求 URL 中提供参数值时，端点会使用这些参数执行相应的 SQL 语句，并将结果作为 HTTP 响应的一部分返回。
 
-To manage endpoints more efficiently, you can use Data Apps. A Data App in Data Service is a collection of endpoints that you can use to access data for a specific application. By creating a Data App, you can group your endpoints and configure authorization settings using API keys to restrict access to endpoints. In this way, you can ensure that only authorized users can access and manipulate your data, making your application more secure.
+为了更高效地管理端点，你可以使用 Data App。Data Service 中的 Data App 是一组端点的集合，你可以用它来访问特定应用的数据。通过创建 Data App，你可以对端点进行分组，并通过 API key 配置授权设置以限制对端点的访问。这样可以确保只有授权用户才能访问和操作你的数据，从而提升应用的安全性。
 
 > **Tip:**
 >
-> TiDB Cloud provides a Chat2Query API for TiDB clusters. After it is enabled, TiDB Cloud will automatically create a system Data App called **Chat2Query** and a Chat2Data endpoint in Data Service. You can call this endpoint to let AI generate and execute SQL statements by providing instructions.
+> TiDB Cloud 为 TiDB 集群提供了 Chat2Query API。启用后，TiDB Cloud 会自动创建一个名为 **Chat2Query** 的系统 Data App 以及一个 Chat2Data 端点在 Data Service 中。你可以调用该端点，通过提供指令让 AI 生成并执行 SQL 语句。
 >
-> For more information, see [Get started with Chat2Query API](/tidb-cloud/use-chat2query-api.md).
+> 详细信息请参见 [Get started with Chat2Query API](/tidb-cloud/use-chat2query-api.md)。
 
-## Scenarios
+## 应用场景
 
-Data Service allows you to seamlessly integrate TiDB Cloud with any application or service that is compatible with HTTPS. The following are some typical usage scenarios:
+Data Service 允许你将 TiDB Cloud 无缝集成到任何兼容 HTTPS 的应用或服务中。以下是一些典型的使用场景：
 
-- Access the database of your TiDB cluster directly from a mobile or web application.
-- Use serverless edge functions to call endpoints and avoid scalability issues caused by database connection pooling.
-- Integrate TiDB Cloud with data visualization projects by using Data Service as a data source. This avoids exposing your database connection username and password, making your API more secure and easier to use.
-- Connect to your database from an environment that the MySQL interface does not support. This provides more flexibility and options for you to access data.
+- 直接从移动端或 Web 应用访问 TiDB 集群的数据库。
+- 使用无服务器边缘函数调用端点，避免因数据库连接池导致的可扩展性问题。
+- 通过将 Data Service 作为数据源，将 TiDB Cloud 集成到数据可视化项目中。这样可以避免暴露数据库连接的用户名和密码，使 API 更安全且更易用。
+- 从不支持 MySQL 接口的环境连接数据库，为你访问数据提供更多灵活性和选择。
 
-## What's next
+## 后续步骤
 
 - [Get Started with Data Service](/tidb-cloud/data-service-get-started.md)
 - [Get Started with Chat2Query API](/tidb-cloud/use-chat2query-api.md)

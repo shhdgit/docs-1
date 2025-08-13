@@ -1,66 +1,66 @@
 ---
 title: Migration and Import Overview
-summary: Learn an overview of data migration and import scenarios for TiDB Cloud.
+summary: 了解 TiDB Cloud 的数据迁移和导入场景概览。
 aliases: ['/tidbcloud/export-data-from-tidb-cloud']
 ---
 
-# Migration and Import Overview
+# 迁移与导入概览
 
-You can migrate data from a wide variety of data sources to TiDB Cloud. This document gives an overview of the data migration scenarios.
+你可以将数据从多种数据源迁移到 TiDB Cloud。本文档概述了数据迁移的相关场景。
 
-## Migrate data from MySQL-Compatible databases
+## 从 MySQL 兼容数据库迁移数据
 
-When you migrate data from a MySQL-compatible database, you can perform full data migration and incremental data migration. The migration scenarios and methods are as follows:
+当你从 MySQL 兼容数据库迁移数据时，可以执行全量数据迁移和增量数据迁移。具体的迁移场景和方法如下：
 
-- Migrate MySQL-compatible databases using Data Migration
+- 使用 Data Migration 迁移 MySQL 兼容数据库
 
-    TiDB is highly compatible with MySQL. You can use Data Migration in the TiDB Cloud console to migrate data from any MySQL-compatible databases to TiDB Cloud smoothly. For more information, see [Migrate MySQL-Compatible Databases to TiDB Cloud Using Data Migration](/tidb-cloud/migrate-from-mysql-using-data-migration.md).
+    TiDB 与 MySQL 高度兼容。你可以在 TiDB Cloud 控制台中使用 Data Migration，将数据从任意 MySQL 兼容数据库平滑迁移到 TiDB Cloud。更多信息，参见 [Migrate MySQL-Compatible Databases to TiDB Cloud Using Data Migration](/tidb-cloud/migrate-from-mysql-using-data-migration.md)。
 
-- Migrate using AWS DMS
+- 使用 AWS DMS 进行迁移
 
-    If you want to migrate heterogeneous databases, such as PostgreSQL, Oracle, and SQL Server to TiDB Cloud, it is recommended to use AWS Database Migration Service (AWS DMS).
+    如果你需要将异构数据库（如 PostgreSQL、Oracle 和 SQL Server）迁移到 TiDB Cloud，推荐使用 AWS Database Migration Service（AWS DMS）。
 
     - [Migrate from MySQL-Compatible Databases to TiDB Cloud Using AWS DMS](/tidb-cloud/migrate-from-mysql-using-aws-dms.md)
     - [Migrate from Amazon RDS for Oracle Using AWS DMS](/tidb-cloud/migrate-from-oracle-using-aws-dms.md)
 
-- Migrate and merge MySQL shards
+- 迁移并合并 MySQL 分片
 
-    If your application uses MySQL shards for data storage, you can migrate these shards into TiDB Cloud as one table. For more information, see [Migrate and Merge MySQL Shards of Large Datasets to TiDB Cloud](/tidb-cloud/migrate-sql-shards.md).
+    如果你的应用使用 MySQL 分片进行数据存储，可以将这些分片合并迁移到 TiDB Cloud 的一张表中。更多信息，参见 [Migrate and Merge MySQL Shards of Large Datasets to TiDB Cloud](/tidb-cloud/migrate-sql-shards.md)。
 
-- Migrate from TiDB Self-Managed
+- 从 TiDB 自建集群迁移
 
-    You can migrate data from your TiDB Self-Managed clusters to TiDB Cloud (AWS) through Dumpling and TiCDC. For more information, see [Migrate from TiDB Self-Managed to TiDB Cloud](/tidb-cloud/migrate-from-op-tidb.md).
+    你可以通过 Dumpling 和 TiCDC，将数据从自建的 TiDB 集群迁移到 TiDB Cloud（AWS）。更多信息，参见 [Migrate from TiDB Self-Managed to TiDB Cloud](/tidb-cloud/migrate-from-op-tidb.md)。
 
-## Import data from files to TiDB Cloud
+## 从文件导入数据到 TiDB Cloud
 
-If you have data files in SQL, CSV, Parquet, or Aurora Snapshot formats, you can import these files to TiDB Cloud in one go. The import scenarios and methods are as follows:
+如果你有 SQL、CSV、Parquet 或 Aurora Snapshot 格式的数据文件，可以一次性将这些文件导入到 TiDB Cloud。具体的导入场景和方法如下：
 
-- Import a local CSV file to TiDB Cloud
+- 导入本地 CSV 文件到 TiDB Cloud
 
-    You can import a local CSV file to TiDB Cloud. For more information, see [Import Local Files to TiDB Cloud](/tidb-cloud/tidb-cloud-import-local-files.md).
+    你可以将本地 CSV 文件导入到 TiDB Cloud。更多信息，参见 [Import Local Files to TiDB Cloud](/tidb-cloud/tidb-cloud-import-local-files.md)。
 
-- Import sample data (SQL file) to TiDB Cloud
+- 导入示例数据（SQL 文件）到 TiDB Cloud
 
-    You can import sample data (SQL file) to TiDB Cloud to quickly get familiar with the TiDB Cloud interface and the import process. For more information, see [Import Sample Data to TiDB Cloud](/tidb-cloud/import-sample-data.md).
+    你可以将示例数据（SQL 文件）导入到 TiDB Cloud，以便快速熟悉 TiDB Cloud 的界面和导入流程。更多信息，参见 [Import Sample Data to TiDB Cloud Starter or Essential](/tidb-cloud/import-sample-data-serverless.md) 和 [Import Sample Data to TiDB Cloud Dedicated](/tidb-cloud/import-sample-data.md)。
 
-- Import CSV files from Amazon S3 or GCS into TiDB Cloud
+- 从 Amazon S3、Google Cloud Storage（GCS）、Azure Blob Storage 或阿里云 OSS 导入 CSV 文件到 TiDB Cloud
 
-    You can import CSV files from Amazon S3 or GCS into TiDB Cloud. For more information, see [Import CSV Files from Amazon S3 or GCS into TiDB Cloud](/tidb-cloud/import-csv-files.md).
+    你可以将 CSV 文件从 Amazon S3、Google Cloud Storage（GCS）、Azure Blob Storage 或阿里云 OSS 导入到 TiDB Cloud。更多信息，参见 [Import CSV Files from Cloud Storage into TiDB Cloud Starter or Essential](/tidb-cloud/import-csv-files-serverless.md) 和 [Import CSV Files from Cloud Storage into TiDB Cloud Dedicated](/tidb-cloud/import-csv-files.md)。
 
-- Import Apache Parquet files from Amazon S3 or GCS into TiDB Cloud
+- 从 Amazon S3、Google Cloud Storage（GCS）、Azure Blob Storage 或阿里云 OSS 导入 Apache Parquet 文件到 TiDB Cloud
 
-    You can import Parquet files from Amazon S3 or GCS into TiDB Cloud. For more information, see [Import Apache Parquet Files from Amazon S3 or GCS into TiDB Cloud](/tidb-cloud/import-parquet-files.md).
+    你可以将 Parquet 文件从 Amazon S3、Google Cloud Storage（GCS）、Azure Blob Storage 或阿里云 OSS 导入到 TiDB Cloud。更多信息，参见 [Import Apache Parquet Files from Cloud Storage into TiDB Cloud Starter or Essential](/tidb-cloud/import-parquet-files-serverless.md) 和 [Import Apache Parquet Files from Cloud Storage into TiDB Cloud Dedicated](/tidb-cloud/import-parquet-files.md)。
 
-## Reference
+## 参考
 
-### Configure Amazon S3 access and GCS access
+### 配置云存储访问
 
-If your source data is stored in Amazon S3 or Google Cloud Storage (GCS) buckets, before importing or migrating the data to TiDB Cloud, you need to configure access to the buckets. For more information, see [Configure Amazon S3 access and GCS access](/tidb-cloud/config-s3-and-gcs-access.md).
+如果你的源数据存储在 Amazon S3、Google Cloud Storage（GCS）桶、Azure Blob Storage 容器或阿里云 OSS 桶中，在将数据导入或迁移到 TiDB Cloud 之前，需要先配置存储访问。更多信息，参见 [Configure External Storage Access for TiDB Cloud Starter or Essential](/tidb-cloud/serverless-external-storage.md) 和 [Configure External Storage Access for TiDB Cloud Dedicated](/tidb-cloud/dedicated-external-storage.md)。
 
-### Naming conventions for data import
+### 数据导入命名规范
 
-To make sure that your data can be imported successfully, you need to prepare schema files and data files that conform to the naming conventions. For more information, see [Naming Conventions for Data Import](/tidb-cloud/naming-conventions-for-data-import.md).
+为确保数据能够成功导入，你需要准备符合命名规范的 schema 文件和数据文件。更多信息，参见 [Naming Conventions for Data Import](/tidb-cloud/naming-conventions-for-data-import.md)。
 
-### Troubleshoot access denied errors during data import from Amazon S3
+### 排查从 Amazon S3 导入数据时的访问被拒绝错误
 
-You can troubleshoot access denied errors that might occur when you import data from Amazon S3 into TiDB Cloud. For more information, see [Troubleshoot Access Denied Errors during Data Import from Amazon S3](/tidb-cloud/troubleshoot-import-access-denied-error.md).
+你可以排查在从 Amazon S3 导入数据到 TiDB Cloud 时可能出现的访问被拒绝错误。更多信息，参见 [Troubleshoot Access Denied Errors during Data Import from Amazon S3](/tidb-cloud/troubleshoot-import-access-denied-error.md)。

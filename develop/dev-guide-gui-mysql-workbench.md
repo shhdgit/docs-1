@@ -1,185 +1,185 @@
 ---
-title: Connect to TiDB with MySQL Workbench
-summary: Learn how to connect to TiDB using MySQL Workbench.
+title: 使用 MySQL Workbench 连接 TiDB
+summary: 学习如何使用 MySQL Workbench 连接 TiDB。
 ---
 
-# Connect to TiDB with MySQL Workbench
+# 使用 MySQL Workbench 连接 TiDB
 
-TiDB is a MySQL-compatible database, and [MySQL Workbench](https://www.mysql.com/products/workbench/) is a GUI tool set for MySQL database users.
+TiDB 是兼容 MySQL 的数据库，[MySQL Workbench](https://www.mysql.com/products/workbench/) 是为 MySQL 数据库用户提供的图形化工具集。
 
 > **Warning:**
 >
-> - Although you can use MySQL Workbench to connect to TiDB due to its MySQL compatibility, MySQL Workbench does not fully support TiDB. You might encounter some issues during usage as it treats TiDB as MySQL.
-> - It is recommended to use other GUI tools that officially support TiDB, such as [DataGrip](/develop/dev-guide-gui-datagrip.md), [DBeaver](/develop/dev-guide-gui-dbeaver.md), and [VS Code SQLTools](/develop/dev-guide-gui-vscode-sqltools.md). For a complete list of GUI tools that fully supported by TiDB, see [Third-party tools supported by TiDB](/develop/dev-guide-third-party-support.md#gui).
+> - 虽然你可以因为 TiDB 的 MySQL 兼容性而使用 MySQL Workbench 连接 TiDB，但 MySQL Workbench 并不完全支持 TiDB。在使用过程中可能会遇到一些问题，因为它将 TiDB 视为 MySQL。
+> - 推荐使用官方支持 TiDB 的其他 GUI 工具，例如 [DataGrip](/develop/dev-guide-gui-datagrip.md)、[DBeaver](/develop/dev-guide-gui-dbeaver.md) 和 [VS Code SQLTools](/develop/dev-guide-gui-vscode-sqltools.md)。完整支持 TiDB 的 GUI 工具列表请参见 [TiDB 支持的第三方工具](/develop/dev-guide-third-party-support.md#gui)。
 
-In this tutorial, you can learn how to connect to your TiDB cluster using MySQL Workbench.
+本教程将指导你如何使用 MySQL Workbench 连接到你的 TiDB 集群。
 
 > **Note:**
 >
-> This tutorial is compatible with {{{ .starter }}}, TiDB Cloud Dedicated, and TiDB Self-Managed.
+> 本教程适用于 TiDB Cloud Starter、TiDB Cloud Essential、TiDB Cloud Dedicated 以及自建 TiDB。
 
-## Prerequisites
+## 前置条件
 
-To complete this tutorial, you need:
+完成本教程，你需要：
 
-- [MySQL Workbench](https://dev.mysql.com/downloads/workbench/) **8.0.31** or later versions.
-- A TiDB cluster.
+- [MySQL Workbench](https://dev.mysql.com/downloads/workbench/) **8.0.31** 或更高版本。
+- 一个 TiDB 集群。
 
 <CustomContent platform="tidb">
 
-**If you don't have a TiDB cluster, you can create one as follows:**
+**如果你还没有 TiDB 集群，可以按如下方式创建：**
 
-- (Recommended) Follow [Creating a {{{ .starter }}} cluster](/develop/dev-guide-build-cluster-in-cloud.md) to create your own TiDB Cloud cluster.
-- Follow [Deploy a local test TiDB cluster](/quick-start-with-tidb.md#deploy-a-local-test-cluster) or [Deploy a production TiDB cluster](/production-deployment-using-tiup.md) to create a local cluster.
+- （推荐）参考 [创建 TiDB Cloud Starter 集群](/develop/dev-guide-build-cluster-in-cloud.md) 创建属于你自己的 TiDB Cloud 集群。
+- 参考 [部署本地测试 TiDB 集群](/quick-start-with-tidb.md#deploy-a-local-test-cluster) 或 [部署生产环境 TiDB 集群](/production-deployment-using-tiup.md) 创建本地集群。
 
 </CustomContent>
 <CustomContent platform="tidb-cloud">
 
-**If you don't have a TiDB cluster, you can create one as follows:**
+**如果你还没有 TiDB 集群，可以按如下方式创建：**
 
-- (Recommended) Follow [Creating a {{{ .starter }}} cluster](/develop/dev-guide-build-cluster-in-cloud.md) to create your own TiDB Cloud cluster.
-- Follow [Deploy a local test TiDB cluster](https://docs.pingcap.com/tidb/stable/quick-start-with-tidb#deploy-a-local-test-cluster) or [Deploy a production TiDB cluster](https://docs.pingcap.com/tidb/stable/production-deployment-using-tiup) to create a local cluster.
+- （推荐）参考 [创建 TiDB Cloud Starter 集群](/develop/dev-guide-build-cluster-in-cloud.md) 创建属于你自己的 TiDB Cloud 集群。
+- 参考 [部署本地测试 TiDB 集群](https://docs.pingcap.com/tidb/stable/quick-start-with-tidb#deploy-a-local-test-cluster) 或 [部署生产环境 TiDB 集群](https://docs.pingcap.com/tidb/stable/production-deployment-using-tiup) 创建本地集群。
 
 </CustomContent>
 
-## Connect to TiDB
+## 连接 TiDB
 
-Connect to your TiDB cluster depending on the TiDB deployment option you have selected.
+根据你选择的 TiDB 部署方式，连接到你的 TiDB 集群。
 
 <SimpleTab>
-<div label="{{{ .starter }}}">
+<div label="TiDB Cloud Starter or Essential">
 
-1. Navigate to the [**Clusters**](https://tidbcloud.com/console/clusters) page, and then click the name of your target cluster to go to its overview page.
+1. 进入 [**Clusters**](https://tidbcloud.com/console/clusters) 页面，点击目标集群名称进入其概览页面。
 
-2. Click **Connect** in the upper-right corner. A connection dialog is displayed.
+2. 点击右上角的 **Connect**，弹出连接对话框。
 
-3. Ensure the configurations in the connection dialog match your operating environment.
+3. 确认连接对话框中的配置与你的操作环境一致。
 
-    - **Connection Type** is set to `Public`.
-    - **Branch** is set to `main`.
-    - **Connect With** is set to `MySQL Workbench`.
-    - **Operating System** matches your environment.
+    - **Connection Type** 设置为 `Public`。
+    - **Branch** 设置为 `main`。
+    - **Connect With** 设置为 `MySQL Workbench`。
+    - **Operating System** 与你的环境一致。
 
-4. Click **Generate Password** to create a random password.
+4. 点击 **Generate Password** 生成一个随机密码。
 
     > **Tip:**
     >
-    > If you have created a password before, you can either use the original password or click **Reset Password** to generate a new one.
+    > 如果你之前已经创建过密码，可以继续使用原密码，或者点击 **Reset Password** 生成新密码。
 
-5. Launch MySQL Workbench and click **+** near the **MySQL Connections** title.
+5. 启动 MySQL Workbench，点击 **MySQL Connections** 标题旁的 **+**。
 
     ![MySQL Workbench: add new connection](/media/develop/mysql-workbench-add-new-connection.png)
 
-6. In the **Setup New Connection** dialog, configure the following connection parameters:
+6. 在 **Setup New Connection** 对话框中，配置以下连接参数：
 
-    - **Connection Name**: give this connection a meaningful name.
-    - **Hostname**: enter the `HOST` parameter from the TiDB Cloud connection dialog.
-    - **Port**: enter the `PORT` parameter from the TiDB Cloud connection dialog.
-    - **Username**: enter the `USERNAME` parameter from the TiDB Cloud connection dialog.
-    - **Password**: click **Store in Keychain ...** or **Store in Vault**, enter the password of the {{{ .starter }}} cluster, and then click **OK** to store the password.
+    - **Connection Name**：为该连接起一个有意义的名称。
+    - **Hostname**：输入 TiDB Cloud 连接对话框中的 `HOST` 参数。
+    - **Port**：输入 TiDB Cloud 连接对话框中的 `PORT` 参数。
+    - **Username**：输入 TiDB Cloud 连接对话框中的 `USERNAME` 参数。
+    - **Password**：点击 **Store in Keychain ...** 或 **Store in Vault**，输入 TiDB Cloud Starter 集群的密码，然后点击 **OK** 保存密码。
 
-        ![MySQL Workbench: store the password of {{{ .starter }}} in keychain](/media/develop/mysql-workbench-store-password-in-keychain.png)
+        ![MySQL Workbench: store the password of TiDB Cloud Starter in keychain](/media/develop/mysql-workbench-store-password-in-keychain.png)
 
-    The following figure shows an example of the connection parameters:
+    下图展示了连接参数的示例：
 
-    ![MySQL Workbench: configure connection settings for {{{ .starter }}}](/media/develop/mysql-workbench-connection-config-serverless-parameters.png)
+    ![MySQL Workbench: configure connection settings for TiDB Cloud Starter](/media/develop/mysql-workbench-connection-config-serverless-parameters.png)
 
-7. Click **Test Connection** to validate the connection to the {{{ .starter }}} cluster.
+7. 点击 **Test Connection** 验证与 TiDB Cloud Starter 集群的连接。
 
-8. If the connection test is successful, you can see the **Successfully made the MySQL connection** message. Click **OK** to save the connection configuration.
+8. 如果连接测试成功，你会看到 **Successfully made the MySQL connection** 消息。点击 **OK** 保存连接配置。
 
 </div>
 <div label="TiDB Cloud Dedicated">
 
-1. Navigate to the [**Clusters**](https://tidbcloud.com/console/clusters) page, and then click the name of your target cluster to go to its overview page.
+1. 进入 [**Clusters**](https://tidbcloud.com/console/clusters) 页面，点击目标集群名称进入其概览页面。
 
-2. Click **Connect** in the upper-right corner. A connection dialog is displayed.
+2. 点击右上角的 **Connect**，弹出连接对话框。
 
-3. In the connection dialog, select **Public** from the **Connection Type** drop-down list, and then click **CA cert** to download the CA certificate.
+3. 在连接对话框中，从 **Connection Type** 下拉列表选择 **Public**，然后点击 **CA cert** 下载 CA 证书。
 
-    If you have not configured the IP access list, click **Configure IP Access List** or follow the steps in [Configure an IP Access List](https://docs.pingcap.com/tidbcloud/configure-ip-access-list) to configure it before your first connection.
+    如果你还未配置 IP 访问列表，点击 **Configure IP Access List** 或参考 [配置 IP 访问列表](https://docs.pingcap.com/tidbcloud/configure-ip-access-list) 进行首次连接前的配置。
 
-    In addition to the **Public** connection type, TiDB Cloud Dedicated supports **Private Endpoint** and **VPC Peering** connection types. For more information, see [Connect to Your TiDB Cloud Dedicated Cluster](https://docs.pingcap.com/tidbcloud/connect-to-tidb-cluster).
+    除了 **Public** 连接类型，TiDB Cloud Dedicated 还支持 **Private Endpoint** 和 **VPC Peering** 连接类型。更多信息请参见 [连接到你的 TiDB Cloud Dedicated 集群](https://docs.pingcap.com/tidbcloud/connect-to-tidb-cluster)。
 
-4. Launch MySQL Workbench and click **+** near the **MySQL Connections** title.
+4. 启动 MySQL Workbench，点击 **MySQL Connections** 标题旁的 **+**。
 
     ![MySQL Workbench: add new connection](/media/develop/mysql-workbench-add-new-connection.png)
 
-5. In the **Setup New Connection** dialog, configure the following connection parameters:
+5. 在 **Setup New Connection** 对话框中，配置以下连接参数：
 
-    - **Connection Name**: give this connection a meaningful name.
-    - **Hostname**: enter the `HOST` parameter from the TiDB Cloud connection dialog.
-    - **Port**: enter the `PORT` parameter from the TiDB Cloud connection dialog.
-    - **Username**: enter the `USERNAME` parameter from the TiDB Cloud connection dialog.
-    - **Password**: click **Store in Keychain ...**, enter the password of the TiDB Cloud Dedicated cluster, and then click **OK** to store the password.
+    - **Connection Name**：为该连接起一个有意义的名称。
+    - **Hostname**：输入 TiDB Cloud 连接对话框中的 `HOST` 参数。
+    - **Port**：输入 TiDB Cloud 连接对话框中的 `PORT` 参数。
+    - **Username**：输入 TiDB Cloud 连接对话框中的 `USERNAME` 参数。
+    - **Password**：点击 **Store in Keychain ...**，输入 TiDB Cloud Dedicated 集群的密码，然后点击 **OK** 保存密码。
 
         ![MySQL Workbench: store the password of TiDB Cloud Dedicated in keychain](/media/develop/mysql-workbench-store-dedicated-password-in-keychain.png)
 
-    The following figure shows an example of the connection parameters:
+    下图展示了连接参数的示例：
 
     ![MySQL Workbench: configure connection settings for TiDB Cloud Dedicated](/media/develop/mysql-workbench-connection-config-dedicated-parameters.png)
 
-6. Click **Test Connection** to validate the connection to the TiDB Cloud Dedicated cluster.
+6. 点击 **Test Connection** 验证与 TiDB Cloud Dedicated 集群的连接。
 
-7. If the connection test is successful, you can see the **Successfully made the MySQL connection** message. Click **OK** to save the connection configuration.
+7. 如果连接测试成功，你会看到 **Successfully made the MySQL connection** 消息。点击 **OK** 保存连接配置。
 
 </div>
 <div label="TiDB Self-Managed">
 
-1. Launch MySQL Workbench and click **+** near the **MySQL Connections** title.
+1. 启动 MySQL Workbench，点击 **MySQL Connections** 标题旁的 **+**。
 
     ![MySQL Workbench: add new connection](/media/develop/mysql-workbench-add-new-connection.png)
 
-2. In the **Setup New Connection** dialog, configure the following connection parameters:
+2. 在 **Setup New Connection** 对话框中，配置以下连接参数：
 
-    - **Connection Name**: give this connection a meaningful name.
-    - **Hostname**: enter the IP address or domain name of your TiDB Self-Managed cluster.
-    - **Port**: enter the port number of your TiDB Self-Managed cluster.
-    - **Username**: enter the username to use to connect to your TiDB.
-    - **Password**: click **Store in Keychain ...**, enter the password to use to connect to your TiDB cluster, and then click **OK** to store the password.
+    - **Connection Name**：为该连接起一个有意义的名称。
+    - **Hostname**：输入你的 TiDB 自建集群的 IP 地址或域名。
+    - **Port**：输入你的 TiDB 自建集群的端口号。
+    - **Username**：输入用于连接 TiDB 的用户名。
+    - **Password**：点击 **Store in Keychain ...**，输入用于连接 TiDB 集群的密码，然后点击 **OK** 保存密码。
 
         ![MySQL Workbench: store the password of TiDB Self-Managed in keychain](/media/develop/mysql-workbench-store-self-hosted-password-in-keychain.png)
 
-    The following figure shows an example of the connection parameters:
+    下图展示了连接参数的示例：
 
     ![MySQL Workbench: configure connection settings for TiDB Self-Managed](/media/develop/mysql-workbench-connection-config-self-hosted-parameters.png)
 
-3. Click **Test Connection** to validate the connection to the TiDB Self-Managed cluster.
+3. 点击 **Test Connection** 验证与 TiDB 自建集群的连接。
 
-4. If the connection test is successful, you can see the **Successfully made the MySQL connection** message. Click **OK** to save the connection configuration.
+4. 如果连接测试成功，你会看到 **Successfully made the MySQL connection** 消息。点击 **OK** 保存连接配置。
 
 </div>
 </SimpleTab>
 
-## FAQs
+## 常见问题
 
-### How to handle the connection timeout error "Error Code: 2013. Lost connection to MySQL server during query"?
+### 如何处理连接超时错误 "Error Code: 2013. Lost connection to MySQL server during query"？
 
-This error indicates that the query execution time exceeds the timeout limit. To resolve this issue, you can adjust the timeout settings by the following steps:
+该错误表示查询执行时间超过了超时时间限制。你可以通过以下步骤调整超时设置来解决此问题：
 
-1. Launch MySQL Workbench and navigate to the **Workbench Preferences** page.
-2. In the **SQL Editor** > **MySQL Session** section, configure the **DBMS connection read timeout interval (in seconds)** option. This sets the maximum amount of time (in seconds) that a query can take before MySQL Workbench disconnects from the server.
+1. 启动 MySQL Workbench，进入 **Workbench Preferences** 页面。
+2. 在 **SQL Editor** > **MySQL Session** 部分，配置 **DBMS connection read timeout interval (in seconds)** 选项。该选项设置了查询最大允许执行时间（秒），超时后 MySQL Workbench 会断开与服务器的连接。
 
     ![MySQL Workbench: adjust timeout option in SQL Editor settings](/media/develop/mysql-workbench-adjust-sqleditor-read-timeout.jpg)
 
-For more information, see [MySQL Workbench frequently asked questions](https://dev.mysql.com/doc/workbench/en/workbench-faq.html).
+更多信息请参见 [MySQL Workbench 常见问题](https://dev.mysql.com/doc/workbench/en/workbench-faq.html)。
 
-## Next steps
+## 后续步骤
 
-- Learn more usage of MySQL Workbench from [the documentation of MySQL Workbench](https://dev.mysql.com/doc/workbench/en/).
-- Learn the best practices for TiDB application development with the chapters in the [Developer guide](/develop/dev-guide-overview.md), such as [Insert data](/develop/dev-guide-insert-data.md), [Update data](/develop/dev-guide-update-data.md), [Delete data](/develop/dev-guide-delete-data.md), [Single table reading](/develop/dev-guide-get-data-from-single-table.md), [Transactions](/develop/dev-guide-transaction-overview.md), and [SQL performance optimization](/develop/dev-guide-optimize-sql-overview.md).
-- Learn through the professional [TiDB developer courses](https://www.pingcap.com/education/) and earn [TiDB certifications](https://www.pingcap.com/education/certification/) after passing the exam.
+- 通过 [MySQL Workbench 官方文档](https://dev.mysql.com/doc/workbench/en/) 了解更多 MySQL Workbench 的用法。
+- 通过 [开发者指南](/develop/dev-guide-overview.md) 各章节学习 TiDB 应用开发最佳实践，例如 [插入数据](/develop/dev-guide-insert-data.md)、[更新数据](/develop/dev-guide-update-data.md)、[删除数据](/develop/dev-guide-delete-data.md)、[单表读取](/develop/dev-guide-get-data-from-single-table.md)、[事务](/develop/dev-guide-transaction-overview.md) 以及 [SQL 性能优化](/develop/dev-guide-optimize-sql-overview.md)。
+- 通过专业的 [TiDB 开发者课程](https://www.pingcap.com/education/)学习，并在通过考试后获得 [TiDB 认证](https://www.pingcap.com/education/certification/)。
 
-## Need help?
+## 需要帮助？
 
 <CustomContent platform="tidb">
 
-Ask the community on [Discord](https://discord.gg/DQZ2dy3cuc?utm_source=doc) or [Slack](https://slack.tidb.io/invite?team=tidb-community&channel=everyone&ref=pingcap-docs), or [submit a support ticket](/support.md).
+在 [Discord](https://discord.gg/DQZ2dy3cuc?utm_source=doc) 或 [Slack](https://slack.tidb.io/invite?team=tidb-community&channel=everyone&ref=pingcap-docs) 社区提问，或 [提交支持工单](/support.md)。
 
 </CustomContent>
 
 <CustomContent platform="tidb-cloud">
 
-Ask the community on [Discord](https://discord.gg/DQZ2dy3cuc?utm_source=doc) or [Slack](https://slack.tidb.io/invite?team=tidb-community&channel=everyone&ref=pingcap-docs), or [submit a support ticket](https://tidb.support.pingcap.com/).
+在 [Discord](https://discord.gg/DQZ2dy3cuc?utm_source=doc) 或 [Slack](https://slack.tidb.io/invite?team=tidb-community&channel=everyone&ref=pingcap-docs) 社区提问，或 [提交支持工单](https://tidb.support.pingcap.com/)。
 
 </CustomContent>

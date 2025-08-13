@@ -1,84 +1,84 @@
 ---
-title: Use Resource Control to Manage Background Tasks
-summary: Introduces how to control background tasks through Resource Control.
+title: 使用资源控制管理后台任务
+summary: 介绍如何通过资源控制管理后台任务。
 ---
 
-# Use Resource Control to Manage Background Tasks
+# 使用资源控制管理后台任务
 
 > **Warning:**
 >
-> This feature is experimental. It is not recommended that you use it in the production environment. This feature might be changed or removed without prior notice. If you find a bug, you can report an [issue](https://docs.pingcap.com/tidb/stable/support) on GitHub.
+> 此功能为实验性功能。不建议在生产环境中使用。该功能可能会在没有提前通知的情况下更改或移除。如果你发现了 bug，可以在 GitHub 上提交 [issue](https://docs.pingcap.com/tidb/stable/support)。
 >
-> The background task management in resource control is based on TiKV's dynamic adjustment of resource quotas for CPU/IO utilization. Therefore, it relies on the available resource quota of each instance. If multiple components or instances are deployed on a single server, it is mandatory to set the appropriate resource quota for each instance through `cgroup`. It is difficult to achieve the expected effect in deployment with shared resources such as TiUP Playground.
+> 资源控制中的后台任务管理基于 TiKV 对 CPU/IO 利用率资源配额的动态调整。因此，它依赖于每个实例的可用资源配额。如果在单台服务器上部署了多个组件或实例，必须通过 `cgroup` 为每个实例设置合适的资源配额。在如 TiUP Playground 这类资源共享的部署环境下，难以达到预期效果。
 
 > **Note:**
 >
-> This feature is not available on [{{{ .starter }}}](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) clusters.
+> 该功能在 [TiDB Cloud Starter](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) 和 [TiDB Cloud Essential](https://docs.pingcap.com/tidbcloud/select-cluster-tier#essential) 集群中不可用。
 
-Background tasks, such as data backup and automatic statistics collection, are low-priority but consume many resources. These tasks are usually triggered periodically or irregularly. During execution, they consume a lot of resources, thus affecting the performance of online high-priority tasks.
+后台任务（如数据备份和自动统计信息收集）优先级较低，但会消耗大量资源。这些任务通常会定期或不定期触发。在执行过程中会占用大量资源，从而影响在线高优先级任务的性能。
 
-Starting from v7.4.0, the [TiDB resource control](/tidb-resource-control-ru-groups.md) feature supports managing background tasks. When a task is marked as a background task, TiKV dynamically limits the resources used by this type of task to avoid the impact on the performance of other foreground tasks. TiKV monitors the CPU and IO resources consumed by all foreground tasks in real time, and calculates the resource threshold that can be used by background tasks based on the total resource limit of the instance. All background tasks are restricted by this threshold during execution.
+自 v7.4.0 起，[TiDB 资源控制](/tidb-resource-control-ru-groups.md) 功能支持后台任务管理。当任务被标记为后台任务时，TiKV 会动态限制此类任务使用的资源，以避免影响其他前台任务的性能。TiKV 实时监控所有前台任务消耗的 CPU 和 IO 资源，并根据实例的总资源限制计算后台任务可用的资源阈值。所有后台任务在执行时都受该阈值限制。
 
-## `BACKGROUND` parameters
+## `BACKGROUND` 参数
 
-- `TASK_TYPES`: specifies the task types that need to be managed as background tasks. Use commas (`,`) to separate multiple task types.
-- `UTILIZATION_LIMIT`: limits the maximum percentage (0-100) of resources that background tasks can consume on each TiKV node. By default, TiKV calculates the available resources for background tasks based on the total resources of the node and the resources currently occupied by the foreground tasks. If `UTILIZATION_LIMIT` is configured, the resource allocated to background tasks will not exceed this limit.
+- `TASK_TYPES`：指定需要作为后台任务管理的任务类型。多个任务类型用逗号（`,`）分隔。
+- `UTILIZATION_LIMIT`：限制后台任务在每个 TiKV 节点上可消耗的最大资源百分比（0-100）。默认情况下，TiKV 会根据节点的总资源和当前前台任务占用的资源计算后台任务可用的资源。如果配置了 `UTILIZATION_LIMIT`，分配给后台任务的资源不会超过该限制。
 
-TiDB supports the following types of background tasks:
+TiDB 支持以下类型的后台任务：
 
 <CustomContent platform="tidb">
 
-- `lightning`: perform import tasks using [TiDB Lightning](/tidb-lightning/tidb-lightning-overview.md). Both physical and logical import modes of TiDB Lightning are supported.
-- `br`: perform backup and restore tasks using [BR](/br/backup-and-restore-overview.md). PITR is not supported.
-- `ddl`: control the resource usage during the batch data write back phase of Reorg DDLs.
-- `stats`: the [collect statistics](/statistics.md#collect-statistics) tasks that are manually executed or automatically triggered by TiDB.
-- `background`: a reserved task type. You can use the [`tidb_request_source_type`](/system-variables.md#tidb_request_source_type-new-in-v740) system variable to specify the task type of the current session as `background`.
+- `lightning`：使用 [TiDB Lightning](/tidb-lightning/tidb-lightning-overview.md) 执行导入任务。支持 TiDB Lightning 的物理和逻辑导入模式。
+- `br`：使用 [BR](/br/backup-and-restore-overview.md) 执行备份和恢复任务。不支持 PITR。
+- `ddl`：控制 Reorg DDL 批量数据回写阶段的资源使用。
+- `stats`：由 TiDB 手动执行或自动触发的 [收集统计信息](/statistics.md#collect-statistics) 任务。
+- `background`：保留任务类型。你可以使用 [`tidb_request_source_type`](/system-variables.md#tidb_request_source_type-new-in-v740) 系统变量将当前会话的任务类型指定为 `background`。
 
 </CustomContent>
 
 <CustomContent platform="tidb-cloud">
 
-- `lightning`: perform import tasks using [TiDB Lightning](https://docs.pingcap.com/tidb/stable/tidb-lightning-overview). Both physical and logical import modes of TiDB Lightning are supported.
-- `br`: perform backup and restore tasks using [BR](https://docs.pingcap.com/tidb/stable/backup-and-restore-overview). PITR is not supported.
-- `ddl`: control the resource usage during the batch data write back phase of Reorg DDLs.
-- `stats`: the [collect statistics](/statistics.md#collect-statistics) tasks that are manually executed or automatically triggered by TiDB.
-- `background`: a reserved task type. You can use the [`tidb_request_source_type`](/system-variables.md#tidb_request_source_type-new-in-v740) system variable to specify the task type of the current session as `background`.
+- `lightning`：使用 [TiDB Lightning](https://docs.pingcap.com/tidb/stable/tidb-lightning-overview) 执行导入任务。支持 TiDB Lightning 的物理和逻辑导入模式。
+- `br`：使用 [BR](https://docs.pingcap.com/tidb/stable/backup-and-restore-overview) 执行备份和恢复任务。不支持 PITR。
+- `ddl`：控制 Reorg DDL 批量数据回写阶段的资源使用。
+- `stats`：由 TiDB 手动执行或自动触发的 [收集统计信息](/statistics.md#collect-statistics) 任务。
+- `background`：保留任务类型。你可以使用 [`tidb_request_source_type`](/system-variables.md#tidb_request_source_type-new-in-v740) 系统变量将当前会话的任务类型指定为 `background`。
 
 </CustomContent>
 
-By default, the task types that are marked as background tasks are `""`, and the management of background tasks is disabled. To enable background task management, you need to manually modify the background task type of the `default` resource group. After a background task is identified and matched, Resource Control is automatically performed. This means that when system resources are insufficient, the background tasks are automatically reduced to the lowest priority to ensure the execution of foreground tasks.
+默认情况下，被标记为后台任务的任务类型为 `""`，后台任务管理功能处于关闭状态。要启用后台任务管理，你需要手动修改 `default` 资源组的后台任务类型。当后台任务被识别并匹配后，会自动进行资源控制。这意味着当系统资源不足时，后台任务会自动降为最低优先级，以保障前台任务的执行。
 
 > **Note:**
 >
-> Currently, background tasks for all resource groups are bound to the `default` resource group. You can manage background task types globally through `default`. Binding background tasks to other resource groups is currently not supported.
+> 目前，所有资源组的后台任务都绑定在 `default` 资源组。你可以通过 `default` 全局管理后台任务类型。暂不支持将后台任务绑定到其他资源组。
 
-## Examples
+## 示例
 
-1. Modify the `default` resource group by marking `br` and `ddl` as background tasks and setting the resource limit of background tasks to 30%.
+1. 修改 `default` 资源组，将 `br` 和 `ddl` 标记为后台任务，并设置后台任务的资源限制为 30%。
 
     ```sql
     ALTER RESOURCE GROUP `default` BACKGROUND=(TASK_TYPES='br,ddl', UTILIZATION_LIMIT=30);
     ```
 
-2. Change the `default` resource group to revert the background task type to its default value.
+2. 修改 `default` 资源组，将后台任务类型恢复为默认值。
 
     ```sql
     ALTER RESOURCE GROUP `default` BACKGROUND=NULL;
     ```
 
-3. Change the `default` resource group to set the background task type to empty. In this case, all tasks of this resource group are not treated as background tasks.
+3. 修改 `default` 资源组，将后台任务类型设置为空。此时该资源组的所有任务都不会被视为后台任务。
 
     ```sql
     ALTER RESOURCE GROUP `default` BACKGROUND=(TASK_TYPES="");
     ```
 
-4. View the background task type of the `default` resource group.
+4. 查看 `default` 资源组的后台任务类型。
 
     ```sql
     SELECT * FROM information_schema.resource_groups WHERE NAME="default";
     ```
 
-    The output is as follows:
+    输出如下：
 
     ```
     +---------+------------+----------+-----------+-------------+-------------------------------------------+
@@ -88,7 +88,7 @@ By default, the task types that are marked as background tasks are `""`, and the
     +---------+------------+----------+-----------+-------------+-------------------------------------------+
     ```
 
-5. To explicitly mark tasks in the current session as the background type, you can use `tidb_request_source_type` to explicitly specify the task type. The following is an example:
+5. 如果你希望在当前会话中显式将任务标记为后台类型，可以使用 `tidb_request_source_type` 显式指定任务类型。示例如下：
 
     ``` sql
     SET @@tidb_request_source_type="background";

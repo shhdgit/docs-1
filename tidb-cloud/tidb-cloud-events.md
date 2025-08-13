@@ -1,51 +1,51 @@
 ---
 title: TiDB Cloud Cluster Events
-summary: Learn how to view the events for TiDB Cloud clusters using the Events page.
+summary: 了解如何使用 Events 页面查看 TiDB Cloud 集群的事件。
 ---
 
 # TiDB Cloud Cluster Events
 
-TiDB Cloud logs the historical events at the cluster level. An *event* indicates a change in your TiDB Cloud cluster. You can view the logged events on the **Events** page, including the event type, status, message, trigger time, and trigger user.
+TiDB Cloud 会在集群层面记录历史事件。一个 *event* 表示你的 TiDB Cloud 集群发生的某个变更。你可以在 **Events** 页面查看已记录的事件，包括事件类型、状态、消息、触发时间和触发用户。
 
-This document describes how to view the events for TiDB Cloud clusters using the **Events** page and lists the supported event types.
+本文档介绍如何使用 **Events** 页面查看 TiDB Cloud 集群的事件，并列出了支持的事件类型。
 
-## View the Events page
+## 查看 Events 页面
 
-To view the events on the Events page, take the following steps:
+要在 **Events** 页面查看事件，请按照以下步骤操作：
 
-1. In the [TiDB Cloud console](https://tidbcloud.com/), navigate to the [**Clusters**](https://tidbcloud.com/console/clusters) page of your project.
+1. 在你的项目的 [**Clusters**](https://tidbcloud.com/project/clusters) 页面，点击目标集群的名称，进入其概览页面。
 
     > **Tip:**
     >
-    > If you have multiple projects, you can click <MDSvgIcon name="icon-left-projects" /> in the lower-left corner and switch to another project.
+    > 你可以使用左上角的下拉框在组织、项目和集群之间切换。
 
-2. Click the name of the target cluster. The cluster overview page is displayed.
-3. Click **Events** in the left navigation pane.
+2. 在左侧导航栏，点击 **Monitoring** > **Events**。
 
-## Logged events
+## 已记录的事件
 
-TiDB Cloud logs the following types of cluster events:
+TiDB Cloud 会记录以下类型的集群事件：
 
 | Event Type| Description |
 |:--- |:--- |
-| CreateCluster |  Create a cluster |  
-| PauseCluster |   Pause a cluster |  
-| ResumeCluster |   Resume a cluster | 
-| ModifyClusterSize |   Modify cluster size | 
-| BackupCluster |   Back up a cluster |  
-| RestoreFromCluster |   Restore a cluster |  
-| CreateChangefeed |   Create a changefeed |  
-| PauseChangefeed |   Pause a changefeed | 
-| ResumeChangefeed |   Resume a changefeed | 
-| DeleteChangefeed |   Delete a changefeed |  
-| EditChangefeed |  Edit a changefeed |  
-| ScaleChangefeed |   Scale the specification of a changefeed |  
-| FailedChangefeed |   Changefeed failures |  
-| ImportData |   Import data to a cluster |  
-| UpdateSpendingLimit |   Update spending limit of a TiDB Cloud Serverless scalable cluster |  
-| ResourceLimitation |   Update resource limitation of a TiDB Cloud Serverless cluster |  
+| CreateCluster |  创建集群 |  
+| PauseCluster |   暂停集群 |  
+| ResumeCluster |   恢复集群 | 
+| ModifyClusterSize |   修改集群规格 | 
+| BackupCluster |   备份集群 |  
+| ExportBackup |   导出备份 |
+| RestoreFromCluster |   恢复集群 |  
+| CreateChangefeed |   创建 changefeed |  
+| PauseChangefeed |   暂停 changefeed | 
+| ResumeChangefeed |   恢复 changefeed | 
+| DeleteChangefeed |   删除 changefeed |  
+| EditChangefeed |  编辑 changefeed |  
+| ScaleChangefeed |   扩容 changefeed 规格 |  
+| FailedChangefeed |   changefeed 失败 |  
+| ImportData |   向集群导入数据 |  
+| UpdateSpendingLimit |   更新 TiDB Cloud Starter 集群的消费额度 |  
+| ResourceLimitation |   更新 TiDB Cloud Starter 集群的资源限制 |  
 
-For each event, the following information is logged:
+每个事件会记录以下信息：
 
 - Event Type
 - Status
@@ -53,6 +53,6 @@ For each event, the following information is logged:
 - Time
 - Triggered By
 
-## Event retention policy
+## 事件保留策略
 
-Event data is kept for 7 days.
+事件数据会保留 7 天。

@@ -1,22 +1,22 @@
 ---
 title: TIDB_SERVERS_INFO
-summary: Learn the `TIDB_SERVERS_INFO` INFORMATION_SCHEMA table.
+summary: 了解 `TIDB_SERVERS_INFO` INFORMATION_SCHEMA 表。
 ---
 
 # TIDB_SERVERS_INFO
 
-The `TIDB_SERVERS_INFO` table provides information about TiDB servers in the TiDB Cluster (namely, tidb-server processes).
+`TIDB_SERVERS_INFO` 表提供了关于 TiDB 集群中 TiDB 服务器（即 tidb-server 进程）的信息。
 
 > **Note:**
 >
-> This table is not available on [{{{ .starter }}}](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) clusters.
+> 该表在 [TiDB Cloud Starter](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) 和 [TiDB Cloud Essential](https://docs.pingcap.com/tidbcloud/select-cluster-tier#essential) 集群中不可用。
 
 ```sql
 USE INFORMATION_SCHEMA;
 DESC tidb_servers_info;
 ```
 
-The output is as follows:
+输出如下：
 
 ```sql
 +---------------+--------------+------+------+---------+-------+
@@ -35,13 +35,13 @@ The output is as follows:
 9 rows in set (0.00 sec)
 ```
 
-View the `TIDB_SERVERS_INFO` table:
+查看 `TIDB_SERVERS_INFO` 表：
 
 ```sql
 SELECT * FROM TIDB_SERVERS_INFO\G
 ```
 
-The output is as follows:
+输出如下：
 
 ```sql
 *************************** 1. row ***************************
@@ -50,7 +50,7 @@ The output is as follows:
          PORT: 4000
   STATUS_PORT: 10080
         LEASE: 45s
-      VERSION: 8.0.11-TiDB-{{{ .tidb-version }}}
+      VERSION: 8.0.11-TiDB-v8.5.2
      GIT_HASH: 827d8ff2d22ac4c93ae1b841b79d468211e1d393
 BINLOG_STATUS: Off
        LABELS:

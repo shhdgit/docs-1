@@ -1,231 +1,231 @@
 ---
-title: Perform a Proof of Concept (PoC) with TiDB Cloud
-summary: Learn about how to perform a Proof of Concept (PoC) with TiDB Cloud.
+title: 使用 TiDB Cloud 进行概念验证（PoC）
+summary: 了解如何使用 TiDB Cloud 进行概念验证（PoC）。
 ---
 
-# Perform a Proof of Concept (PoC) with TiDB Cloud
+# 使用 TiDB Cloud 进行概念验证（PoC）
 
-TiDB Cloud is a Database-as-a-Service (DBaaS) product that delivers everything great about TiDB in a fully managed cloud database. It helps you focus on your applications, instead of the complexities of your database. TiDB Cloud is currently available on both Amazon Web Services (AWS) and Google Cloud.
+TiDB Cloud 是一款数据库即服务（DBaaS）产品，将 TiDB 的所有优势以全托管云数据库的形式交付。它帮助你专注于应用程序开发，而无需关注数据库的复杂性。TiDB Cloud 目前支持 Amazon Web Services（AWS）、Google Cloud、Microsoft Azure 和阿里云。
 
-Initiating a proof of concept (PoC) is the best way to determine whether TiDB Cloud is the best fit for your business needs. It will also get you familiar with the key features of TiDB Cloud in a short time. By running performance tests, you can see whether your workload can run efficiently on TiDB Cloud. You can also evaluate the efforts required to migrate your data and adapt configurations.
+发起概念验证（PoC）是判断 TiDB Cloud 是否适合你业务需求的最佳方式。通过 PoC，你还可以在短时间内熟悉 TiDB Cloud 的关键特性。通过运行性能测试，你可以评估你的业务负载是否能高效运行在 TiDB Cloud 上，同时也能评估数据迁移和配置适配所需的工作量。
 
-This document describes the typical PoC procedures and aims to help you quickly complete a TiDB Cloud PoC. It is a best practice that has been validated by TiDB experts and a large customer base.
+本文档介绍了典型的 PoC 流程，旨在帮助你快速完成 TiDB Cloud 的 PoC。这是经过 TiDB 专家和大量客户验证的最佳实践。
 
-If you are interested in doing a PoC, feel free to contact <a href="mailto:tidbcloud-support@pingcap.com">PingCAP</a> before you get started. The support team can help you create a test plan and walk you through the PoC procedures smoothly.
+如果你有兴趣进行 PoC，欢迎在开始前联系 <a href="mailto:tidbcloud-support@pingcap.com">PingCAP</a>。支持团队可以帮助你制定测试计划，并顺利引导你完成 PoC 流程。
 
-Alternatively, you can [create a TiDB Cloud Serverless](/tidb-cloud/tidb-cloud-quickstart.md#step-1-create-a-tidb-cluster) to get familiar with TiDB Cloud for a quick evaluation. Note that the TiDB Cloud Serverless has some [special terms and conditions](/tidb-cloud/select-cluster-tier.md#tidb-cloud-serverless-special-terms-and-conditions).
+你也可以 [创建 TiDB Cloud Starter](/tidb-cloud/tidb-cloud-quickstart.md#step-1-create-a-tidb-cluster) 快速体验 TiDB Cloud 进行初步评估。请注意，TiDB Cloud Starter 有一些 [特殊条款和条件](/tidb-cloud/serverless-limitations.md)。
 
-## Overview of the PoC procedures
+## PoC 流程概览
 
-The purpose of a PoC is to test whether TiDB Cloud meets your business requirements. A typical PoC usually lasts 14 days, during which you are expected to focus on completing the PoC.
+PoC 的目的是测试 TiDB Cloud 是否满足你的业务需求。一个典型的 PoC 通常持续 14 天，在此期间建议你专注于完成 PoC。
 
-A typical TiDB Cloud PoC consists of the following steps:
+一个典型的 TiDB Cloud PoC 包含以下步骤：
 
-1. Define success criteria and create a test plan
-2. Identify characteristics of your workload
-3. Sign up and create a TiDB Cloud Dedicated cluster for the PoC
-4. Adapt your schemas and SQL
-5. Import data
-6. Run your workload and evaluate results
-7. Explore more features
-8. Clean up the environment and finish the PoC
+1. 定义成功标准并制定测试计划
+2. 明确你的业务负载特性
+3. 注册并为 PoC 创建 TiDB Cloud Dedicated 集群
+4. 适配你的数据库结构和 SQL
+5. 导入数据
+6. 运行业务负载并评估结果
+7. 探索更多功能
+8. 清理环境并完成 PoC
 
-## Step 1. Define success criteria and create a test plan
+## 第 1 步：定义成功标准并制定测试计划
 
-When evaluating TiDB Cloud through a PoC, it is recommended to decide your points of interest and the corresponding technical evaluation criteria based on your business needs, and then clarify your expectations and goals for the PoC. Clear and measurable technical criteria with a detailed test plan can help you focus on the key aspects, cover the business level requirements, and ultimately get answers through the PoC procedures.
+在通过 PoC 评估 TiDB Cloud 时，建议你根据业务需求确定关注点及相应的技术评估标准，并明确你对 PoC 的期望和目标。清晰且可量化的技术标准配合详细的测试计划，可以帮助你聚焦关键点，覆盖业务层面的需求，并最终通过 PoC 流程获得答案。
 
-Use the following questions to help identify the goals of your PoC:
+你可以通过以下问题来帮助确定 PoC 的目标：
 
-- What is the scenario of your workload?
-- What is the dataset size or workload of your business? What is the growth rate?
-- What are the performance requirements, including the business-critical throughput or latency requirements?
-- What are the availability and stability requirements, including the minimum acceptable planned or unplanned downtime?
-- What are the necessary metrics for operational efficiency? How do you measure them?
-- What are the security and compliance requirements for your workload?
+- 你的业务负载场景是什么？
+- 你的业务数据集规模或负载是多少？增长速度如何？
+- 性能需求有哪些，包括关键业务的吞吐量或延迟要求？
+- 可用性和稳定性需求是什么，包括可接受的计划内或计划外停机时间？
+- 运营效率需要关注哪些指标？你如何衡量这些指标？
+- 你的业务负载有哪些安全和合规性要求？
 
-For more information about the success criteria and how to create a test plan, feel free to contact <a href="mailto:tidbcloud-support@pingcap.com">PingCAP</a>.
+如需了解更多关于成功标准和如何制定测试计划的信息，欢迎联系 <a href="mailto:tidbcloud-support@pingcap.com">PingCAP</a>。
 
-## Step 2. Identify characteristics of your workload
+## 第 2 步：明确你的业务负载特性
 
-TiDB Cloud is suitable for various use cases that require high availability and strong consistency with a large volume of data. [TiDB Introduction](https://docs.pingcap.com/tidb/stable/overview) lists the key features and scenarios. You can check whether they apply to your business scenarios:
+TiDB Cloud 适用于需要高可用性、强一致性和大数据量的多种场景。[TiDB 简介](https://docs.pingcap.com/tidb/stable/overview) 列出了关键特性和应用场景。你可以检查这些特性是否适用于你的业务场景：
 
-- Horizontally scaling out or scaling in
-- Financial-grade high availability
-- Real-time HTAP
-- Compatible with the MySQL protocol and MySQL ecosystem
+- 水平扩展和缩容
+- 金融级高可用性
+- 实时 HTAP
+- 兼容 MySQL 协议及生态
 
-You might also be interested in using [TiFlash](https://docs.pingcap.com/tidb/stable/tiflash-overview), a columnar storage engine that helps speed up analytical processing. During the PoC, you can use the TiFlash feature at any time.
+你可能还会对 [TiFlash](https://docs.pingcap.com/tidb/stable/tiflash-overview) 感兴趣，它是一款加速分析处理的列存储引擎。在 PoC 过程中，你可以随时使用 TiFlash 功能。
 
-## Step 3. Sign up and create a TiDB Cloud Dedicated cluster for the PoC
+## 第 3 步：注册并为 PoC 创建 TiDB Cloud Dedicated 集群
 
-To create a [TiDB Cloud Dedicated](/tidb-cloud/select-cluster-tier.md#tidb-cloud-dedicated) cluster for the PoC, take the following steps:
+要为 PoC 创建 [TiDB Cloud Dedicated](/tidb-cloud/select-cluster-tier.md#tidb-cloud-dedicated) 集群，请按照以下步骤操作：
 
-1. Fill in the PoC application form by doing one of the following:
+1. 通过以下任一方式填写 PoC 申请表：
 
-    - On the PingCAP website, go to the [Apply for PoC](https://pingcap.com/apply-for-poc/) page to fill in the application form.
-    - In the [TiDB Cloud console](https://tidbcloud.com/), click **?** in the lower-right corner, click **Contact Sales**, and then select **Apply for PoC** to fill in the application form.
+    - 在 PingCAP 官网，访问 [申请 PoC](https://pingcap.com/apply-for-poc/) 页面填写申请表。
+    - 在 [TiDB Cloud 控制台](https://tidbcloud.com/)，点击右下角的 **?**，选择 **Contact Sales**，再选择 **Apply for PoC** 填写申请表。
 
-    Once you submit the form, the TiDB Cloud Support team will review your application, contact you, and transfer credits to your account once the application is approved. You can also contact a PingCAP support engineer to assist with your PoC procedures to ensure the PoC runs as smoothly as possible.
+    提交表单后，TiDB Cloud 支持团队会审核你的申请，与你联系，并在申请通过后将额度转入你的账户。你也可以联系 PingCAP 支持工程师协助 PoC 流程，确保 PoC 顺利进行。
 
-2. Refer to [Create a TiDB Cloud Dedicated Cluster](/tidb-cloud/create-tidb-cluster.md) to create a TiDB Cloud Dedicated cluster for the PoC.
+2. 参考 [创建 TiDB Cloud Dedicated 集群](/tidb-cloud/create-tidb-cluster.md) 为 PoC 创建专属集群。
 
-Capacity planning is recommended for cluster sizing before you create a cluster. You can start with estimated numbers of TiDB, TiKV, or TiFlash nodes, and scale out the cluster later to meet performance requirements. You can find more details in the following documents or consult our support team.
+在创建集群前，建议进行容量规划。你可以根据预估的 TiDB、TiKV 或 TiFlash 节点数量起步，后续根据性能需求扩容。你可以参考以下文档或咨询我们的支持团队获取更多细节。
 
-- For more information about estimation practice, see [Size Your TiDB](/tidb-cloud/size-your-cluster.md).
-- For configurations of the TiDB Cloud Dedicated cluster, see [Create a TiDB Cloud Dedicated Cluster](/tidb-cloud/create-tidb-cluster.md). Configure the cluster size for TiDB, TiKV, and TiFlash (optional) respectively.
-- For how to plan and optimize your PoC credits consumption effectively, see [FAQ](#faq) in this document.
-- For more information about scaling, see [Scale Your TiDB Cluster](/tidb-cloud/scale-tidb-cluster.md).
+- 关于容量估算实践，参见 [集群容量规划](/tidb-cloud/size-your-cluster.md)。
+- 关于 TiDB Cloud Dedicated 集群的配置，参见 [创建 TiDB Cloud Dedicated 集群](/tidb-cloud/create-tidb-cluster.md)。分别为 TiDB、TiKV 和 TiFlash（可选）配置集群规模。
+- 关于如何有效规划和优化 PoC 额度消耗，参见本文档的 [FAQ](#faq)。
+- 关于扩容的更多信息，参见 [扩容 TiDB 集群](/tidb-cloud/scale-tidb-cluster.md)。
 
-Once a dedicated PoC cluster is created, you are ready to load data and perform a series of tests. For how to connect to a TiDB cluster, see [Connect to Your TiDB Cloud Dedicated Cluster](/tidb-cloud/connect-to-tidb-cluster.md).
+专属 PoC 集群创建完成后，你就可以加载数据并进行一系列测试。关于如何连接 TiDB 集群，参见 [连接 TiDB Cloud Dedicated 集群](/tidb-cloud/connect-to-tidb-cluster.md)。
 
-For a newly created cluster, note the following configurations:
+对于新建集群，请注意以下配置：
 
-- The default time zone (the **Create Time** column on the Dashboard) is UTC. You can change it to your local time zone by following [Set the Local Time Zone](/tidb-cloud/manage-user-access.md#set-the-time-zone-for-your-organization).
-- The default backup setting on a new cluster is full database backup on a daily basis. You can specify a preferred backup time or back up data manually. For the default backup time and more details, see [Back up and Restore TiDB Cluster Data](/tidb-cloud/backup-and-restore.md#turn-on-auto-backup).
+- 默认时区（Dashboard 上的 **Create Time** 列）为 UTC。你可以按照 [设置本地时区](/tidb-cloud/manage-user-access.md#set-the-time-zone-for-your-organization) 修改为本地时区。
+- 新集群的默认备份设置为每日全库备份。你可以指定首选备份时间或手动备份数据。关于默认备份时间及更多细节，参见 [备份与恢复 TiDB 集群数据](/tidb-cloud/backup-and-restore.md#turn-on-auto-backup)。
 
-## Step 4. Adapt your schemas and SQL
+## 第 4 步：适配你的数据库结构和 SQL
 
-Next, you can load your database schemas to the TiDB cluster, including tables and indexes.
+接下来，你可以将数据库结构（包括表和索引）加载到 TiDB 集群。
 
-Because the amount of PoC credits is limited, to maximize the value of credits, it is recommended that you create a [TiDB Cloud Serverless cluster](/tidb-cloud/select-cluster-tier.md#tidb-cloud-serverless) for compatibility tests and preliminary analysis on TiDB Cloud.
+由于 PoC 额度有限，为了最大化额度价值，建议你先创建 [TiDB Cloud Starter 集群](/tidb-cloud/select-cluster-tier.md#tidb-cloud-serverless) 进行兼容性测试和初步分析。
 
-TiDB Cloud is highly compatible with MySQL 8.0. You can directly import your data into TiDB if it is MySQL-compatible or can be adapted to be compatible with MySQL.
+TiDB Cloud 高度兼容 MySQL 8.0。如果你的数据源兼容 MySQL，或可以适配为兼容 MySQL，可以直接导入数据到 TiDB。
 
-For more information about compatibilities, see the following documents:
+关于兼容性，参见以下文档：
 
-- [TiDB compatibility with MySQL](https://docs.pingcap.com/tidb/stable/mysql-compatibility).
-- [TiDB features that are different from MySQL](https://docs.pingcap.com/tidb/stable/mysql-compatibility#features-that-are-different-from-mysql).
-- [TiDB's Keywords and Reserved Words](https://docs.pingcap.com/tidb/stable/keywords).
-- [TiDB Limitations](https://docs.pingcap.com/tidb/stable/tidb-limitations).
+- [TiDB 与 MySQL 的兼容性](https://docs.pingcap.com/tidb/stable/mysql-compatibility)
+- [TiDB 与 MySQL 不同的特性](https://docs.pingcap.com/tidb/stable/mysql-compatibility#features-that-are-different-from-mysql)
+- [TiDB 的关键字和保留字](https://docs.pingcap.com/tidb/stable/keywords)
+- [TiDB 限制](https://docs.pingcap.com/tidb/stable/tidb-limitations)
 
-Here are some best practices:
+以下是一些最佳实践：
 
-- Check whether there are inefficiencies in schema setup.
-- Remove unnecessary indexes.
-- Plan the partitioning policy for effective partitioning.
-- Avoid [hotspot issues](https://docs.pingcap.com/tidb/stable/troubleshoot-hot-spot-issues#identify-hotspot-issues) caused by Right-Hand-Side Index Growth, for example, indexes on the timestamp.
-- Avoid [hotspot issues](https://docs.pingcap.com/tidb/stable/troubleshoot-hot-spot-issues#identify-hotspot-issues) by using [SHARD_ROW_ID_BITS](https://docs.pingcap.com/tidb/stable/shard-row-id-bits) and [AUTO_RANDOM](https://docs.pingcap.com/tidb/stable/auto-random).
+- 检查数据库结构设计是否存在低效问题。
+- 移除不必要的索引。
+- 规划分区策略，实现有效分区。
+- 避免因右侧索引增长（如时间戳索引）导致的 [热点问题](https://docs.pingcap.com/tidb/stable/troubleshoot-hot-spot-issues#identify-hotspot-issues)。
+- 通过使用 [SHARD_ROW_ID_BITS](https://docs.pingcap.com/tidb/stable/shard-row-id-bits) 和 [AUTO_RANDOM](https://docs.pingcap.com/tidb/stable/auto-random) 避免 [热点问题](https://docs.pingcap.com/tidb/stable/troubleshoot-hot-spot-issues#identify-hotspot-issues)。
 
-For SQL statements, you might need to adapt them depending on the level of your data source's compatibility with TiDB.
+对于 SQL 语句，你可能需要根据数据源与 TiDB 的兼容性程度进行适配。
 
-If you have any questions, contact [PingCAP](/tidb-cloud/tidb-cloud-support.md) for consultation.
+如有疑问，请联系 [PingCAP](/tidb-cloud/tidb-cloud-support.md) 咨询。
 
-## Step 5. Import data
+## 第 5 步：导入数据
 
-You can import a small dataset to quickly test feasibility, or a large dataset to test the throughput of TiDB data migration tools. Although TiDB provides sample data, it is strongly recommended to perform a test with real workloads from your business.
+你可以导入小规模数据集以快速测试可行性，或导入大规模数据集以测试 TiDB 数据迁移工具的吞吐能力。虽然 TiDB 提供了示例数据，但强烈建议你使用真实业务负载进行测试。
 
-You can import data in various formats to TiDB Cloud:
+你可以将多种格式的数据导入 TiDB Cloud：
 
-- [Migrate MySQL-Compatible Databases to TiDB Cloud Using Data Migration](/tidb-cloud/migrate-from-mysql-using-data-migration.md)
-- [Import Local Files to TiDB Cloud](/tidb-cloud/tidb-cloud-import-local-files.md)
-- [Import sample data in the SQL file format](/tidb-cloud/import-sample-data.md)
-- [Import CSV Files from Amazon S3 or GCS](/tidb-cloud/import-csv-files.md)
-- [Import Apache Parquet Files](/tidb-cloud/import-parquet-files.md)
+- [使用数据迁移将 MySQL 兼容数据库迁移到 TiDB Cloud](/tidb-cloud/migrate-from-mysql-using-data-migration.md)
+- [导入本地文件到 TiDB Cloud](/tidb-cloud/tidb-cloud-import-local-files.md)
+- [导入 SQL 文件格式的示例数据](/tidb-cloud/import-sample-data.md)
+- [从云存储导入 CSV 文件](/tidb-cloud/import-csv-files.md)
+- [导入 Apache Parquet 文件](/tidb-cloud/import-parquet-files.md)
 
 > **Note:**
 >
-> Data import on the **Import** page does not generate additional billing fees.
+> 在 **Import** 页面进行数据导入不会产生额外计费费用。
 
-## Step 6. Run your workload and evaluate results
+## 第 6 步：运行业务负载并评估结果
 
-Now you have created the environment, adapted the schemas, and imported data. It is time to test your workload.
+现在你已经创建好环境、适配了数据库结构并导入了数据，可以开始测试你的业务负载。
 
-Before testing the workload, consider performing a manual backup, so that you can restore the database to its original state if needed. For more information, see [Back up and Restore TiDB Cluster Data](/tidb-cloud/backup-and-restore.md#turn-on-auto-backup).
+在测试负载前，建议先进行一次手动备份，以便在需要时可以将数据库恢复到初始状态。更多信息参见 [备份与恢复 TiDB 集群数据](/tidb-cloud/backup-and-restore.md#turn-on-auto-backup)。
 
-After kicking off the workload, you can observe the system using the following methods:
+启动业务负载后，你可以通过以下方式观察系统：
 
-- The commonly used metrics of the cluster can be found on the cluster overview page, including Total QPS, Latency, Connections, TiFlash Request QPS, TiFlash Request Duration, TiFlash Storage Size, TiKV Storage Size, TiDB CPU, TiKV CPU, TiKV IO Read, and TiKV IO Write. See [Monitor a TiDB Cluster](/tidb-cloud/monitor-tidb-cluster.md).
-- Go to **Diagnosis > Statements**, where you can observe SQL execution and easily locate performance problems without querying the system tables. See [Statement Analysis](/tidb-cloud/tune-performance.md).
-- Go to **Diagnosis > Key Visualizer**, where you can view TiDB data access patterns and data hotspots. See [Key Visualizer](/tidb-cloud/tune-performance.md#key-visualizer).
-- You can also integrate these metrics to your own Datadog and Prometheus. See [Third-Party Monitoring Integrations](/tidb-cloud/third-party-monitoring-integrations.md).
+- 集群常用指标可在集群概览页面查看，包括 Total QPS、Latency、Connections、TiFlash Request QPS、TiFlash Request Duration、TiFlash Storage Size、TiKV Storage Size、TiDB CPU、TiKV CPU、TiKV IO Read 和 TiKV IO Write。参见 [监控 TiDB 集群](/tidb-cloud/monitor-tidb-cluster.md)。
+- 进入集群的 [**Diagnosis**](/tidb-cloud/tune-performance.md#view-the-diagnosis-page) 页面，查看 **SQL Statement** 标签页，可以观察 SQL 执行情况，无需查询系统表即可定位性能问题。参见 [SQL 语句分析](/tidb-cloud/tune-performance.md#statement-analysis)。
+- 进入集群的 [**Diagnosis**](/tidb-cloud/tune-performance.md#view-the-diagnosis-page) 页面，查看 **Key Visualizer** 标签页，可以查看 TiDB 的数据访问模式和数据热点。参见 [Key Visualizer](/tidb-cloud/tune-performance.md#key-visualizer)。
+- 你也可以将这些指标集成到自己的 Datadog 和 Prometheus。参见 [第三方监控集成](/tidb-cloud/third-party-monitoring-integrations.md)。
 
-Now it is time for evaluating the test results.
+现在可以评估测试结果了。
 
-To get a more accurate evaluation, determine the metrics baseline before the test, and record the test results properly for each run. By analyzing the results, you can decide whether TiDB Cloud is a good fit for your application. Meanwhile, these results indicate the running status of the system, and you can adjust the system according to the metrics. For example:
+为了获得更准确的评估，建议在测试前确定指标基线，并为每次测试妥善记录结果。通过分析结果，你可以判断 TiDB Cloud 是否适合你的应用。同时，这些结果也反映了系统运行状态，你可以根据指标调整系统。例如：
 
-- Evaluate whether the system performance meets your requirements. Check the total QPS and latency. If the system performance is not satisfactory, you can tune performance as follows:
+- 评估系统性能是否满足需求。检查总 QPS 和延迟。如果系统性能不理想，可以通过以下方式进行性能调优：
 
-    - Monitor and optimize the network latency.
-    - Investigate and tune the SQL performance.
-    - Monitor and [resolve hotspot issues](https://docs.pingcap.com/tidb/dev/troubleshoot-hot-spot-issues#troubleshoot-hotspot-issues).
+    - 监控并优化网络延迟。
+    - 排查并优化 SQL 性能。
+    - 监控并 [解决热点问题](https://docs.pingcap.com/tidb/dev/troubleshoot-hot-spot-issues#troubleshoot-hotspot-issues)。
 
-- Evaluate the storage size and CPU usage rate, and scale out or scale in the TiDB cluster accordingly. Refer to the [FAQ](#faq) section for scaling details.
+- 评估存储容量和 CPU 使用率，并据此扩容或缩容 TiDB 集群。扩容细节可参考 [FAQ](#faq) 部分。
 
-The following are tips for performance tuning:
+以下是性能调优建议：
 
-- Improve write performance
+- 提升写入性能
 
-    - Increase the write throughput by scaling out the TiDB clusters (see [Scale a TiDB Cluster](/tidb-cloud/scale-tidb-cluster.md)).
-    - Reduce lock conflicts by using the [optimistic transaction model](https://docs.pingcap.com/tidb/stable/optimistic-transaction#tidb-optimistic-transaction-model).
+    - 通过扩容 TiDB 集群提升写入吞吐量（参见 [扩容 TiDB 集群](/tidb-cloud/scale-tidb-cluster.md)）。
+    - 通过使用 [乐观事务模型](https://docs.pingcap.com/tidb/stable/optimistic-transaction#tidb-optimistic-transaction-model) 减少锁冲突。
 
-- Improve query performance
+- 提升查询性能
 
-    - Check the SQL execution plan on the **Diagnostic > Statements** page.
-    - Check hotspot issues on the **Dashboard > Key Visualizer** page.
-    - Monitor if the TiDB cluster is running out of capacity on the **Overview > Capacity Metrics** page.
-    - Use the TiFlash feature to optimize analytical processing. See [Use an HTAP Cluster](/tiflash/tiflash-overview.md).
+    - 在 [**Diagnosis**](/tidb-cloud/tune-performance.md#view-the-diagnosis-page) 页的 [**SQL Statement**](/tidb-cloud/tune-performance.md#statement-analysis) 标签查看 SQL 执行计划。
+    - 在 [**Diagnosis**](/tidb-cloud/tune-performance.md#view-the-diagnosis-page) 页的 [**Key Visualizer**](/tidb-cloud/tune-performance.md#key-visualizer) 标签查看热点问题。
+    - 在 [**Metrics**](/tidb-cloud/built-in-monitoring.md#view-the-metrics-page) 页面监控 TiDB 集群是否容量不足。
+    - 使用 TiFlash 功能优化分析型处理。参见 [使用 HTAP 集群](/tiflash/tiflash-overview.md)。
 
-## Step 7. Explore more features
+## 第 7 步：探索更多功能
 
-Now the workload testing is finished, you can explore more features, for example, upgrade and backup.
+完成业务负载测试后，你可以探索更多功能，例如升级和备份。
 
-- Upgrade
+- 升级
 
-    TiDB Cloud regularly upgrades the TiDB clusters, while you can also submit a support ticket to request an upgrade to your clusters. See [Upgrade a TiDB Cluster](/tidb-cloud/upgrade-tidb-cluster.md).
+    TiDB Cloud 会定期升级 TiDB 集群，你也可以提交工单请求集群升级。参见 [升级 TiDB 集群](/tidb-cloud/upgrade-tidb-cluster.md)。
 
-- Backup
+- 备份
 
-    To avoid vendor lock-in, you can use daily full backup to migrate data to a new cluster and use [Dumpling](https://docs.pingcap.com/tidb/stable/dumpling-overview) to export data. For more information, see [Back Up and Restore TiDB Cloud Dedicated Data](/tidb-cloud/backup-and-restore.md#turn-on-auto-backup) and [Back Up and Restore TiDB Cloud Dedicated Data](/tidb-cloud/backup-and-restore-serverless.md#backup).
+    为避免厂商锁定，你可以使用每日全量备份将数据迁移到新集群，并使用 [Dumpling](https://docs.pingcap.com/tidb/stable/dumpling-overview) 导出数据。更多信息参见 [备份与恢复 TiDB Cloud Dedicated 数据](/tidb-cloud/backup-and-restore.md#turn-on-auto-backup) 及 [备份与恢复 TiDB Cloud Starter 或 Essential 数据](/tidb-cloud/backup-and-restore-serverless.md)。
 
-## Step 8. Clean up the environment and finish the PoC
+## 第 8 步：清理环境并完成 PoC
 
-You have completed the full cycle of a PoC after you test TiDB Cloud using real workloads and get the testing results. These results help you determine if TiDB Cloud meets your expectations. Meanwhile, you have accumulated best practices for using TiDB Cloud.
+当你使用真实业务负载测试 TiDB Cloud 并获得测试结果后，PoC 的完整流程就已完成。这些结果可以帮助你判断 TiDB Cloud 是否符合预期，同时你也积累了 TiDB Cloud 的最佳实践。
 
-If you want to try TiDB Cloud on a larger scale, for a new round of deployments and tests, such as deploying with other node storage sizes offered by TiDB Cloud, get full access to TiDB Cloud by creating a [TiDB Cloud Dedicated](/tidb-cloud/select-cluster-tier.md#tidb-cloud-dedicated) cluster.
+如果你希望在更大规模上体验 TiDB Cloud，进行新一轮部署和测试（如使用 TiDB Cloud 提供的不同节点存储规格），可以创建 [TiDB Cloud Dedicated](/tidb-cloud/select-cluster-tier.md#tidb-cloud-dedicated) 集群获得完整访问权限。
 
-If your credits are running out and you want to continue with the PoC, contact the [TiDB Cloud Support](/tidb-cloud/tidb-cloud-support.md) for consultation.
+如果你的额度即将用尽且希望继续 PoC，请联系 [TiDB Cloud Support](/tidb-cloud/tidb-cloud-support.md) 咨询。
 
-You can end the PoC and remove the test environment anytime. For more information, see [Delete a TiDB Cluster](/tidb-cloud/delete-tidb-cluster.md).
+你可以随时结束 PoC 并移除测试环境。更多信息参见 [删除 TiDB 集群](/tidb-cloud/delete-tidb-cluster.md)。
 
-Any feedback to our support team is highly appreciated by filling in the [TiDB Cloud Feedback form](https://www.surveymonkey.com/r/L3VVW8R), such as the PoC process, the feature requests, and how we can improve the products.
+欢迎通过填写 [TiDB Cloud 反馈表](https://www.surveymonkey.com/r/L3VVW8R) 向我们的支持团队反馈 PoC 流程、功能需求及产品改进建议。
 
 ## FAQ
 
-### 1. How long does it take to back up and restore my data?
+### 1. 备份和恢复数据需要多长时间？
 
-TiDB Cloud provides two types of database backup: automatic backup and manual backup. Both methods back up the full database.
+TiDB Cloud 提供两种数据库备份方式：自动备份和手动备份。两种方式均为全库备份。
 
-The time it takes to back up and restore data might vary, depending on the number of tables, the number of mirror copies, and the CPU-intensive level. The backup and restoring rate in one single TiKV node is approximately 50 MB/s.
+备份和恢复所需时间会因表数量、镜像副本数和 CPU 密集程度而异。单个 TiKV 节点的备份和恢复速率约为 50 MB/s。
 
-Database backup and restore operations are typically CPU-intensive, and always require additional CPU resources. They might have an impact (10% to 50%) on QPS and transaction latency, depending on how CPU-intensive this environment is.
+数据库备份和恢复操作通常是 CPU 密集型的，并且总是需要额外的 CPU 资源。根据环境的 CPU 密集程度，可能会对 QPS 和事务延迟产生 10% 到 50% 的影响。
 
-### 2. When do I need to scale out and scale in?
+### 2. 什么时候需要扩容和缩容？
 
-The following are some considerations about scaling:
+关于扩缩容，有以下几点建议：
 
-- During peak hours or data import, if you observe that the capacity metrics on the dashboard have reached the upper limits (see [Monitor a TiDB Cluster](/tidb-cloud/monitor-tidb-cluster.md)), you might need to scale out the cluster.
-- If you observe that the resource usage is persistently low, for example, only 10%-20% of CPU usage, you can scale in the cluster to save resources.
+- 在业务高峰期或数据导入时，如果你观察到 Dashboard 上的容量指标已接近上限（参见 [监控 TiDB 集群](/tidb-cloud/monitor-tidb-cluster.md)），你可能需要扩容集群。
+- 如果你发现资源使用率持续较低，例如 CPU 使用率仅为 10%-20%，可以缩容集群以节省资源。
 
-You can scale out clusters on the console by yourself. If you need to scale in a cluster, you need to contact [TiDB Cloud Support](/tidb-cloud/tidb-cloud-support.md) for help. For more information about scaling, see [Scale Your TiDB Cluster](/tidb-cloud/scale-tidb-cluster.md). You can keep in touch with the support team to track the exact progress. You must wait for the scaling operation to finish before starting your test because it can impact the performance due to data rebalancing.
+你可以在控制台自行扩容集群。如果需要缩容集群，则需要联系 [TiDB Cloud Support](/tidb-cloud/tidb-cloud-support.md) 协助。关于扩缩容的更多信息，参见 [扩容 TiDB 集群](/tidb-cloud/scale-tidb-cluster.md)。你可以与支持团队保持沟通，跟踪具体进度。扩缩容操作会涉及数据重平衡，需等待操作完成后再开始测试，以免影响性能。
 
-### 3. How to make the best use of my PoC credits?
+### 3. 如何最大化利用 PoC 额度？
 
-Once your application for the PoC is approved, you will receive credits in your account. Generally, the credits are sufficient for a 14-day PoC. The credits are charged by the type of nodes and the number of nodes, on an hourly basis. For more information, see [TiDB Cloud Billing](/tidb-cloud/tidb-cloud-billing.md#credits).
+PoC 申请通过后，你的账户会获得额度。一般来说，这些额度足以支持 14 天的 PoC。额度按节点类型和节点数量按小时计费。更多信息参见 [TiDB Cloud 计费](/tidb-cloud/tidb-cloud-billing.md#credits)。
 
-To check the credits left for your PoC, go to the [**Clusters**](https://tidbcloud.com/console/clusters) page of your target project, as shown in the following screenshot.
+要查看 PoC 剩余额度，请进入目标项目的 [**Clusters**](https://tidbcloud.com/project/clusters) 页面，如下图所示。
 
 ![TiDB Cloud PoC Credits](/media/tidb-cloud/poc-points.png)
 
-Alternatively, you can also click <MDSvgIcon name="icon-top-organization" /> in the lower-left corner of the TiDB Cloud console, click **Billing**, and click **Credits** to see the credit details page.
+你也可以在 TiDB Cloud 控制台左上角通过下拉框切换到目标组织，点击左侧导航栏的 **Billing**，再点击 **Credits** 标签查看额度信息。
 
-To save credits, remove the cluster that you are not using. Currently, you cannot stop a cluster. You need to ensure that your backups are up to date before removing a cluster, so you can restore the cluster later when you want to resume your PoC.
+为节省额度，请移除不再使用的集群。目前无法停止集群。移除集群前请确保备份已更新，这样在需要恢复 PoC 时可以还原集群。
 
-If you still have unused credits after your PoC process is completed, you can continue using the credits to pay TiDB cluster fees as long as these credits are not expired.
+如果 PoC 结束后还有剩余额度，只要额度未过期，你可以继续用这些额度支付 TiDB 集群费用。
 
-### 4. Can I take more than 2 weeks to complete a PoC?
+### 4. 完成 PoC 可以超过 2 周吗？
 
-If you want to extend the PoC trial period or are running out of credits, [contact PingCAP](https://www.pingcap.com/contact-us/) for help.
+如果你希望延长 PoC 试用期或额度即将用尽，请 [联系 PingCAP](https://www.pingcap.com/contact-us/) 获取帮助。
 
-### 5. I'm stuck with a technical problem. How do I get help for my PoC?
+### 5. 如果遇到技术问题，如何获得 PoC 支持？
 
-You can always [contact TiDB Cloud Support](/tidb-cloud/tidb-cloud-support.md) for help.
+你可以随时 [联系 TiDB Cloud Support](/tidb-cloud/tidb-cloud-support.md) 获取帮助。

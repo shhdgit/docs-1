@@ -1,141 +1,141 @@
 ---
-title: Get Started with Chat2Query API
-summary: Learn how to use TiDB Cloud Chat2Query API to generate and execute SQL statements using AI by providing instructions.
+title: 快速开始使用 Chat2Query API
+summary: 了解如何通过 TiDB Cloud Chat2Query API 提供指令，利用 AI 生成并执行 SQL 语句。
 ---
 
-# Get Started with Chat2Query API
+# 快速开始使用 Chat2Query API
 
-TiDB Cloud provides the Chat2Query API, a RESTful interface that enables you to generate and execute SQL statements using AI by providing instructions. Then, the API returns the query results for you.
+TiDB Cloud 提供了 Chat2Query API，这是一个 RESTful 接口，允许你通过提供指令，利用 AI 生成并执行 SQL 语句。随后，API 会返回查询结果。
 
-Chat2Query API can only be accessed through HTTPS, ensuring that all data transmitted over the network is encrypted using TLS.
+Chat2Query API 只能通过 HTTPS 访问，确保所有通过网络传输的数据都使用 TLS 加密。
 
 > **Note:**
 >
-> Chat2Query API is available for [TiDB Cloud Serverless](/tidb-cloud/select-cluster-tier.md#tidb-cloud-serverless) clusters. To use the Chat2Query API on [TiDB Cloud Dedicated](/tidb-cloud/select-cluster-tier.md#tidb-cloud-dedicated) clusters, contact [TiDB Cloud support](/tidb-cloud/tidb-cloud-support.md).
+> Chat2Query API 仅适用于托管在 AWS 上的 [TiDB Cloud Serverless](/tidb-cloud/select-cluster-tier.md#tidb-cloud-serverless)（现为 Starter）集群。如需在 [TiDB Cloud Dedicated](/tidb-cloud/select-cluster-tier.md#tidb-cloud-dedicated) 集群上使用 Chat2Query API，请联系 [TiDB Cloud support](/tidb-cloud/tidb-cloud-support.md)。
 
-## Before you begin
+## 开始之前
 
-Before calling Chat2Query endpoints, you need to create a Chat2Query Data App and create an API key for the Data App.
+在调用 Chat2Query 端点之前，你需要创建一个 Chat2Query Data App，并为该 Data App 创建一个 API key。
 
-### Create a Chat2Query Data App
+### 创建 Chat2Query Data App
 
-To create a Data App for your project, perform the following steps:
+要为你的项目创建 Data App，请执行以下步骤：
 
-1. On the [**Data Service**](https://tidbcloud.com/console/data-service) page of your project, click <MDSvgIcon name="icon-create-data-app" /> **Create DataApp** in the left pane. The data app creation dialog is displayed.
+1. 在项目的 [**Data Service**](https://tidbcloud.com/project/data-service) 页面左侧，点击 <MDSvgIcon name="icon-create-data-app" /> **Create DataApp**。此时会弹出数据应用创建对话框。
 
     > **Tip:**
     >
-    > If you are on the **SQL Editor** page of your cluster, you can also open the data app creation dialog by clicking **...** in the upper-right corner, choosing **Access Chat2Query via API**, and clicking **New Chat2Query Data App**.
+    > 如果你在集群的 **SQL Editor** 页面，也可以通过点击右上角的 **...**，选择 **Access Chat2Query via API**，再点击 **New Chat2Query Data App** 打开数据应用创建对话框。
 
-2. In the dialog, define a name for your Data App, choose the desired clusters as the data sources, and select **Chat2Query Data App** as the **Data App** type. Optionally, you can also write a description for the App.
+2. 在对话框中，为你的 Data App 命名，选择所需的集群作为数据源，并将 **Data App** 类型选择为 **Chat2Query Data App**。你还可以为该应用填写描述（可选）。
 
-3. Click **Create**.
+3. 点击 **Create**。
 
-   The newly created Chat2Query Data App is displayed in the left pane. Under this Data App, you can find a list of Chat2Query endpoints.
+   新创建的 Chat2Query Data App 会显示在左侧面板。在该 Data App 下，你可以看到 Chat2Query 端点列表。
 
-### Create an API key
+### 创建 API key
 
-Before calling an endpoint, you need to create an API key for the Chat2Query Data App, which is used by the endpoint to access data in your TiDB Cloud clusters.
+在调用端点之前，你需要为 Chat2Query Data App 创建一个 API key，端点将使用该 key 访问你在 TiDB Cloud 集群中的数据。
 
-To create an API key, perform the following steps:
+创建 API key 的步骤如下：
 
-1. In the left pane of [**Data Service**](https://tidbcloud.com/console/data-service), click your Chat2Query Data App to view its details on the right side.
-2. In the **Authentication** area, click **Create API Key**.
-3. In the **Create API Key** dialog, enter a description, and then select one of the following roles for your API key:
+1. 在 [**Data Service**](https://tidbcloud.com/project/data-service) 左侧面板，点击你的 Chat2Query Data App，在右侧查看其详细信息。
+2. 在 **Authentication** 区域，点击 **Create API Key**。
+3. 在 **Create API Key** 对话框中，输入描述，并为你的 API key 选择以下角色之一：
 
-   - `Chat2Query Admin`: allows the API key to manage data summaries, generate SQL statements based on provided instructions, and execute any SQL statements.
-   - `Chat2Query Data Summary Management Role`: only allows the API key to generate and update data summaries.
+   - `Chat2Query Admin`：允许该 API key 管理数据摘要、根据指令生成 SQL 语句并执行任意 SQL 语句。
+   - `Chat2Query Data Summary Management Role`：仅允许该 API key 生成和更新数据摘要。
 
         > **Tip:**
         >
-        > For Chat2Query API, a data summary is an analysis result of your database by AI, including your database descriptions, table descriptions, and column descriptions. By generating a data summary of your database, you can get a more accurate response when generating SQL statements by providing instructions.
+        > 对于 Chat2Query API，数据摘要是 AI 对你的数据库分析的结果，包括数据库描述、表描述和列描述。通过生成数据库的数据摘要，你在提供指令生成 SQL 语句时可以获得更准确的响应。
 
-   - `Chat2Query SQL ReadOnly`: only allows the API key to generate SQL statements based on provided instructions and execute `SELECT` SQL statements.
-   - `Chat2Query SQL ReadWrite`: allows the API key to generate SQL statements based on provided instructions and execute any SQL statements.
+   - `Chat2Query SQL ReadOnly`：仅允许该 API key 根据指令生成 SQL 语句并执行 `SELECT` SQL 语句。
+   - `Chat2Query SQL ReadWrite`：允许该 API key 根据指令生成 SQL 语句并执行任意 SQL 语句。
 
-4. By default, an API key never expires. If you prefer to set an expiration time for the key, click **Expires in**, select a time unit (`Minutes`, `Days`, or `Months`), and then fill in a desired number for the time unit.
+4. 默认情况下，API key 永不过期。如果你希望为 key 设置过期时间，点击 **Expires in**，选择时间单位（`Minutes`、`Days` 或 `Months`），并填写期望的数值。
 
-5. Click **Next**. The public key and private key are displayed.
+5. 点击 **Next**。此时会显示公钥和私钥。
 
-    Make sure that you have copied and saved the private key in a secure location. After leaving this page, you will not be able to get the full private key again.
+    请确保你已将私钥复制并保存在安全的位置。离开此页面后，你将无法再次获取完整的私钥。
 
-6. Click **Done**.
+6. 点击 **Done**。
 
-## Call Chat2Query endpoints
+## 调用 Chat2Query 端点
 
 > **Note:**
 >
-> Each Chat2Query Data App has a rate limit of 100 requests per day. If you exceed the rate limit, the API returns a `429` error. For more quota, you can [submit a request](https://tidb.support.pingcap.com/) to our support team.
+> 每个 Chat2Query Data App 每天有 100 次请求的速率限制。如果超过速率限制，API 会返回 `429` 错误。如需更多配额，可以 [提交请求](https://tidb.support.pingcap.com/) 联系我们的支持团队。
 
-In each Chat2Query Data App, you can find the following endpoints:
+在每个 Chat2Query Data App 中，你可以找到以下端点：
 
-- Chat2Query v3 endpoints: the endpoints whose names starting with `/v3`, such as `/v3/dataSummaries` and `/v3/chat2data`(recommended)
-- Chat2Query v2 endpoints: the endpoints whose names starting with `/v2`, such as `/v2/dataSummaries` and `/v2/chat2data`
-- Chat2Query v1 endpoint: `/v1/chat2data`(deprecated)
+- Chat2Query v3 端点：端点名称以 `/v3` 开头，如 `/v3/dataSummaries` 和 `/v3/chat2data`（推荐）
+- Chat2Query v2 端点：端点名称以 `/v2` 开头，如 `/v2/dataSummaries` 和 `/v2/chat2data`
+- Chat2Query v1 端点：`/v1/chat2data`（已弃用）
 
 > **Tip:**
 >
-> Compared with `/v1/chat2data`, `/v3/chat2data` and `/v2/chat2data` requires you to analyze your database first by calling `/v3/dataSummaries` or `/v2/dataSummaries`. Consequently, the results returned by `/v3/chat2data` and `/v2/chat2data` are generally more accurate.
+> 与 `/v1/chat2data` 相比，`/v3/chat2data` 和 `/v2/chat2data` 需要你先通过调用 `/v3/dataSummaries` 或 `/v2/dataSummaries` 对数据库进行分析。因此，`/v3/chat2data` 和 `/v2/chat2data` 返回的结果通常更为准确。
 
-### Get the code example of an endpoint
+### 获取端点的代码示例
 
-TiDB Cloud provides code examples to help you quickly call Chat2Query endpoints. To get the code example of a Chat2Query endpoint, perform the following steps:
+TiDB Cloud 提供了代码示例，帮助你快速调用 Chat2Query 端点。获取 Chat2Query 端点代码示例的步骤如下：
 
-1. In the left pane of the [**Data Service**](https://tidbcloud.com/console/data-service) page, click the name of a Chat2Query endpoint.
+1. 在 [**Data Service**](https://tidbcloud.com/project/data-service) 页面左侧，点击某个 Chat2Query 端点的名称。
 
-    The information for calling this endpoint is displayed on the right side, such as endpoint URL, code example, and request method.
+    右侧会显示调用该端点的信息，如端点 URL、代码示例和请求方法。
 
-2. Click **Show Code Example**.
+2. 点击 **Show Code Example**。
 
-3. In the displayed dialog box, select the cluster, database, and authentication method that you want to use to call the endpoint, and then copy the code example.
+3. 在弹出的对话框中，选择你想要调用端点的集群、数据库和认证方式，然后复制代码示例。
 
     > **Note:**
     >
-    > For some of the endpoints such as `/v2/jobs/{job_id}`, you only need to select the authentication method.
+    > 对于某些端点（如 `/v2/jobs/{job_id}`），你只需选择认证方式即可。
 
-4. To call the endpoint, you can paste the example in your application, replace the parameters in the example with your own (such as replacing the `${PUBLIC_KEY}` and `${PRIVATE_KEY}` placeholders with your API key), and then run it.
+4. 要调用端点，你可以将示例粘贴到你的应用中，将示例中的参数替换为你自己的（如将 `${PUBLIC_KEY}` 和 `${PRIVATE_KEY}` 占位符替换为你的 API key），然后运行即可。
 
-### Call Chat2Query v3 endpoints or v2 endpoints
+### 调用 Chat2Query v3 或 v2 端点
 
-TiDB Cloud Data Service provides the following Chat2Query v3 endpoints and v2 endpoints:
+TiDB Cloud Data Service 提供了以下 Chat2Query v3 和 v2 端点：
 
 | Method | Endpoint | Description |
 | ------ | -------- | ----------- |
-| POST   | `/v3/dataSummaries` | This endpoint generates a data summary for your database schema, table schema, and column schema by using artificial intelligence for analysis. |
-| GET    | `/v3/dataSummaries` | This endpoint retrieves all data summaries of your database. |
-| GET    | `/v3/dataSummaries/{data_summary_id}` | This endpoint retrieves a specific data summary. |
-| PUT    | `/v3/dataSummaries/{data_summary_id}` | This endpoint updates a specific data summary. |
-| PUT    | `/v3/dataSummaries/{data_summary_id}/tables/{table_name}` | This endpoint updates the description of a specific table in a specific data summary. |
-| PUT    | `/v3/dataSummaries/{data_summary_id}/tables/{table_name}/columns` | This endpoint updates the description of columns for a specific table in a specific data summary. |
-| POST   | `/v3/knowledgeBases` | This endpoint creates a new knowledge base. For more information about the usage of knowledge base related endpoints, see [Use knowledge bases](/tidb-cloud/use-chat2query-knowledge.md).  |
-| GET    | `/v3/knowledgeBases` | This endpoint retrieves all knowledge bases. |
-| GET    | `/v3/knowledgeBases/{knowledge_base_id}` | This endpoint retrieves a specific knowledge base. |
-| PUT    | `/v3/knowledgeBases/{knowledge_base_id}` | This endpoint updates a specific knowledge base. |
-| POST   | `/v3/knowledgeBases/{knowledge_base_id}/data` | This endpoint adds data to a specific knowledge base. |
-| GET    | `/v3/knowledgeBases/{knowledge_base_id}/data` | This endpoint retrieves data from a specific knowledge base. |
-| PUT    | `/v3/knowledgeBases/{knowledge_base_id}/data/{knowledge_data_id}` | This endpoint updates specific data in a knowledge base. |
-| DEL    | `/v3/knowledgeBases/{knowledge_base_id}/data/{knowledge_data_id}` | This endpoint deletes specific data from a knowledge base. |
-| POST   | `/v3/sessions` | This endpoint creates a new session. For more information about the usage of session-related endpoints, see [Start multi-round Chat2Query](/tidb-cloud/use-chat2query-sessions.md). |
-| GET    | `/v3/sessions` | This endpoint retrieves a list of all sessions. |
-| GET    | `/v3/sessions/{session_id}` | This endpoint retrieves the details of a specific session. |
-| PUT    | `/v3/sessions/{session_id}` | This endpoint updates a specific session. |
-| PUT    | `/v3/sessions/{session_id}/reset` | This endpoint resets a specific session. |
-| POST   | `/v3/sessions/{session_id}/chat2data` | This endpoint generates and executes SQL statements within a specific session using artificial intelligence. For more information, see [Start multi-round Chat2Query by using sessions](/tidb-cloud/use-chat2query-sessions.md). |
-| POST   | `/v3/chat2data` | This endpoint enables you to generate and execute SQL statements using artificial intelligence by providing the data summary ID and instructions. |
-| POST   | `/v3/refineSql` | This endpoint refines existing SQL queries using artificial intelligence. |
-| POST   | `/v3/suggestQuestions` | This endpoint suggests questions based on the provided data summary. |
-| POST   | `/v2/dataSummaries` | This endpoint generates a data summary for your database schema, table schema, and column schema using artificial intelligence. |
-| GET    | `/v2/dataSummaries` | This endpoint retrieves all data summaries. |
-| POST   | `/v2/chat2data` | This endpoint enables you to generate and execute SQL statements using artificial intelligence by providing the data summary ID and instructions. |
-| GET    | `/v2/jobs/{job_id}` | This endpoint enables you to query the status of a specific data summary generation job. |
+| POST   | `/v3/dataSummaries` | 该端点通过人工智能分析，为你的数据库 schema、表 schema 和列 schema 生成数据摘要。 |
+| GET    | `/v3/dataSummaries` | 该端点获取你数据库的所有数据摘要。 |
+| GET    | `/v3/dataSummaries/{data_summary_id}` | 该端点获取指定的数据摘要。 |
+| PUT    | `/v3/dataSummaries/{data_summary_id}` | 该端点更新指定的数据摘要。 |
+| PUT    | `/v3/dataSummaries/{data_summary_id}/tables/{table_name}` | 该端点更新指定数据摘要中某个表的描述。 |
+| PUT    | `/v3/dataSummaries/{data_summary_id}/tables/{table_name}/columns` | 该端点更新指定数据摘要中某个表的列描述。 |
+| POST   | `/v3/knowledgeBases` | 该端点创建新的知识库。关于知识库相关端点的用法，详见 [使用知识库](/tidb-cloud/use-chat2query-knowledge.md)。  |
+| GET    | `/v3/knowledgeBases` | 该端点获取所有知识库。 |
+| GET    | `/v3/knowledgeBases/{knowledge_base_id}` | 该端点获取指定知识库。 |
+| PUT    | `/v3/knowledgeBases/{knowledge_base_id}` | 该端点更新指定知识库。 |
+| POST   | `/v3/knowledgeBases/{knowledge_base_id}/data` | 该端点向指定知识库添加数据。 |
+| GET    | `/v3/knowledgeBases/{knowledge_base_id}/data` | 该端点从指定知识库获取数据。 |
+| PUT    | `/v3/knowledgeBases/{knowledge_base_id}/data/{knowledge_data_id}` | 该端点更新知识库中的指定数据。 |
+| DEL    | `/v3/knowledgeBases/{knowledge_base_id}/data/{knowledge_data_id}` | 该端点从知识库中删除指定数据。 |
+| POST   | `/v3/sessions` | 该端点创建新的会话。关于会话相关端点的用法，详见 [开启多轮 Chat2Query](/tidb-cloud/use-chat2query-sessions.md)。 |
+| GET    | `/v3/sessions` | 该端点获取所有会话列表。 |
+| GET    | `/v3/sessions/{session_id}` | 该端点获取指定会话的详情。 |
+| PUT    | `/v3/sessions/{session_id}` | 该端点更新指定会话。 |
+| PUT    | `/v3/sessions/{session_id}/reset` | 该端点重置指定会话。 |
+| POST   | `/v3/sessions/{session_id}/chat2data` | 该端点在指定会话内通过人工智能生成并执行 SQL 语句。详见 [通过会话开启多轮 Chat2Query](/tidb-cloud/use-chat2query-sessions.md)。 |
+| POST   | `/v3/chat2data` | 该端点允许你通过提供数据摘要 ID 和指令，利用人工智能生成并执行 SQL 语句。 |
+| POST   | `/v3/refineSql` | 该端点通过人工智能优化已有 SQL 查询。 |
+| POST   | `/v3/suggestQuestions` | 该端点基于提供的数据摘要推荐问题。 |
+| POST   | `/v2/dataSummaries` | 该端点通过人工智能为你的数据库 schema、表 schema 和列 schema 生成数据摘要。 |
+| GET    | `/v2/dataSummaries` | 该端点获取所有数据摘要。 |
+| POST   | `/v2/chat2data` | 该端点允许你通过提供数据摘要 ID 和指令，利用人工智能生成并执行 SQL 语句。 |
+| GET    | `/v2/jobs/{job_id}` | 该端点允许你查询指定数据摘要生成任务的状态。 |
 
-The steps to call `/v3/chat2data` and `/v2/chat2data` are the same. The following sections take `/v3/chat2data` as an example to show how to call it.
+调用 `/v3/chat2data` 和 `/v2/chat2data` 的步骤相同。以下以 `/v3/chat2data` 为例，介绍如何调用。
 
-#### 1. Generate a data summary by calling `/v3/dataSummaries`
+#### 1. 通过调用 `/v3/dataSummaries` 生成数据摘要
 
-Before calling `/v3/chat2data`, let AI analyze the database and generate a data summary first by calling `/v3/dataSummaries`, so `/v3/chat2data` can get a better performance in SQL generation later.
+在调用 `/v3/chat2data` 之前，先通过调用 `/v3/dataSummaries` 让 AI 分析数据库并生成数据摘要，这样 `/v3/chat2data` 在后续生成 SQL 时能获得更好的效果。
 
-The following is a code example of calling `/v3/dataSummaries` to analyze the `sp500insight` database and generate a data summary for the database:
+以下是调用 `/v3/dataSummaries` 分析 `sp500insight` 数据库并生成数据摘要的代码示例：
 
 ```bash
 curl --digest --user ${PUBLIC_KEY}:${PRIVATE_KEY} --request POST 'https://<region>.data.tidbcloud.com/api/v1beta/app/chat2query-<ID>/endpoint/v3/dataSummaries'\
@@ -148,14 +148,14 @@ curl --digest --user ${PUBLIC_KEY}:${PRIVATE_KEY} --request POST 'https://<regio
 }'
 ```
 
-In the preceding example, the request body is a JSON object with the following properties:
+在上述示例中，请求体是一个 JSON 对象，包含以下属性：
 
-- `cluster_id`: _string_. A unique identifier of the TiDB cluster.
-- `database`: _string_. The name of the database.
-- `description`: _string_. A description of the data summary.
-- `reuse`: _boolean_. Specifies whether to reuse an existing data summary. If you set it to `true`, the API will reuse an existing data summary. If you set it to `false`, the API will generate a new data summary.
+- `cluster_id`：_string_。TiDB 集群的唯一标识符。
+- `database`：_string_。数据库名称。
+- `description`：_string_。数据摘要的描述。
+- `reuse`：_boolean_。是否复用已有数据摘要。如果设置为 `true`，API 会复用已有数据摘要；如果为 `false`，API 会生成新的数据摘要。
 
-An example response is as follows:
+示例响应如下：
 
 ```js
 {
@@ -168,65 +168,65 @@ An example response is as follows:
 }
 ```
 
-#### 2. Check the analysis status by calling `/v2/jobs/{job_id}`
+#### 2. 通过调用 `/v2/jobs/{job_id}` 检查分析状态
 
-The `/v3/dataSummaries` API is asynchronous. For a database with a large dataset, it might take a few minutes to complete the database analysis and return the full data summary.
+`/v3/dataSummaries` API 是异步的。对于数据量较大的数据库，分析并返回完整数据摘要可能需要几分钟。
 
-To check the analysis status of your database, you can call the `/v2/jobs/{job_id}` endpoint as follows:
+你可以通过调用 `/v2/jobs/{job_id}` 端点检查数据库的分析状态：
 
 ```bash
 curl --digest --user ${PUBLIC_KEY}:${PRIVATE_KEY} --request GET 'https://<region>.data.dev.tidbcloud.com/api/v1beta/app/chat2query-<ID>`/endpoint/v2/jobs/{job_id}'\
  --header 'content-type: application/json'
 ```
 
-An example response is as follows:
+示例响应如下：
 
 ```js
 {
   "code": 200,
   "msg": "",
   "result": {
-    "ended_at": 1699518950, // A UNIX timestamp indicating when the job is finished
-    "job_id": "fb99ef785da640ab87bf69afed60903d", // ID of current job
-    "result": DataSummaryObject, // AI exploration information of the given database
-    "status": "done" // Status of the current job
+    "ended_at": 1699518950, // 任务完成时的 UNIX 时间戳
+    "job_id": "fb99ef785da640ab87bf69afed60903d", // 当前任务的 ID
+    "result": DataSummaryObject, // 指定数据库的 AI 探索信息
+    "status": "done" // 当前任务的状态
   }
 }
 ```
 
-If `"status"` is `"done"`, the full data summary is ready and you can now generate and execute SQL statements for this database by calling `/v3/chat2data`. Otherwise, you need to wait and check the analysis status later until it is done.
+如果 `"status"` 为 `"done"`，则完整数据摘要已就绪，你可以通过调用 `/v3/chat2data` 为该数据库生成并执行 SQL 语句。否则，请等待一段时间后再次检查分析状态，直到完成。
 
-In the response, `DataSummaryObject` represents AI exploration information of the given database. The structure of `DataSummaryObject` is as follows:
+响应中的 `DataSummaryObject` 表示指定数据库的 AI 探索信息。其结构如下：
 
 ```js
 {
-    "cluster_id": "10140100115280519574", // The cluster ID
-    "data_summary_id": 304823, // The data summary ID
-    "database": "sp500insight", // The database name
-    "default": false, // Whether this data summary is the default one
-    "status": "done", // The status of the data summary
+    "cluster_id": "10140100115280519574", // 集群 ID
+    "data_summary_id": 304823, // 数据摘要 ID
+    "database": "sp500insight", // 数据库名称
+    "default": false, // 该数据摘要是否为默认
+    "status": "done", // 数据摘要状态
     "description": {
-        "system": "Data source for financial analysis and decision-making in stock market", // The description of the data summary generated by AI
-        "user": "Data summary for SP500 Insight" // The description of the data summary provided by the user
+        "system": "Data source for financial analysis and decision-making in stock market", // AI 生成的数据摘要描述
+        "user": "Data summary for SP500 Insight" // 用户提供的数据摘要描述
     },
-    "keywords": ["User_Stock_Selection", "Index_Composition"], // Keywords of the data summary
+    "keywords": ["User_Stock_Selection", "Index_Composition"], // 数据摘要关键词
     "relationships": {
         "companies": {
-            "referencing_table": "...", // The table that references the `companies` table
-            "referencing_table_column": "..." // The column that references the `companies` table
-            "referenced_table": "...", // The table that the `companies` table references
-            "referenced_table_column": "..." // The column that the `companies` table references
+            "referencing_table": "...", // 引用 `companies` 表的表
+            "referencing_table_column": "...", // 引用 `companies` 表的列
+            "referenced_table": "...", // `companies` 表引用的表
+            "referenced_table_column": "..." // `companies` 表引用的列
         }
-    }, // Relationships between tables
-    "summary": "Financial data source for stock market analysis", // The summary of the data summary
-    "tables": { // Tables in the database
+    }, // 表之间的关系
+    "summary": "Financial data source for stock market analysis", // 数据摘要的总结
+    "tables": { // 数据库中的表
       "companies": {
-        "name": "companies" // The table name
-        "description": "This table provides comprehensive...", // The description of the table
+        "name": "companies" // 表名
+        "description": "This table provides comprehensive...", // 表描述
         "columns": {
-          "city": { // Columns in the table
-            "name": "city" // The column name
-            "description": "The city where the company is headquartered.", // The description of the column
+          "city": { // 表中的列
+            "name": "city" // 列名
+            "description": "The city where the company is headquartered.", // 列描述
           }
         },
       },
@@ -234,11 +234,11 @@ In the response, `DataSummaryObject` represents AI exploration information of th
 }
 ```
 
-#### 3. Generate and execute SQL statements by calling `/v3/chat2data`
+#### 3. 通过调用 `/v3/chat2data` 生成并执行 SQL 语句
 
-When the data summary of a database is ready, you can call `/v3/chat2data` to generate and execute SQL statements by providing the cluster ID, database name, and your question.
+当数据库的数据摘要准备好后，你可以通过提供集群 ID、数据库名称和你的问题，调用 `/v3/chat2data` 生成并执行 SQL 语句。
 
-For example:
+例如：
 
 ```bash
 curl --digest --user ${PUBLIC_KEY}:${PRIVATE_KEY} --request POST 'https://<region>.data.tidbcloud.com/api/v1beta/app/chat2query-<ID>/endpoint/v3/chat2data'\
@@ -251,15 +251,15 @@ curl --digest --user ${PUBLIC_KEY}:${PRIVATE_KEY} --request POST 'https://<regio
 }'
 ```
 
-The request body is a JSON object with the following properties:
+请求体是一个 JSON 对象，包含以下属性：
 
-- `cluster_id`: _string_. A unique identifier of the TiDB cluster.
-- `database`: _string_. The name of the database.
-- `data_summary_id`: _integer_. The ID of the data summary used to generate SQL. This property only takes effect if `cluster_id` and `database` are not provided. If you specify both `cluster_id` and `database`, the API uses the default data summary of the database.
-- `question`: _string_. A question in natural language describing the query you want.
-- `sql_generate_mode`: _string_. The mode to generate SQL statements. The value can be `direct` or `auto_breakdown`. If you set it to `direct`, the API will generate SQL statements directly based on the `question` you provided. If you set it to `auto_breakdown`, the API will break down the `question` into multiple tasks and generate SQL statements for each task.
+- `cluster_id`：_string_。TiDB 集群的唯一标识符。
+- `database`：_string_。数据库名称。
+- `data_summary_id`：_integer_。用于生成 SQL 的数据摘要 ID。仅当未提供 `cluster_id` 和 `database` 时生效。如果同时指定 `cluster_id` 和 `database`，API 会使用该数据库的默认数据摘要。
+- `question`：_string_。用自然语言描述你想要查询的问题。
+- `sql_generate_mode`：_string_。SQL 语句生成模式。可选值为 `direct` 或 `auto_breakdown`。如果设置为 `direct`，API 会直接根据你提供的 `question` 生成 SQL 语句；如果设置为 `auto_breakdown`，API 会将 `question` 拆解为多个任务，并为每个任务生成 SQL 语句。
 
-An example response is as follows:
+示例响应如下：
 
 ```js
 {
@@ -274,7 +274,7 @@ An example response is as follows:
 }
 ```
 
-If you receive a response with the status code `400` as follows, it means that you need to wait a moment for the data summary to be ready.
+如果你收到如下状态码为 `400` 的响应，说明数据摘要尚未准备好，请稍等片刻后重试。
 
 ```js
 {
@@ -284,26 +284,26 @@ If you receive a response with the status code `400` as follows, it means that y
 }
 ```
 
-The `/v3/chat2data` API is asynchronous. You can check the job status by calling the `/v2/jobs/{job_id}` endpoint:
+`/v3/chat2data` API 是异步的。你可以通过调用 `/v2/jobs/{job_id}` 端点检查任务状态：
 
 ```bash
 curl --digest --user ${PUBLIC_KEY}:${PRIVATE_KEY} --request GET 'https://<region>.data.dev.tidbcloud.com/api/v1beta/app/chat2query-<ID>/endpoint/v2/jobs/{job_id}'\
  --header 'content-type: application/json'
 ```
 
-An example response is as follows:
+示例响应如下：
 
 ```js
 {
   "code": 200,
   "msg": "",
   "result": {
-    "ended_at": 1718785006, // A UNIX timestamp indicating when the job is finished
+    "ended_at": 1718785006, // 任务完成时的 UNIX 时间戳
     "job_id": "20f7577088154d7889964f1a5b12cb26",
-    "reason": "", // The reason for the job failure if the job fails
+    "reason": "", // 任务失败时的原因
     "result": {
       "assumptions": [],
-      "chart_options": { // The generated chart options for the result
+      "chart_options": { // 结果生成的图表选项
         "chart_name": "Table",
         "option": {
           "columns": [
@@ -312,8 +312,8 @@ An example response is as follows:
         },
         "title": "Total Number of Users in the Database"
       },
-      "clarified_task": "Count the total number of users in the database.", // The clarified description of the task
-      "data": { // The data returned by the SQL statement
+      "clarified_task": "Count the total number of users in the database.", // 明确后的任务描述
+      "data": { // SQL 语句返回的数据
         "columns": [
           {
             "col": "total_users"
@@ -326,44 +326,45 @@ An example response is as follows:
         ]
       },
       "description": "",
-      "sql": "SELECT COUNT(`user_id`) AS total_users FROM `users`;", // The generated SQL statement
-      "sql_error": null, // The error message of the SQL statement
-      "status": "done", // The status of the job
+      "sql": "SELECT COUNT(`user_id`) AS total_users FROM `users`;", // 生成的 SQL 语句
+      "sql_error": null, // SQL 语句的错误信息
+      "status": "done", // 任务状态
       "task_id": "0",
-      "type": "data_retrieval" // The type of the job
+      "type": "data_retrieval" // 任务类型
     },
     "status": "done"
   }
 }
 ```
 
-### Call the Chat2Data v1 endpoint (deprecated)
+### 调用 Chat2Data v1 端点（已弃用）
 
 > **Note:**
 >
-> The Chat2Data v1 endpoint is deprecated. It is recommended that you call Chat2Data v3 endpoints instead.
+> Chat2Data v1 端点已弃用。建议优先调用 Chat2Data v3 端点。
 
-TiDB Cloud Data Service provides the following Chat2Query v1 endpoint:
+TiDB Cloud Data Service 提供以下 Chat2Query v1 端点：
 
 |  Method | Endpoint| Description |
 |  ----  | ----  |----  |
-|  POST | `/v1/chat2data`  | This endpoint allows you to generate and execute SQL statements using artificial intelligence by providing the target database name and instructions.  |
+|  POST | `/v1/chat2data`  | 该端点允许你通过提供目标数据库名称和指令，利用人工智能生成并执行 SQL 语句。  |
 
-You can call the `/v1/chat2data` endpoint directly to generate and execute SQL statements. Compared with `/v2/chat2data`, `/v1/chat2data` provides a faster response but lower performance.
+你可以直接调用 `/v1/chat2data` 端点生成并执行 SQL 语句。与 `/v2/chat2data` 相比，`/v1/chat2data` 响应更快，但性能较低。
 
-TiDB Cloud generates code examples to help you call an endpoint. To get the examples and run the code, see [Get the code example of an endpoint](#get-the-code-example-of-an-endpoint).
+TiDB Cloud 会生成代码示例，帮助你调用端点。获取示例并运行代码，详见 [获取端点的代码示例](#get-the-code-example-of-an-endpoint)。
 
-When calling `/v1/chat2data`, you need to replace the following parameters:
+调用 `/v1/chat2data` 时，你需要替换以下参数：
 
-- Replace the `${PUBLIC_KEY}` and `${PRIVATE_KEY}` placeholders with your API key.
-- Replace the `<your table name, optional>` placeholder with the table name you want to query. If you do not specify a table name, AI will query all tables in the database.
-- Replace the `<your instruction>` placeholder with the instruction you want AI to generate and execute SQL statements.
+- 将 `${PUBLIC_KEY}` 和 `${PRIVATE_KEY}` 占位符替换为你的 API key。
+- 将 `<your table name, optional>` 占位符替换为你要查询的表名。如果未指定表名，AI 会查询数据库中的所有表。
+- 将 `<your instruction>` 占位符替换为你希望 AI 生成并执行 SQL 语句的指令。
 
 > **Note:**
 >
-> - Each Chat2Query Data App has a rate limit of 100 requests per day. If you exceed the rate limit, the API returns a `429` error. For more quota, you can [submit a request](https://tidb.support.pingcap.com/) to our support team.
-> - An API Key with the role `Chat2Query Data Summary Management Role` cannot call the Chat2Data v1 endpoint.
-The following code example is used to count how many users are in the `sp500insight.users` table:
+> - 每个 Chat2Query Data App 每天有 100 次请求的速率限制。如果超过速率限制，API 会返回 `429` 错误。如需更多配额，可以 [提交请求](https://tidb.support.pingcap.com/) 联系我们的支持团队。
+> - 角色为 `Chat2Query Data Summary Management Role` 的 API Key 无法调用 Chat2Data v1 端点。
+
+以下代码示例用于统计 `sp500insight.users` 表中的用户数量：
 
 ```bash
 curl --digest --user ${PUBLIC_KEY}:${PRIVATE_KEY} --request POST 'https://<region>.data.dev.tidbcloud.com/api/v1beta/app/chat2query-<ID>/endpoint/chat2data'\
@@ -376,14 +377,14 @@ curl --digest --user ${PUBLIC_KEY}:${PRIVATE_KEY} --request POST 'https://<regio
 }'
 ```
 
-In the preceding example, the request body is a JSON object with the following properties:
+在上述示例中，请求体是一个 JSON 对象，包含以下属性：
 
-- `cluster_id`: _string_. A unique identifier of the TiDB cluster.
-- `database`: _string_. The name of the database.
-- `tables`: _array_. (optional) A list of table names to be queried.
-- `instruction`: _string_. An instruction in natural language describing the query you want.
+- `cluster_id`：_string_。TiDB 集群的唯一标识符。
+- `database`：_string_。数据库名称。
+- `tables`：_array_。（可选）要查询的表名列表。
+- `instruction`：_string_。用自然语言描述你想要查询的指令。
 
-The response is as follows:
+响应如下：
 
 ```json
 {
@@ -417,7 +418,7 @@ The response is as follows:
 }
 ```
 
-If your API call is not successful, you will receive a status code other than `200`. The following is an example of the `500` status code:
+如果 API 调用失败，你会收到非 `200` 的状态码。以下是状态码为 `500` 的示例：
 
 ```json
 {
@@ -439,9 +440,9 @@ If your API call is not successful, you will receive a status code other than `2
 }
 ```
 
-## Learn more
+## 了解更多
 
-- [Manage an API key](/tidb-cloud/data-service-api-key.md)
-- [Start Multi-round Chat2Query](/tidb-cloud/use-chat2query-sessions.md)
-- [Use Knowledge Bases](/tidb-cloud/use-chat2query-knowledge.md)
-- [Response and Status Codes of Data Service](/tidb-cloud/data-service-response-and-status-code.md)
+- [管理 API key](/tidb-cloud/data-service-api-key.md)
+- [开启多轮 Chat2Query](/tidb-cloud/use-chat2query-sessions.md)
+- [使用知识库](/tidb-cloud/use-chat2query-knowledge.md)
+- [Data Service 的响应与状态码](/tidb-cloud/data-service-response-and-status-code.md)

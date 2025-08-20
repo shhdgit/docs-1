@@ -1,31 +1,31 @@
 ---
-title: Index Advisor
-summary: Learn how to optimize query performance with TiDB Index Advisor.
+title: 索引顾问
+summary: 了解如何使用 TiDB 索引顾问优化查询性能。
 ---
 
-# Index Advisor
+# 索引顾问
 
-In v8.5.0, TiDB introduces the Index Advisor feature, which helps optimize your workload by recommending indexes that improve query performance. Using the new SQL statement, `RECOMMEND INDEX`, you can generate index recommendations for a single query or an entire workload. To avoid the resource-intensive process of physically creating indexes for evaluation, TiDB supports [hypothetical indexes](#hypothetical-indexes), which are logical indexes that are not materialized.
+在 v8.5.0 版本中，TiDB 引入了索引顾问（Index Advisor）功能，帮助你通过推荐索引来优化工作负载并提升查询性能。通过新的 SQL 语句 `RECOMMEND INDEX`，你可以为单条查询或整个工作负载生成索引推荐。为避免物理创建索引进行评估所带来的资源消耗，TiDB 支持 [假设索引](#假设索引)，即不会实际落地的逻辑索引。
 
-> **Note:**
+> **注意：**
 >
-> Currently, this feature is not available on [{{{ .starter }}}](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) clusters.
+> 目前，该功能不支持在 [{{{ .starter }}}](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) 和 [{{{ .essential }}}](https://docs.pingcap.com/tidbcloud/select-cluster-tier#essential) 集群上使用。
 
-The Index Advisor analyzes queries to identify indexable columns from clauses such as `WHERE`, `GROUP BY`, and `ORDER BY`. Then, it generates index candidates and estimates their performance benefits using hypothetical indexes. TiDB uses a genetic search algorithm to select the optimal set of indexes starting with single-column indexes and iteratively exploring multi-column indexes, leveraging a "What-If" analysis to evaluate potential indexes based on their impact on optimizer plan costs. The advisor recommends indexes when they reduce the overall cost compared to executing queries without them.
+索引顾问会分析查询，识别如 `WHERE`、`GROUP BY` 和 `ORDER BY` 等子句中的可建索引列。随后，它会生成索引候选项，并通过假设索引评估其性能收益。TiDB 采用遗传搜索算法，从单列索引开始，迭代探索多列索引，利用 “What-If” 分析根据优化器执行计划的成本评估潜在索引。当索引能够降低整体查询成本时，顾问会推荐这些索引。
 
-In addition to [recommending new indexes](#recommend-indexes-using-the-recommend-index-statement), the Index Advisor also suggests [removing inactive indexes](#remove-unused-indexes) to ensure efficient index management.
+除了 [推荐新索引](#使用-recommend-index-语句推荐索引) 外，索引顾问还会建议 [移除未使用的索引](#移除未使用的索引)，以确保索引管理的高效性。
 
-## Recommend indexes using the `RECOMMEND INDEX` statement
+## 使用 `RECOMMEND INDEX` 语句推荐索引
 
-TiDB introduces the `RECOMMEND INDEX` SQL statement for index advisor tasks. The `RUN` subcommand analyzes historical workloads and saves recommendations in system tables. With the `FOR` option, you can target a specific SQL statement, even if it was not executed previously. You can also use additional [options](#recommend-index-options) for advanced control. The syntax is as follows:
+TiDB 引入了 `RECOMMEND INDEX` SQL 语句用于索引顾问相关任务。`RUN` 子命令会分析历史工作负载，并将推荐结果保存到系统表中。通过 `FOR` 选项，你可以针对特定 SQL 语句生成推荐，即使该语句之前未被执行过。你还可以使用额外的 [选项](#recommend-index-选项)进行高级控制。语法如下：
 
 ```sql
 RECOMMEND INDEX RUN [ FOR <SQL> ] [<Options>] 
 ```
 
-### Recommend indexes for a single query
+### 为单条查询推荐索引
 
-The following example shows how to generate an index recommendation for a query on table `t`, which contains 5,000 rows. For brevity, the `INSERT` statements are omitted.
+以下示例展示了如何为包含 5,000 行的表 `t` 上的查询生成索引推荐。为简洁起见，省略了 `INSERT` 语句。
 
 ```sql
 CREATE TABLE t (a INT, b INT, c INT);
@@ -41,9 +41,9 @@ RECOMMEND INDEX RUN for "SELECT a, b FROM t WHERE a = 1 AND b = 1"\G
 create_index_statement: CREATE INDEX idx_a_b ON t(a,b);
 ```
 
-The Index Advisor evaluates single-column indexes on `a` and `b` separately and ultimately combines them into a single index for optimal performance.
+索引顾问会分别评估 `a` 和 `b` 的单列索引，并最终将它们合并为一个多列索引以获得最佳性能。
 
-The following `EXPLAIN` results compare the query execution without indexes and with the recommended two-column hypothetical index. The Index Advisor internally evaluates both cases and selects the option with the minimum cost. The Index Advisor also considers single-column hypothetical indexes on `a` and `b`, but these do not provide better performance than the combined two-column index. For brevity, the execution plans are omitted.
+以下 `EXPLAIN` 结果对比了无索引和使用推荐的两列表假设索引时的查询执行情况。索引顾问会在内部评估两种情况，并选择成本最低的方案。索引顾问同样会考虑 `a` 和 `b` 的单列假设索引，但这些索引的性能不如组合的两列表索引。为简洁起见，省略了执行计划的详细内容。
 
 ```sql
 EXPLAIN FORMAT='VERBOSE' SELECT a, b FROM t WHERE a=1 AND b=1;
@@ -65,9 +65,9 @@ EXPLAIN FORMAT='VERBOSE' SELECT /*+ HYPO_INDEX(t, idx_ab, a, b) */ a, b FROM t W
 +------------------------+---------+---------+-----------+-----------------------------+-------------------------------------------------+
 ```
 
-### Recommend indexes for a workload
+### 为工作负载推荐索引
 
-The following example shows how to generate index recommendations for an entire workload. Assume tables `t1` and `t2` each contain 5,000 rows:
+以下示例展示了如何为整个工作负载生成索引推荐。假设表 `t1` 和 `t2` 各包含 5,000 行：
 
 ```sql
 CREATE TABLE t1 (a INT, b INT, c INT, d INT);
@@ -88,11 +88,11 @@ RECOMMEND INDEX RUN;
 +----------+-------+------------+---------------+------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------+
 ```
 
-In this case, the Index Advisor identifies optimal indexes for the entire workload rather than a single query. The workload queries are sourced from the TiDB system table `INFORMATION_SCHEMA.STATEMENTS_SUMMARY`.
+在此场景下，索引顾问会为整个工作负载（而非单条查询）识别最优索引。工作负载中的查询来源于 TiDB 系统表 `INFORMATION_SCHEMA.STATEMENTS_SUMMARY`。
 
-This table can contain tens of thousands to hundreds of thousands of queries, which might affect the performance of the Index Advisor. To address this issue, the Index Advisor prioritizes the most frequently executed queries, as these queries have a greater impact on overall workload performance. By default, the Index Advisor selects the top 1,000 queries. You can adjust this value using the [`max_num_query`](#recommend-index-options) parameter.
+该表可能包含数万到数十万条查询，这可能会影响索引顾问的性能。为解决此问题，索引顾问会优先分析执行频率最高的查询，因为这些查询对整体工作负载性能影响更大。默认情况下，索引顾问会选择前 1,000 条查询。你可以通过 [`max_num_query`](#recommend-index-选项) 参数调整该值。
 
-The results of the `RECOMMEND INDEX` statements are stored in the `mysql.index_advisor_results` table. You can query this table to view the recommended indexes. The following example shows the contents of this system table after the previous two `RECOMMEND INDEX` statements are executed:
+`RECOMMEND INDEX` 语句的结果会存储在 `mysql.index_advisor_results` 表中。你可以查询该表以查看推荐的索引。以下示例展示了前述两次 `RECOMMEND INDEX` 语句执行后的系统表内容：
 
 ```sql
 SELECT * FROM mysql.index_advisor_results;
@@ -105,23 +105,23 @@ SELECT * FROM mysql.index_advisor_results;
 +----+---------------------+---------------------+-------------+------------+------------+---------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------+-------+
 ```
 
-### `RECOMMEND INDEX` options
+### `RECOMMEND INDEX` 选项
 
-You can configure and view options for the `RECOMMEND INDEX` statement to fine-tune its behavior for your workloads as follows:
+你可以通过如下方式配置和查看 `RECOMMEND INDEX` 语句的选项，以便针对你的工作负载微调其行为：
 
 ```sql
 RECOMMEND INDEX SET <option> = <value>;
 RECOMMEND INDEX SHOW OPTION;
 ```
 
-The following options are available:
+可用的选项包括：
 
-- `timeout`: specifies the maximum time allowed for running the `RECOMMEND INDEX` command.
-- `max_num_index`: specifies the maximum number of indexes to include in the result of `RECOMMEND INDEX`.
-- `max_index_columns`: specifies the maximum number of columns allowed in multi-column indexes in the result.
-- `max_num_query`: specifies the maximum number of queries to select from the statement summary workload.
+- `timeout`：指定执行 `RECOMMEND INDEX` 命令的最大允许时间。
+- `max_num_index`：指定 `RECOMMEND INDEX` 结果中最多包含的索引数量。
+- `max_index_columns`：指定结果中多列索引允许的最大列数。
+- `max_num_query`：指定从语句摘要工作负载中选取的最大查询数量。
 
-To check your current option settings, execute the `RECOMMEND INDEX SHOW OPTION` statement:
+要查看当前选项设置，可执行 `RECOMMEND INDEX SHOW OPTION` 语句：
 
 ```sql
 RECOMMEND INDEX SHOW OPTION;
@@ -136,49 +136,49 @@ RECOMMEND INDEX SHOW OPTION;
 4 rows in set (0.00 sec)
 ```
 
-To modify an option, use the `RECOMMEND INDEX SET` statement. For example, to change the `timeout` option:
+要修改某个选项，可使用 `RECOMMEND INDEX SET` 语句。例如，修改 `timeout` 选项：
 
 ```sql
 RECOMMEND INDEX SET timeout='20s';
 Query OK, 1 row affected (0.00 sec)
 ```
 
-### Limitations
+### 限制
 
-The index recommendation feature has the following limitations:
+索引推荐功能目前存在以下限制：
 
-- Currently, it does not support [prepared statements](/develop/dev-guide-prepared-statement.md). The `RECOMMEND INDEX RUN` statement cannot recommend indexes for queries executed through the `Prepare` and `Execute` protocol.
-- Currently, it does not provide recommendations for deleting indexes.
-- Currently, a user interface (UI) for the Index Advisor is not yet available.
+- 暂不支持 [预处理语句](/develop/dev-guide-prepared-statement.md)。`RECOMMEND INDEX RUN` 语句无法为通过 `Prepare` 和 `Execute` 协议执行的查询推荐索引。
+- 暂不支持删除索引的推荐。
+- 目前尚未提供索引顾问的用户界面（UI）。
 
-## Remove unused indexes
+## 移除未使用的索引
 
-For v8.0.0 or later versions, you can identify inactive indexes in your workload using [`schema_unused_indexes`](/sys-schema/sys-schema-unused-indexes.md) and [`INFORMATION_SCHEMA.CLUSTER_TIDB_INDEX_USAGE`](/information-schema/information-schema-tidb-index-usage.md). Removing these indexes can save storage space and reduce overhead. For production environments, it is highly recommended to make the target indexes invisible first and observe the impact for one complete business cycle before permanently removing them.
+在 v8.0.0 及以上版本，你可以通过 [`schema_unused_indexes`](/sys-schema/sys-schema-unused-indexes.md) 和 [`INFORMATION_SCHEMA.CLUSTER_TIDB_INDEX_USAGE`](/information-schema/information-schema-tidb-index-usage.md) 识别工作负载中的未活跃索引。移除这些索引可以节省存储空间并减少开销。对于生产环境，强烈建议先将目标索引设置为不可见，并观察一个完整业务周期的影响后再永久删除。
 
-### Use `sys.schema_unused_indexes`
+### 使用 `sys.schema_unused_indexes`
 
-The [`sys.schema_unused_indexes`](/sys-schema/sys-schema-unused-indexes.md) view identifies indexes that have not been used since the last startup of all TiDB instances. This view, based on system tables containing schema, table, and column information, provides the full specification for each index, including schema, table, and index names. You can query this view to decide which indexes to make invisible or delete.
+[`sys.schema_unused_indexes`](/sys-schema/sys-schema-unused-indexes.md) 视图用于识别自所有 TiDB 实例上次启动以来未被使用过的索引。该视图基于包含 schema、表和列信息的系统表，提供每个索引的完整规格，包括 schema、表和索引名。你可以查询该视图，决定哪些索引需要设置为不可见或删除。
 
-> **Warning:**
+> **警告：**
 >
-> Because the `sys.schema_unused_indexes` view shows unused indexes since the last startup of all TiDB instances, ensure that the TiDB instances have been running long enough. Otherwise, the view might show false candidates if certain workloads have not yet run. Use the following SQL query to identify the uptime of all TiDB instances.
+> 由于 `sys.schema_unused_indexes` 视图展示的是自所有 TiDB 实例上次启动以来未被使用的索引，请确保 TiDB 实例已运行足够长时间。否则，如果某些工作负载尚未运行，视图可能会显示误报。可使用以下 SQL 查询所有 TiDB 实例的运行时长。
 >
 > ```sql
 > SELECT START_TIME,UPTIME FROM INFORMATION_SCHEMA.CLUSTER_INFO WHERE TYPE='tidb';
 > ```
 
-### Use `INFORMATION_SCHEMA.CLUSTER_TIDB_INDEX_USAGE`
+### 使用 `INFORMATION_SCHEMA.CLUSTER_TIDB_INDEX_USAGE`
 
-The [`INFORMATION_SCHEMA.CLUSTER_TIDB_INDEX_USAGE`](/information-schema/information-schema-tidb-index-usage.md) table provides metrics such as selectivity buckets, last access time, and rows accessed. The following examples show queries to identify unused or inefficient indexes based on this table:
+[`INFORMATION_SCHEMA.CLUSTER_TIDB_INDEX_USAGE`](/information-schema/information-schema-tidb-index-usage.md) 表提供了选择性分桶、最后访问时间、访问行数等指标。以下示例展示了如何基于该表查询未使用或低效索引：
 
 ```sql
--- Find indexes that have not been accessed in the last 30 days.
+-- 查找最近 30 天未被访问的索引。
 SELECT table_schema, table_name, index_name, last_access_time
 FROM information_schema.cluster_tidb_index_usage
 WHERE last_access_time IS NULL
   OR last_access_time < NOW() - INTERVAL 30 DAY;
 
--- Find indexes that are consistently scanned with over 50% of total records.
+-- 查找每次扫描都超过总记录数 50% 的索引。
 SELECT table_schema, table_name, index_name,
        query_total, rows_access_total,
        percentage_access_0 as full_table_scans
@@ -186,19 +186,19 @@ FROM information_schema.cluster_tidb_index_usage
 WHERE last_access_time IS NOT NULL AND percentage_access_0 + percentage_access_0_1 + percentage_access_1_10 + percentage_access_10_20 + percentage_access_20_50 = 0;
 ```
 
-> **Note:**
+> **注意：**
 >
-> The data in `INFORMATION_SCHEMA.CLUSTER_TIDB_INDEX_USAGE` might be delayed by up to five minutes, and the usage data is reset whenever a TiDB node restarts. Additionally, index usage is only recorded if the table has valid statistics.
+> `INFORMATION_SCHEMA.CLUSTER_TIDB_INDEX_USAGE` 中的数据可能会有最多五分钟的延迟，并且每当 TiDB 节点重启时，使用数据会被重置。此外，只有表拥有有效统计信息时，索引使用情况才会被记录。
 
-## Hypothetical indexes
+## 假设索引
 
-Hypothetical indexes (Hypo Indexes) are created using SQL comments, similar to [query hints](/optimizer-hints.md), rather than through the `CREATE INDEX` statement. This approach enables lightweight experimentation with indexes without the overhead of physically materializing them.
+假设索引（Hypothetical Index，Hypo Index）是通过 SQL 注释（类似于 [查询提示](/optimizer-hints.md)）而非 `CREATE INDEX` 语句创建的。这种方式可以让你在不实际落地索引的情况下，轻量级地进行索引实验。
 
-For example, the `/*+ HYPO_INDEX(t, idx_ab, a, b) */` comment instructs the query planner to create a hypothetical index named `idx_ab` on table `t` for columns `a` and `b`. The planner generates the index's metadata but does not physically materialize it. If applicable, the planner considers this hypothetical index during query optimization without incurring the costs associated with index creation.
+例如，`/*+ HYPO_INDEX(t, idx_ab, a, b) */` 注释会指示查询优化器为表 `t` 的列 `a` 和 `b` 创建一个名为 `idx_ab` 的假设索引。优化器会生成该索引的元数据，但不会实际创建物理索引。如果适用，优化器会在查询优化过程中考虑该假设索引，而不会产生索引创建的相关开销。
 
-The `RECOMMEND INDEX` advisor uses hypothetical indexes for "What-If" analysis to evaluate potential benefits of different indexes. You can also use hypothetical indexes directly to experiment with index designs before proceeding to create them.
+`RECOMMEND INDEX` 顾问会利用假设索引进行 “What-If” 分析，以评估不同索引的潜在收益。你也可以直接使用假设索引，在正式创建索引前进行设计实验。
 
-The following example shows a query using a hypothetical index:
+以下示例展示了如何在查询中使用假设索引：
 
 ```sql
 CREATE TABLE t(a INT, b INT, c INT);
@@ -222,6 +222,6 @@ EXPLAIN FORMAT='verbose' SELECT /*+ HYPO_INDEX(t, idx_ab, a, b) */ a, b FROM t W
 +------------------------+---------+---------+-----------+-----------------------------+-------------------------------------------------+
 ```
 
-In this example, the `HYPO_INDEX` comment specifies a hypothetical index. Using this index reduces the estimated cost from `392133.42` to `2.20` by enabling an index range scan (`IndexRangeScan`) instead of a full table scan (`TableFullScan`).
+在该示例中，`HYPO_INDEX` 注释指定了一个假设索引。使用该索引后，估算成本从 `392133.42` 降低到 `2.20`，因为查询可以通过索引范围扫描（`IndexRangeScan`）而非全表扫描（`TableFullScan`）完成。
 
-Based on queries in your workload, TiDB can automatically generate index candidates that could benefit your workload. It uses hypothetical indexes to estimate their potential benefits and recommend the most effective ones.
+基于你工作负载中的查询，TiDB 可以自动生成可能带来收益的索引候选项。它会利用假设索引评估这些索引的潜在收益，并推荐最有效的索引。

@@ -1,58 +1,58 @@
 ---
 title: Data Migration Billing
-summary: Learn about billing for Data Migration in TiDB Cloud.
+summary: 了解 TiDB Cloud 中数据迁移的计费方式。
 ---
 
-# Data Migration Billing
+# 数据迁移计费
 
-This document describes the billing for Data Migration in TiDB Cloud.
+本文档介绍了 TiDB Cloud 中数据迁移的计费方式。
 
-## Specifications for Data Migration
+## 数据迁移规格
 
-TiDB Cloud measures the capacity of Data Migration in Replication Capacity Units (RCUs). When you create a Data Migration job, you can select an appropriate specification. The higher the RCU, the better the migration performance. You will be charged for these Data Migration RCUs.
+TiDB Cloud 以复制容量单位（Replication Capacity Units，RCU）来衡量数据迁移的容量。当你创建数据迁移任务时，可以选择合适的规格。RCU 越高，迁移性能越好。你需要为这些数据迁移 RCU 支付费用。
 
-The following table lists the corresponding performance and the maximum number of tables that each Data Migration specification can migrate.
+下表列出了每种数据迁移规格对应的性能以及可迁移的最大表数量。
 
-| Specification | Full data migration | Incremental data migration | Maximum number of tables |
-|---------------|---------------------|----------------------------|-----------------------|
-| 2 RCUs  | 25 MiB/s | 10,000 rows/s | 500   |
-| 4 RCUs  | 35 MiB/s | 20,000 rows/s | 10000 |
-| 8 RCUs  | 40 MiB/s | 40,000 rows/s | 30000 |
-| 16 RCUs | 45 MiB/s | 80,000 rows/s | 60000 |
+| 规格 | 全量数据迁移 | 增量数据迁移 | 最大表数量 |
+|------|--------------|--------------|------------|
+| 2 RCUs  | 25 MiB/s | 10,000 行/s | 500   |
+| 4 RCUs  | 35 MiB/s | 20,000 行/s | 10000 |
+| 8 RCUs  | 40 MiB/s | 40,000 行/s | 30000 |
+| 16 RCUs | 45 MiB/s | 80,000 行/s | 60000 |
 
-For more information about the prices of Data Migration RCUs, see [Data Migration Cost](https://www.pingcap.com/tidb-dedicated-pricing-details/#dm-cost).
+关于数据迁移 RCU 的价格详情，请参见 [Data Migration Cost](https://www.pingcap.com/tidb-dedicated-pricing-details/#dm-cost)。
 
 > **Note:**
 >
-> - If the number of tables to be migrated exceeds the maximum number of tables, the Data Migration job might still run, but the job could become unstable or even fail.
-> - All the performance values in this table are maximum and optimal ones. It is assumed that there are no performance, network bandwidth, or other bottlenecks in the upstream and downstream databases. The performance values are for reference only and might vary in different scenarios.
+> - 如果待迁移的表数量超过最大表数量，数据迁移任务可能仍会运行，但任务可能会变得不稳定，甚至失败。
+> - 表中所有性能数值均为最大且最优值。假设上下游数据库不存在性能、网络带宽或其他瓶颈。性能数值仅供参考，实际场景下可能有所不同。
 
-The Data Migration job measures full data migration performance in MiB/s. This unit indicates the amount of data (in MiB) that is migrated per second by the Data Migration job.
+数据迁移任务以 MiB/s 作为全量数据迁移性能的计量单位。该单位表示数据迁移任务每秒迁移的数据量（以 MiB 计）。
 
-The Data Migration job measures incremental data migration performance in rows/s. This unit indicates the number of rows that are migrated to the target database per second. For example, if the upstream database executes `INSERT`, `UPDATE`, or `DELETE` statements of 10,000 rows in about 1 second, the Data Migration job of the corresponding specification can replicate the 10,000 rows to the downstream in about 1 second.
+数据迁移任务以行/s 作为增量数据迁移性能的计量单位。该单位表示每秒迁移到目标数据库的行数。例如，如果上游数据库在约 1 秒内执行了 `INSERT`、`UPDATE` 或 `DELETE` 语句共 10,000 行，则对应规格的数据迁移任务可以在约 1 秒内将这 10,000 行同步到下游。
 
-## Price
+## 价格
 
-To learn about the supported regions and the price of TiDB Cloud for each Data Migration RCU, see [Data Migration Cost](https://www.pingcap.com/tidb-cloud-pricing-details/#dm-cost).
+关于 TiDB Cloud 各区域支持情况及每个数据迁移 RCU 的价格，请参见 [Data Migration Cost](https://www.pingcap.com/tidb-dedicated-pricing-details/#dm-cost)。
 
-The Data Migration job is in the same region as the target TiDB node.
+数据迁移任务与目标 TiDB 节点处于同一区域。
 
-Note that if you are using AWS PrivateLink or VPC peering connections, and if the source database and the TiDB node are not in the same region or not in the same availability zone (AZ), two additional traffic charges will be incurred: cross-region and cross-AZ traffic charges.
+请注意，如果你使用 AWS PrivateLink 或 VPC 对等连接，并且源数据库与 TiDB 节点不在同一区域或不在同一可用区（AZ），则会产生两项额外的流量费用：跨区域和跨可用区流量费用。
 
-- If the source database and the TiDB node are not in the same region, cross-region traffic charges are incurred when the Data Migration job collects data from the source database.
+- 如果源数据库与 TiDB 节点不在同一区域，当数据迁移任务从源数据库采集数据时，会产生跨区域流量费用。
 
     ![Cross-region traffic charges](/media/tidb-cloud/dm-billing-cross-region-fees.png)
 
-- If the source database and the TiDB node are in the same region but in different AZs, cross-AZ traffic charges are incurred when the Data Migration job collects data from the source database.
+- 如果源数据库与 TiDB 节点在同一区域但不在同一 AZ，当数据迁移任务从源数据库采集数据时，会产生跨 AZ 流量费用。
 
     ![Cross-AZ traffic charges](/media/tidb-cloud/dm-billing-cross-az-fees.png)
 
-- If the Data Migration job and the TiDB node are not in the same AZ, cross-AZ traffic charges are incurred when the Data Migration job writes data to the target TiDB node. In addition, if the Data Migration job and the TiDB node are not in the same AZ (or region) with the source database, cross-AZ (or cross-region) traffic charges are incurred when the Data Migration job collects data from the source database.
+- 如果数据迁移任务与 TiDB 节点不在同一 AZ，当数据迁移任务向目标 TiDB 节点写入数据时，会产生跨 AZ 流量费用。此外，如果数据迁移任务与 TiDB 节点和源数据库不在同一 AZ（或区域），当数据迁移任务从源数据库采集数据时，会产生跨 AZ（或跨区域）流量费用。
 
     ![Cross-region and cross-AZ traffic charges](/media/tidb-cloud/dm-billing-cross-region-and-az-fees.png)
 
-The cross-region and cross-AZ traffic prices are the same as those for TiDB Cloud. For more information, see [TiDB Cloud Pricing Details](https://www.pingcap.com/tidb-dedicated-pricing-details/).
+跨区域和跨 AZ 流量价格与 TiDB Cloud 保持一致。详情请参见 [TiDB Cloud Dedicated Pricing Details](https://www.pingcap.com/tidb-dedicated-pricing-details/)。
 
-## See also
+## 参见
 
 - [Migrate from MySQL-Compatible Databases Using Data Migration](/tidb-cloud/migrate-from-mysql-using-data-migration.md)

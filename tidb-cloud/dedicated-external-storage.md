@@ -1,55 +1,55 @@
 ---
-title: Configure External Storage Access for TiDB Cloud Dedicated
-summary: Learn how to configure Amazon Simple Storage Service (Amazon S3), Google Cloud Storage (GCS), and Azure Blob Storage access.
+title: 为 TiDB Cloud Dedicated 配置外部存储访问
+summary: 了解如何配置 Amazon Simple Storage Service (Amazon S3)、Google Cloud Storage (GCS) 和 Azure Blob Storage 的访问权限。
 aliases: ['/tidb-cloud/config-s3-and-gcs-access']
 ---
 
-# Configure External Storage Access for TiDB Cloud Dedicated
+# 为 TiDB Cloud Dedicated 配置外部存储访问
 
-If your source data is stored in Amazon S3 buckets, Azure Blob Storage containers, or Google Cloud Storage (GCS) buckets, before importing or migrating the data to TiDB Cloud, you need to configure cross-account access to the buckets. This document describes how to do this for TiDB Cloud Dedicated clusters.
+如果你的源数据存储在 Amazon S3 bucket、Azure Blob Storage 容器或 Google Cloud Storage (GCS) bucket 中，在将数据导入或迁移到 TiDB Cloud 之前，你需要为这些 bucket 配置跨账号访问权限。本文档介绍了如何为 TiDB Cloud Dedicated 集群进行相关配置。
 
-If you need to configure these external storages for TiDB Cloud Serverless clusters, see [Configure External Storage Access for TiDB Cloud Serverless](/tidb-cloud/serverless-external-storage.md).
+如果你需要为 starter 或 essential 集群配置这些外部存储，请参见 [为 starter 或 Essential 配置外部存储访问](/tidb-cloud/serverless-external-storage.md)。
 
-## Configure Amazon S3 access
+## 配置 Amazon S3 访问权限
 
-To allow a TiDB Cloud Dedicated cluster to access the source data in your Amazon S3 bucket, configure the bucket access for the cluster using either of the following methods:
+要允许 TiDB Cloud Dedicated 集群访问你 Amazon S3 bucket 中的源数据，可以通过以下任一方式为集群配置 bucket 访问权限：
 
-- [Use a Role ARN](#configure-amazon-s3-access-using-a-role-arn) (recommended): use a Role ARN to access your Amazon S3 bucket.
-- [Use an AWS access key](#configure-amazon-s3-access-using-an-aws-access-key): use the access key of an IAM user to access your Amazon S3 bucket.
+- [使用 Role ARN](#configure-amazon-s3-access-using-a-role-arn)（推荐）：使用 Role ARN 访问你的 Amazon S3 bucket。
+- [使用 AWS 访问密钥](#configure-amazon-s3-access-using-an-aws-access-key)：使用 IAM 用户的访问密钥访问你的 Amazon S3 bucket。
 
-### Configure Amazon S3 access using a Role ARN
+### 使用 Role ARN 配置 Amazon S3 访问权限
 
-Configure the bucket access for TiDB Cloud and get the Role ARN as follows:
+按照以下步骤为 TiDB Cloud 配置 bucket 访问权限并获取 Role ARN：
 
-1. In the [TiDB Cloud console](https://tidbcloud.com/), get the corresponding TiDB Cloud account ID and external ID of the target TiDB cluster.
+1. 在 [TiDB Cloud 控制台](https://tidbcloud.com/)中，获取目标 TiDB 集群对应的 TiDB Cloud 账号 ID 和 external ID。
 
-    1. Navigate to the [**Clusters**](https://tidbcloud.com/project/clusters) page of your project.
+    1. 进入你的项目的 [**Clusters**](https://tidbcloud.com/project/clusters) 页面。
 
         > **Tip:**
         >
-        > You can use the combo box in the upper-left corner to switch between organizations, projects, and clusters.
+        > 你可以使用左上角的下拉框在组织、项目和集群之间切换。
 
-    2. Click the name of your target cluster to go to its overview page, and then click **Data** > **Import** in the left navigation pane.
+    2. 点击目标集群名称进入其概览页面，然后在左侧导航栏点击 **Data** > **Import**。
 
-    3. Select **Import data from Cloud Storage**, and then click **Amazon S3**.
+    3. 选择 **Import data from Cloud Storage**，然后点击 **Amazon S3**。
 
-    4. On the **Import Data from Amazon S3** page, click the link under **Role ARN**. The **Add New Role ARN** dialog is displayed.
+    4. 在 **Import Data from Amazon S3** 页面，点击 **Role ARN** 下方的链接。此时会弹出 **Add New Role ARN** 对话框。
 
-    5. Expand **Create Role ARN manually** to get the TiDB Cloud Account ID and TiDB Cloud External ID. Take a note of these IDs for later use.
+    5. 展开 **Create Role ARN manually**，获取 TiDB Cloud Account ID 和 TiDB Cloud External ID。请记录这些 ID，后续会用到。
 
-2. In the AWS Management Console, create a managed policy for your Amazon S3 bucket.
+2. 在 AWS 管理控制台中，为你的 Amazon S3 bucket 创建一个托管策略。
 
-    1. Sign in to the AWS Management Console and open the Amazon S3 console at [https://console.aws.amazon.com/s3/](https://console.aws.amazon.com/s3/).
-    2. In the **Buckets** list, choose the name of your bucket with the source data, and then click **Copy ARN** to get your S3 bucket ARN (for example, `arn:aws:s3:::tidb-cloud-source-data`). Take a note of the bucket ARN for later use.
+    1. 登录 AWS 管理控制台，并打开 Amazon S3 控制台 [https://console.aws.amazon.com/s3/](https://console.aws.amazon.com/s3/)。
+    2. 在 **Buckets** 列表中，选择存放源数据的 bucket 名称，然后点击 **Copy ARN** 获取你的 S3 bucket ARN（例如，`arn:aws:s3:::tidb-cloud-source-data`）。请记录该 bucket ARN，后续会用到。
 
         ![Copy bucket ARN](/media/tidb-cloud/copy-bucket-arn.png)
 
-    3. Open the IAM console at [https://console.aws.amazon.com/iam/](https://console.aws.amazon.com/iam/), click **Policies** in the navigation pane on the left, and then click **Create Policy**.
+    3. 打开 IAM 控制台 [https://console.aws.amazon.com/iam/](https://console.aws.amazon.com/iam/)，在左侧导航栏点击 **Policies**，然后点击 **Create Policy**。
 
         ![Create a policy](/media/tidb-cloud/aws-create-policy.png)
 
-    4. On the **Create policy** page, click the **JSON** tab.
-    5. Copy the following access policy template and paste it into the policy text field.
+    4. 在 **Create policy** 页面，点击 **JSON** 标签页。
+    5. 复制以下访问策略模板，并粘贴到策略文本框中。
 
         ````json
         {
@@ -76,17 +76,17 @@ Configure the bucket access for TiDB Cloud and get the Role ARN as follows:
         }
         ```
 
-        In the policy text field, update the following configurations to your own values.
+        在策略文本框中，将以下配置项替换为你自己的值。
 
         - `"Resource": "<Your S3 bucket ARN>/<Directory of the source data>/*"`
 
-            For example, if your source data is stored in the root directory of the `tidb-cloud-source-data` bucket, use `"Resource": "arn:aws:s3:::tidb-cloud-source-data/*"`. If your source data is stored in the `mydata` directory of the bucket, use `"Resource": "arn:aws:s3:::tidb-cloud-source-data/mydata/*"`. Make sure that `/*` is added to the end of the directory so TiDB Cloud can access all files in this directory.
+            例如，如果你的源数据存储在 `tidb-cloud-source-data` bucket 的根目录下，使用 `"Resource": "arn:aws:s3:::tidb-cloud-source-data/*"`。如果你的源数据存储在 bucket 的 `mydata` 目录下，使用 `"Resource": "arn:aws:s3:::tidb-cloud-source-data/mydata/*"`。请确保目录末尾添加了 `/*`，以便 TiDB Cloud 能访问该目录下的所有文件。
 
         - `"Resource": "<Your S3 bucket ARN>"`
 
-            For example, `"Resource": "arn:aws:s3:::tidb-cloud-source-data"`.
+            例如，`"Resource": "arn:aws:s3:::tidb-cloud-source-data"`。
 
-        - If you have enabled AWS Key Management Service key (SSE-KMS) with customer-managed key encryption, make sure the following configuration is included in the policy. `"arn:aws:kms:ap-northeast-1:105880447796:key/c3046e91-fdfc-4f3a-acff-00597dd3801f"` is a sample KMS key of the bucket.
+        - 如果你启用了 AWS Key Management Service key (SSE-KMS) 并使用了客户自管密钥加密，请确保策略中包含以下配置。`"arn:aws:kms:ap-northeast-1:105880447796:key/c3046e91-fdfc-4f3a-acff-00597dd3801f"` 是 bucket 的一个示例 KMS key。
 
             ```json
             {
@@ -99,144 +99,144 @@ Configure the bucket access for TiDB Cloud and get the Role ARN as follows:
             }
             ```
 
-            If the objects in your bucket have been copied from another encrypted bucket, the KMS key value needs to include the keys of both buckets. For example, `"Resource": ["arn:aws:kms:ap-northeast-1:105880447796:key/c3046e91-fdfc-4f3a-acff-00597dd3801f","arn:aws:kms:ap-northeast-1:495580073302:key/0d7926a7-6ecc-4bf7-a9c1-a38f0faec0cd"]`.
+            如果你的 bucket 中的对象是从另一个加密 bucket 拷贝过来的，KMS key 的值需要包含两个 bucket 的 key。例如，`"Resource": ["arn:aws:kms:ap-northeast-1:105880447796:key/c3046e91-fdfc-4f3a-acff-00597dd3801f","arn:aws:kms:ap-northeast-1:495580073302:key/0d7926a7-6ecc-4bf7-a9c1-a38f0faec0cd"]`。
 
-    6. Click **Next**.
-    7. Set a policy name, add a tag of the policy (optional), and then click **Create policy**.
+    6. 点击 **Next**。
+    7. 设置策略名称，添加策略标签（可选），然后点击 **Create policy**。
 
-3. In the AWS Management Console, create an access role for TiDB Cloud and get the role ARN.
+3. 在 AWS 管理控制台中，为 TiDB Cloud 创建访问角色并获取 role ARN。
 
-    1. In the IAM console at [https://console.aws.amazon.com/iam/](https://console.aws.amazon.com/iam/), click **Roles** in the navigation pane on the left, and then click **Create role**.
+    1. 在 IAM 控制台 [https://console.aws.amazon.com/iam/](https://console.aws.amazon.com/iam/)，点击左侧导航栏的 **Roles**，然后点击 **Create role**。
 
         ![Create a role](/media/tidb-cloud/aws-create-role.png)
 
-    2. To create a role, fill in the following information:
+    2. 创建角色时，填写以下信息：
 
-        - Under **Trusted entity type**, select **AWS account**.
-        - Under **An AWS account**, select **Another AWS account**, and then paste the TiDB Cloud account ID to the **Account ID** field.
-        - Under **Options**, click **Require external ID** to avoid the [confused deputy problem](https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html), and then paste the TiDB Cloud External ID to the **External ID** field. If the role is created without "Require external ID", anyone with your S3 bucket URI and IAM role ARN might be able to access your Amazon S3 bucket. If the role is created with both the account ID and external ID, only TiDB clusters running in the same project and the same region can access the bucket.
+        - 在 **Trusted entity type** 下选择 **AWS account**。
+        - 在 **An AWS account** 下选择 **Another AWS account**，并将 TiDB Cloud account ID 粘贴到 **Account ID** 字段。
+        - 在 **Options** 下点击 **Require external ID**，以避免 [confused deputy problem](https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html)，然后将 TiDB Cloud External ID 粘贴到 **External ID** 字段。如果创建角色时未勾选 "Require external ID"，任何拥有你 S3 bucket URI 和 IAM role ARN 的人都可能访问你的 Amazon S3 bucket。如果同时配置了 account ID 和 external ID，只有运行在同一项目和同一区域的 TiDB 集群才能访问该 bucket。
 
-    3. Click **Next** to open the policy list, choose the policy you just created, and then click **Next**.
-    4. Under **Role details**, set a name for the role, and then click **Create role** in the lower-right corner. After the role is created, the list of roles is displayed.
-    5. In the list of roles, click the name of the role that you just created to go to its summary page, and then copy the role ARN.
+    3. 点击 **Next** 打开策略列表，选择你刚刚创建的策略，然后点击 **Next**。
+    4. 在 **Role details** 下设置角色名称，然后点击右下角的 **Create role**。角色创建完成后会显示角色列表。
+    5. 在角色列表中，点击你刚刚创建的角色名称进入其详情页，然后复制 role ARN。
 
         ![Copy AWS role ARN](/media/tidb-cloud/aws-role-arn.png)
 
-4. In the TiDB Cloud console, go to the **Data Import** page where you get the TiDB Cloud account ID and external ID, and then paste the role ARN to the **Role ARN** field.
+4. 回到 TiDB Cloud 控制台，在你获取 TiDB Cloud account ID 和 external ID 的 **Data Import** 页面，将 role ARN 粘贴到 **Role ARN** 字段。
 
-### Configure Amazon S3 access using an AWS access key
+### 使用 AWS 访问密钥配置 Amazon S3 访问权限
 
-It is recommended that you use an IAM user (instead of the AWS account root user) to create an access key.
+推荐你使用 IAM 用户（而不是 AWS 账号 root 用户）来创建访问密钥。
 
-Take the following steps to configure an access key:
+按照以下步骤配置访问密钥：
 
-1. Create an IAM user with the following policies:
+1. 创建一个具有以下策略的 IAM 用户：
 
    - `AmazonS3ReadOnlyAccess`
-   - [`CreateOwnAccessKeys` (required) and `ManageOwnAccessKeys` (optional)](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html#access-keys_required-permissions)
+   - [`CreateOwnAccessKeys`（必需）和 `ManageOwnAccessKeys`（可选）](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html#access-keys_required-permissions)
 
-   It is recommended that these policies only work for your bucket that stores the source data.
+   推荐这些策略仅对存放源数据的 bucket 生效。
 
-   For more information, see [Creating an IAM user](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html#id_users_create_console).
+   详细信息请参见 [创建 IAM 用户](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html#id_users_create_console)。
 
-2. Use your AWS account ID or account alias, and your IAM user name and password to sign in to [the IAM console](https://console.aws.amazon.com/iam).
+2. 使用你的 AWS 账号 ID 或账号别名，以及 IAM 用户名和密码登录 [IAM 控制台](https://console.aws.amazon.com/iam)。
 
-3. Create an access key. For more details, see [Creating an access key for an IAM user](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html#Using_CreateAccessKey).
+3. 创建访问密钥。详细步骤请参见 [为 IAM 用户创建访问密钥](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html#Using_CreateAccessKey)。
 
 > **Note:**
 >
-> TiDB Cloud does not store your access keys. It is recommended that you [delete the access key](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html#Using_CreateAccessKey) after the import is complete.
+> TiDB Cloud 不会存储你的访问密钥。建议在导入完成后 [删除访问密钥](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html#Using_CreateAccessKey)。
 
-## Configure GCS access
+## 配置 GCS 访问权限
 
-To allow TiDB Cloud to access the source data in your GCS bucket, you need to configure the GCS access for the bucket. Once the configuration is done for one TiDB cluster in a project, all TiDB clusters in that project can access the GCS bucket.
+要允许 TiDB Cloud 访问你 GCS bucket 中的源数据，你需要为该 bucket 配置 GCS 访问权限。项目中任意一个 TiDB 集群完成配置后，该项目下所有 TiDB 集群都可以访问该 GCS bucket。
 
-1. In the TiDB Cloud console, get the Google Cloud Service Account ID of the target TiDB cluster.
+1. 在 TiDB Cloud 控制台获取目标 TiDB 集群的 Google Cloud Service Account ID。
 
-    1. Navigate to the [**Clusters**](https://tidbcloud.com/project/clusters) page of your project.
+    1. 进入你的项目的 [**Clusters**](https://tidbcloud.com/project/clusters) 页面。
 
         > **Tip:**
         >
-        > You can use the combo box in the upper-left corner to switch between organizations, projects, and clusters.
+        > 你可以使用左上角的下拉框在组织、项目和集群之间切换。
 
-    2. Click the name of your target cluster to go to its overview page, and then click **Data** > **Import** in the left navigation pane.
+    2. 点击目标集群名称进入其概览页面，然后在左侧导航栏点击 **Data** > **Import**。
 
-    3. Select **Import data from Cloud Storage**, and then click **Google Cloud Storage**.
+    3. 选择 **Import data from Cloud Storage**，然后点击 **Google Cloud Storage**。
 
-    4. Click **Show Google Cloud Server Account ID**, and then copy the Service Account ID for later use.
+    4. 点击 **Show Google Cloud Server Account ID**，复制 Service Account ID，后续会用到。
 
-2. In the Google Cloud console, create an IAM role for your GCS bucket.
+2. 在 Google Cloud 控制台中，为你的 GCS bucket 创建 IAM 角色。
 
-    1. Sign in to the [Google Cloud console](https://console.cloud.google.com/).
-    2. Go to the [Roles](https://console.cloud.google.com/iam-admin/roles) page, and then click **CREATE ROLE**.
+    1. 登录 [Google Cloud 控制台](https://console.cloud.google.com/)。
+    2. 进入 [Roles](https://console.cloud.google.com/iam-admin/roles) 页面，然后点击 **CREATE ROLE**。
 
         ![Create a role](/media/tidb-cloud/gcp-create-role.png)
 
-    3. Enter a name, description, ID, and role launch stage for the role. The role name cannot be changed after the role is created.
-    4. Click **ADD PERMISSIONS**.
-    5. Add the following read-only permissions to the role, and then click **Add**.
+    3. 输入角色的名称、描述、ID 和角色发布阶段。角色名称创建后不可更改。
+    4. 点击 **ADD PERMISSIONS**。
+    5. 为该角色添加以下只读权限，然后点击 **Add**。
 
         - storage.buckets.get
         - storage.objects.get
         - storage.objects.list
 
-        You can copy a permission name to the **Enter property name or value** field as a filter query, and choose the name in the filter result. To add the three permissions, you can use **OR** between the permission names.
+        你可以将权限名称复制到 **Enter property name or value** 字段作为过滤条件，并在过滤结果中选择名称。要添加这三个权限，可以在权限名称之间使用 **OR**。
 
         ![Add permissions](/media/tidb-cloud/gcp-add-permissions.png)
 
-3. Go to the [Bucket](https://console.cloud.google.com/storage/browser) page, and click the name of the GCS bucket you want TiDB Cloud to access.
+3. 进入 [Bucket](https://console.cloud.google.com/storage/browser) 页面，点击你希望 TiDB Cloud 访问的 GCS bucket 名称。
 
-4. On the **Bucket details** page, click the **PERMISSIONS** tab, and then click **GRANT ACCESS**.
+4. 在 **Bucket details** 页面，点击 **PERMISSIONS** 标签页，然后点击 **GRANT ACCESS**。
 
     ![Grant Access to the bucket ](/media/tidb-cloud/gcp-bucket-permissions.png)
 
-5. Fill in the following information to grant access to your bucket, and then click **SAVE**.
+5. 填写以下信息以授予 bucket 访问权限，然后点击 **SAVE**。
 
-    - In the **New Principals** field, paste the Google Cloud Service Account ID of the target TiDB cluster.
-    - In the **Select a role** drop-down list, type the name of the IAM role you just created, and then choose the name from the filter result.
+    - 在 **New Principals** 字段，粘贴目标 TiDB 集群的 Google Cloud Service Account ID。
+    - 在 **Select a role** 下拉列表中，输入你刚刚创建的 IAM 角色名称，并在过滤结果中选择该名称。
 
     > **Note:**
     >
-    > To remove the access to TiDB Cloud, you can simply remove the access that you have granted.
+    > 如果需要移除 TiDB Cloud 的访问权限，只需移除你已授予的访问即可。
 
-6. On the **Bucket details** page, click the **OBJECTS** tab.
+6. 在 **Bucket details** 页面，点击 **OBJECTS** 标签页。
 
-    If you want to copy a file's gsutil URI, select the file, click **Open object overflow menu**, and then click **Copy gsutil URI**.
+    如果你想复制文件的 gsutil URI，选中文件，点击 **Open object overflow menu**，然后点击 **Copy gsutil URI**。
 
     ![Get bucket URI](/media/tidb-cloud/gcp-bucket-uri01.png)
 
-    If you want to use a folder's gsutil URI, open the folder, and then click the copy button following the folder name to copy the folder name. After that, you need to add `gs://` to the beginning and `/` to the end of the name to get the correct URI for the folder.
+    如果你想使用文件夹的 gsutil URI，打开该文件夹，然后点击文件夹名称后面的复制按钮以复制文件夹名称。之后，你需要在名称前加上 `gs://`，末尾加上 `/`，以获得正确的文件夹 URI。
 
-    For example, if the folder name is `tidb-cloud-source-data`, you need to use `gs://tidb-cloud-source-data/` as the URI.
+    例如，如果文件夹名称为 `tidb-cloud-source-data`，你需要使用 `gs://tidb-cloud-source-data/` 作为 URI。
 
     ![Get bucket URI](/media/tidb-cloud/gcp-bucket-uri02.png)
 
-7. In the TiDB Cloud console, go to the **Data Import** page where you get the Google Cloud Service Account ID, and then paste the GCS bucket gsutil URI to the **Bucket gsutil URI** field. For example, paste `gs://tidb-cloud-source-data/`.
+7. 回到 TiDB Cloud 控制台，在你获取 Google Cloud Service Account ID 的 **Data Import** 页面，将 GCS bucket 的 gsutil URI 粘贴到 **Bucket gsutil URI** 字段。例如，粘贴 `gs://tidb-cloud-source-data/`。
 
-## Configure Azure Blob Storage access
+## 配置 Azure Blob Storage 访问权限
 
-To allow TiDB Cloud Dedicated to access your Azure Blob container, you need to configure the Azure Blob access for the container. You can use an account SAS token to configure the container access:
+要允许 TiDB Cloud Dedicated 访问你的 Azure Blob 容器，你需要为该容器配置 Azure Blob 访问权限。你可以使用账户 SAS token 配置容器访问：
 
-1. On the [Azure Storage account](https://portal.azure.com/#browse/Microsoft.Storage%2FStorageAccounts) page, click your storage account to which the container belongs.
+1. 在 [Azure Storage account](https://portal.azure.com/#browse/Microsoft.Storage%2FStorageAccounts) 页面，点击包含目标容器的存储账户。
 
-2. In the navigation pane for your storage account, click **Security + networking** > **Shared access signature**.
+2. 在存储账户的导航栏中，点击 **Security + networking** > **Shared access signature**。
 
     ![sas-position](/media/tidb-cloud/dedicated-external-storage/azure-sas-position.png)
 
-3. On the **Shared access signature** page, create an [account SAS token](https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview) with the necessary permissions as follows:
+3. 在 **Shared access signature** 页面，按如下方式创建具有必要权限的 [account SAS token](https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview)：
 
-    1. Under **Allowed services**, select **Blob**.
-    2. Under **Allowed resource types**, select **Container** and **Object**.
-    3. Under **Allowed permissions**, select the required permissions. For example, importing data to TiDB Cloud Dedicated requires **Read** and **List**.
-    4. Adjust **Start and expiry date/time** as needed. For security reasons, it is recommended to set an expiration date that aligns with your data import timeline.
-    5. Keep the default values for other settings.
+    1. 在 **Allowed services** 下选择 **Blob**。
+    2. 在 **Allowed resource types** 下选择 **Container** 和 **Object**。
+    3. 在 **Allowed permissions** 下选择所需权限。例如，导入数据到 TiDB Cloud Dedicated 需要 **Read** 和 **List**。
+    4. 根据需要调整 **Start and expiry date/time**。出于安全考虑，建议设置与数据导入时间线相符的过期时间。
+    5. 其他设置保持默认值。
 
     ![sas-create](/media/tidb-cloud/dedicated-external-storage/azure-sas-create.png)
 
-4. Click **Generate SAS and connection string** to generate the SAS token.
+4. 点击 **Generate SAS and connection string** 生成 SAS token。
 
-5. Copy the generated **SAS Token**. You will need this token string when configuring the data import in TiDB Cloud.
+5. 复制生成的 **SAS Token**。在 TiDB Cloud 配置数据导入时需要用到该 token 字符串。
 
 > **Note:**
 >
-> Before starting data import, test the connection and permissions to ensure TiDB Cloud Dedicated can access the specified Azure Blob container and files.
+> 在开始数据导入前，请测试连接和权限，确保 TiDB Cloud Dedicated 能够访问指定的 Azure Blob 容器及文件。

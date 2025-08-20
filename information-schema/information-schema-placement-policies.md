@@ -1,17 +1,16 @@
 ---
 title: PLACEMENT_POLICIES
-summary: Learn the `PLACEMENT_POLICIES` information_schema table.
+summary: 了解 `PLACEMENT_POLICIES` information_schema 表。
 ---
 
 # PLACEMENT_POLICIES
 
-The `PLACEMENT_POLICIES` table provides information on all placement policies. For details, refer to [Placement Rules in SQL](/placement-rules-in-sql.md).
+`PLACEMENT_POLICIES` 表提供了所有放置策略的信息。详情请参阅 [Placement Rules in SQL](/placement-rules-in-sql.md)。
 
 > **Note:**
 >
-> This table is not available on [{{{ .starter }}}](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) clusters.
+> 该表在 [{{{ .starter }}}](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) 和 [{{{ .essential }}}](https://docs.pingcap.com/tidbcloud/select-cluster-tier#essential) 集群中不可用。
 
-{{< copyable "sql" >}}
 
 ```sql
 USE information_schema;
@@ -38,18 +37,17 @@ DESC placement_policies;
 12 rows in set (0.00 sec)
 ```
 
-## Examples
+## 示例
 
-The `PLACEMENT_POLICIES` table only shows all placement policies. To view the canonical version of placement rules (including all placement policies and objects assigned placement policies), use the statement `SHOW PLACEMENT` instead:
+`PLACEMENT_POLICIES` 表仅展示所有放置策略。要查看放置规则的规范版本（包括所有放置策略以及被分配放置策略的对象），请使用 `SHOW PLACEMENT` 语句：
 
-{{< copyable "sql" >}}
 
 ```sql
 CREATE TABLE t1 (a INT); 
 CREATE PLACEMENT POLICY p1 primary_region="us-east-1" regions="us-east-1";
 CREATE TABLE t3 (a INT) PLACEMENT POLICY=p1;
-SHOW PLACEMENT; -- Shows all information, including table t3.
-SELECT * FROM information_schema.placement_policies; -- Only shows placement policies, excluding t3.
+SHOW PLACEMENT; -- 显示所有信息，包括表 t3。
+SELECT * FROM information_schema.placement_policies; -- 仅显示放置策略，不包括 t3。
 ```
 
 ```sql

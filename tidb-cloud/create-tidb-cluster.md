@@ -1,93 +1,96 @@
 ---
-title: Create a TiDB Cloud Dedicated Cluster
-summary: Learn how to create your TiDB Cloud Dedicated cluster.
+title: 创建 TiDB Cloud 专属集群
+summary: 了解如何创建你的 TiDB Cloud 专属集群。
 ---
 
-# Create a TiDB Cloud Dedicated Cluster
+# 创建 TiDB Cloud 专属集群
 
-This tutorial guides you through signing up and creating a TiDB Cloud Dedicated cluster.
+本教程将指导你注册并创建一个 TiDB Cloud 专属集群。
 
 > **Tip:**
 >
-> To learn how to create a TiDB Cloud Serverless cluster, see [Create a TiDB Cloud Serverless Cluster](/tidb-cloud/create-tidb-cluster-serverless.md).
+> 如果你想了解如何创建 {{{ .starter }}} 或 {{{ .essential }}} 集群，请参阅 [创建 {{{ .starter }}} 或 Essential 集群](/tidb-cloud/create-tidb-cluster-serverless.md)。
 
-## Before you begin
+## 开始之前
 
-If you do not have a TiDB Cloud account, click [here](https://tidbcloud.com/signup) to sign up for an account.
+如果你还没有 TiDB Cloud 账号，请点击 [这里](https://tidbcloud.com/signup) 注册账号。
 
-- You can either sign up with email and password so that you can manage your password using TiDB Cloud, or sign up with your Google, GitHub, or Microsoft account.
-- For AWS Marketplace users, you can also sign up through AWS Marketplace. To do that, search for `TiDB Cloud` in [AWS Marketplace](https://aws.amazon.com/marketplace), subscribe to TiDB Cloud, and then follow the onscreen instructions to set up your TiDB Cloud account.
-- For Google Cloud Marketplace users, you can also sign up through Google Cloud Marketplace. To do that, search for `TiDB Cloud` in [Google Cloud Marketplace](https://console.cloud.google.com/marketplace), subscribe to TiDB Cloud, and then follow the onscreen instructions to set up your TiDB Cloud account.
+- 你可以使用邮箱和密码注册，这样你可以通过 TiDB Cloud 管理你的密码，或者使用 Google、GitHub 或 Microsoft 账号注册。
+- 对于 AWS Marketplace 用户，你也可以通过 AWS Marketplace 注册。方法是，在 [AWS Marketplace](https://aws.amazon.com/marketplace) 中搜索 `TiDB Cloud`，订阅 TiDB Cloud，然后按照屏幕上的指引设置你的 TiDB Cloud 账号。
+- 对于 Azure Marketplace 用户，你也可以通过 Azure Marketplace 注册。方法是，在 [Azure Marketplace](https://azuremarketplace.microsoft.com) 中搜索 `TiDB Cloud`，订阅 TiDB Cloud，然后按照屏幕上的指引设置你的 TiDB Cloud 账号。
+- 对于 Google Cloud Marketplace 用户，你也可以通过 Google Cloud Marketplace 注册。方法是，在 [Google Cloud Marketplace](https://console.cloud.google.com/marketplace) 中搜索 `TiDB Cloud`，订阅 TiDB Cloud，然后按照屏幕上的指引设置你的 TiDB Cloud 账号。
 
-## (Optional) Step 1. Use your default project or create a new project
+## （可选）步骤 1. 使用默认项目或创建新项目
 
-Once you log in to the [TiDB Cloud console](https://tidbcloud.com/), you have a default [project](/tidb-cloud/tidb-cloud-glossary.md#project). When there is only one project in your organization, your cluster will be created in that project. For more information about projects, see [Organizations and projects](/tidb-cloud/manage-user-access.md#organizations-and-projects).
+登录 [TiDB Cloud 控制台](https://tidbcloud.com/) 后，你会有一个默认的 [项目](/tidb-cloud/tidb-cloud-glossary.md#project)。当你的组织中只有一个项目时，集群会被创建在该项目下。关于项目的更多信息，请参阅 [组织和项目](/tidb-cloud/manage-user-access.md#organizations-and-projects)。
 
-If you are an organization owner, you can rename the default project or create a new project for the cluster according to your need as follows:
+如果你是组织所有者，可以根据需要重命名默认项目或为集群创建新项目，操作如下：
 
-1. Log in to the [TiDB Cloud console](https://tidbcloud.com/), and then click <MDSvgIcon name="icon-top-organization" /> in the lower-left corner.
+1. 在 [TiDB Cloud 控制台](https://tidbcloud.com/)中，点击左上角的下拉框。你的默认组织和项目会显示出来。
 
-2. Click **Organization Settings**, and click the **Projects** tab in the left navigation pane. The **Projects** tab is displayed.
+2. 点击你的组织名称，然后在左侧导航栏点击 **Projects**。
 
-3. Do one of the following:
+3. 在 **Projects** 页面，执行以下操作之一：
 
-    - To rename the default project, click **Rename** in the **Actions** column.
-    - To create a project, click **Create New Project**, enter a name for your project, and then click **Confirm**.
+    - 若要重命名默认项目，在 **Actions** 列点击 **...** > **Rename**。
+    - 若要创建新项目，点击 **Create New Project**，输入项目名称，然后点击 **Confirm**。
 
-4. To return to the cluster page, click the TiDB Cloud logo in the upper-left corner of the window.
+4. 若要进入该项目的集群列表页面，在 **Projects** 页面点击项目名称。
 
-## Step 2. Create a TiDB Cloud Dedicated cluster
+## 步骤 2. 创建 TiDB Cloud 专属集群
 
-If you are in the `Organization Owner` or the `Project Owner` role, you can create a TiDB Cloud Dedicated cluster as follows:
+如果你拥有 `Organization Owner` 或 `Project Owner` 角色，可以按照以下步骤创建 TiDB Cloud 专属集群：
 
-1. Navigate to the [**Clusters**](https://tidbcloud.com/console/clusters) page of your project.
+1. 进入你的项目的 [**Clusters**](https://tidbcloud.com/project/clusters) 页面。
 
     > **Tip:**
     >
-    > If you have multiple projects, you can click <MDSvgIcon name="icon-left-projects" /> in the lower-left corner and switch to another project.
+    > 你可以使用左上角的下拉框在组织、项目和集群之间切换。
 
-2. Click **Create Cluster**.
+2. 点击 **Create Cluster**。
 
-3. On the **Create Cluster** page, select **Dedicated**, and then configure the cluster information as follows:
+3. 在 **Create Cluster** 页面，选择 **Dedicated**，然后按如下方式配置集群信息：
 
-    1. Choose a cloud provider and a region.
-
-        > **Note:**
-        >
-        > - If you signed up for TiDB Cloud through [AWS Marketplace](https://aws.amazon.com/marketplace), the cloud provider is AWS, and you cannot change it in TiDB Cloud.
-        > - If you signed up for TiDB Cloud through [Google Cloud Marketplace](https://console.cloud.google.com/marketplace), the cloud provider is Google Cloud, and you cannot change it in TiDB Cloud.
-
-    2. Configure the [cluster size](/tidb-cloud/size-your-cluster.md) for TiDB, TiKV, and TiFlash (optional) respectively.
-    3. Update the default cluster name and port number if necessary.
-    4. If CIDR has not been configured for this region, you need to set the CIDR. If you do not see the **Project CIDR** field, it means that CIDR has already been configured for this region.
+    1. 选择云服务商和区域。
 
         > **Note:**
         >
-        > - TiDB Cloud will create a VPC with this CIDR when the first cluster in this region is created. All the subsequent clusters of the same project in this region will use this VPC.
-        > - When setting the CIDR, avoid any conflicts with the CIDR of the VPC where your application is located. You cannot modify your CIDR once the VPC is created.
+        > - 目前，TiDB Cloud 专属集群在 Azure 上的支持处于公测阶段。
+        > - 如果你是通过 [AWS Marketplace](https://aws.amazon.com/marketplace) 注册的 TiDB Cloud，云服务商为 AWS，且无法在 TiDB Cloud 中更改。
+        > - 如果你是通过 [Azure Marketplace](https://azuremarketplace.microsoft.com) 注册的 TiDB Cloud，云服务商为 Azure Cloud，且无法在 TiDB Cloud 中更改。
+        > - 如果你是通过 [Google Cloud Marketplace](https://console.cloud.google.com/marketplace) 注册的 TiDB Cloud，云服务商为 Google Cloud，且无法在 TiDB Cloud 中更改。
 
-4. Confirm the cluster and billing information on the right side.
+    2. 分别为 TiDB、TiKV 和 TiFlash（可选）配置 [集群规格](/tidb-cloud/size-your-cluster.md)。
+    3. 如有需要，修改默认的集群名称和端口号。
+    4. 如果该区域尚未配置 CIDR，则需要设置 CIDR。如果你没有看到 **Project CIDR** 字段，说明该区域已配置了 CIDR。
 
-5. If you have not added a payment method, click **Add Credit Card** in the lower-right corner.
+        > **Note:**
+        >
+        > - 当该区域创建第一个集群时，TiDB Cloud 会使用该 CIDR 创建一个 VPC。该区域同一项目下后续创建的所有集群都会使用该 VPC。
+        > - 设置 CIDR 时，请避免与你应用所在 VPC 的 CIDR 冲突。VPC 创建后，CIDR 无法修改。
+
+4. 在右侧确认集群和计费信息。
+
+5. 如果你还未添加支付方式，请点击右下角的 **Add Credit Card**。
 
     > **Note:**
     >
-    > If you signed up TiDB Cloud through [AWS Marketplace](https://aws.amazon.com/marketplace) or [Google Cloud Marketplace](https://console.cloud.google.com/marketplace), you can pay through your AWS account or Google Cloud account directly but cannot add payment methods or download invoices in the TiDB Cloud console.
+    > 如果你是通过 [AWS Marketplace](https://aws.amazon.com/marketplace)、[Azure Marketplace](https://azuremarketplace.microsoft.com) 或 [Google Cloud Marketplace](https://console.cloud.google.com/marketplace) 注册的 TiDB Cloud，可以直接通过 AWS 账号、Azure 账号或 Google Cloud 账号支付，但无法在 TiDB Cloud 控制台添加支付方式或下载发票。
 
-6. Click **Create**.
+6. 点击 **Create**。
 
-    Your TiDB Cloud cluster will be created in approximately 20 to 30 minutes.
+    你的 TiDB Cloud 集群将在大约 20 到 30 分钟内创建完成。
 
-## Step 3. Set the root password
+## 步骤 3. 设置 root 密码
 
-After your cluster is created, take the following steps to set the root password:
+集群创建完成后，按照以下步骤设置 root 密码：
 
-1. In the upper-right corner of your cluster overview page, click **...** and select **Password Settings**.
+1. 在集群概览页面右上角，点击 **...** 并选择 **Password Settings**。
 
-2. Set the root password to connect to your cluster, and then click **Save**.
+2. 设置连接集群所需的 root 密码，然后点击 **Save**。
 
-    You can click **Auto-generate Password** to generate a random password. The generated password will not show again, so save your password in a secure location.
+    你可以点击 **Auto-generate Password** 自动生成一个随机密码。生成的密码不会再次显示，请妥善保存你的密码。
 
-## What's next
+## 后续操作
 
-After your cluster is created on TiDB Cloud, you can connect to it via the methods provided in [Connect to Your TiDB Cloud Dedicated Cluster](/tidb-cloud/connect-to-tidb-cluster.md).
+在 TiDB Cloud 上创建集群后，你可以通过 [连接到你的 TiDB Cloud 专属集群](/tidb-cloud/connect-to-tidb-cluster.md) 中提供的方法进行连接。

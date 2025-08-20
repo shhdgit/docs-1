@@ -1,31 +1,39 @@
 ---
 title: Changefeed Billing
-summary: Learn about billing for changefeeds in TiDB Cloud.
+summary: 了解 TiDB Cloud 中 changefeed 的计费方式。
 aliases: ['/tidbcloud/tidb-cloud-billing-tcu']
 ---
 
-# Changefeed Billing
+# Changefeed 计费
 
-TiDB Cloud measures the capacity of [changefeeds](/tidb-cloud/changefeed-overview.md) in TiCDC Replication Capacity Units (RCUs). When you [create a changefeed](/tidb-cloud/changefeed-overview.md#create-a-changefeed) for a cluster, you can select an appropriate specification. The higher the RCU, the better the replication performance. You will be charged for these TiCDC changefeed RCUs.
+## RCU 成本
 
-## Number of TiCDC RCUs
+TiDB Cloud 以 TiCDC 复制能力单位（Replication Capacity Units，RCUs）来衡量 [changefeed](/tidb-cloud/changefeed-overview.md) 的容量。当你为集群 [创建 changefeed](/tidb-cloud/changefeed-overview.md#create-a-changefeed) 时，可以选择合适的规格。RCU 越高，复制性能越好。你需要为这些 TiCDC changefeed 的 RCU 支付费用。
 
-The following table lists the specifications and corresponding replication performances for changefeeds:
+### TiCDC RCU 数量
 
-| Specification | Maximum replication performance |
-|---------------|---------------------------------|
-| 2 RCUs        | 5,000 rows/s                    |
-| 4 RCUs        | 10,000 rows/s                   |
-| 8 RCUs        | 20,000 rows/s                   |
-| 16 RCUs       | 40,000 rows/s                   |
-| 24 RCUs       | 60,000 rows/s                   |
-| 32 RCUs       | 80,000 rows/s                   |
-| 40 RCUs       | 100,000 rows/s                  |
+下表列出了 changefeed 的规格及其对应的最大复制性能：
+
+| 规格         | 最大复制性能         |
+|--------------|---------------------|
+| 2 RCUs       | 5,000 行/秒         |
+| 4 RCUs       | 10,000 行/秒        |
+| 8 RCUs       | 20,000 行/秒        |
+| 16 RCUs      | 40,000 行/秒        |
+| 24 RCUs      | 60,000 行/秒        |
+| 32 RCUs      | 80,000 行/秒        |
+| 40 RCUs      | 100,000 行/秒       |
 
 > **Note:**
 >
-> The preceding performance data is for reference only and might vary in different scenarios. It is strongly recommended that you conduct a real workload test before using the changefeed feature in a production environment. For further assistance, contact [TiDB Cloud support](/tidb-cloud/tidb-cloud-support.md#get-support-for-a-cluster).
+> 上述性能数据仅供参考，实际场景下可能有所不同。强烈建议你在生产环境中使用 changefeed 功能前，先进行真实负载测试。如需进一步协助，请联系 [TiDB Cloud support](/tidb-cloud/tidb-cloud-support.md)。
 
-## Price
+### 价格
 
-To learn about the supported regions and the price of TiDB Cloud for each TiCDC RCU, see [Changefeed Cost](https://www.pingcap.com/tidb-cloud-pricing-details/#changefeed-cost).
+关于 TiDB Cloud 各区域支持情况及每个 TiCDC RCU 的价格，请参见 [Changefeed Cost](https://www.pingcap.com/tidb-dedicated-pricing-details/#changefeed-cost)。
+
+## Private Data Link 成本
+
+如果你选择 **Private Link** 或 **Private Service Connect** 网络连接方式，将会产生额外的 **Private Data Link** 费用。这部分费用属于 [Data Transfer Cost](https://www.pingcap.com/tidb-dedicated-pricing-details/#data-transfer-cost) 类别。
+
+**Private Data Link** 的价格为 **$0.01/GiB**，与 [AWS Interface Endpoint pricing](https://aws.amazon.com/privatelink/pricing/#Interface_Endpoint_pricing) 的 **Data Processed**、[Google Cloud Private Service Connect pricing](https://cloud.google.com/vpc/pricing#psc-forwarding-rules) 的 **Consumer data processing** 以及 [Azure Private Link pricing](https://azure.microsoft.com/en-us/pricing/details/private-link/) 的 **Inbound/Outbound Data Processed** 相同。

@@ -1,14 +1,14 @@
 ---
 title: Recovery Group Billing
-summary: Learn about billing for recovery groups in TiDB Cloud.
+summary: 了解 TiDB Cloud 中恢复组的计费方式。
 ---
 
-# Recovery Group Billing
+# 恢复组计费
 
-TiDB Cloud bills for recovery groups based on the deployed size of your TiKV nodes in the primary cluster of the recovery group. When you [create a recovery group](/tidb-cloud/recovery-group-get-started.md) for a cluster, you can select the primary cluster for the recovery group. The larger the TiKV configuration, the higher the cost for recovery group protection.
+TiDB Cloud 会根据恢复组主集群中已部署的 TiKV 节点规模对恢复组进行计费。当你为某个集群 [创建恢复组](/tidb-cloud/recovery-group-get-started.md) 时，可以为恢复组选择主集群。TiKV 配置越大，恢复组保护的成本就越高。
 
-TiDB Cloud also bills for data processing per GiB basis. The data processing price varies depending on whether the data is replicated to a secondary cluster in another region, or within the same region.
+TiDB Cloud 还会按照每 GiB 的数据处理量进行计费。数据处理价格会根据数据是复制到另一个区域的辅助集群，还是在同一区域内复制而有所不同。
 
-## Pricing
+## 价格
 
-To learn about the supported regions and the pricing for TiDB Cloud recovery groups, see [Recovery Group Cost](https://www.pingcap.com/tidb-cloud-pricing-details/#recovery-group-cost).
+要了解 TiDB Cloud 恢复组支持的区域和价格，请参见 [Recovery Group Cost](https://www.pingcap.com/tidb-dedicated-pricing-details/#recovery-group-cost)。

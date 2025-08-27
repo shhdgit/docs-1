@@ -1,69 +1,67 @@
 ---
-title: Select Your Cluster Tier
-summary: Learn how to select your cluster tier on TiDB Cloud.
+title: 选择你的集群方案
+summary: 了解如何在 TiDB Cloud 上选择你的集群方案。
 aliases: ['/tidbcloud/developer-tier-cluster']
 ---
 
-# Select Your Cluster Tier
+# 选择你的集群方案
 
-The cluster tier determines the throughput and performance of your cluster.
+集群方案决定了你的集群的吞吐量和性能。
 
-TiDB Cloud provides the following two options of cluster tiers. Before creating a cluster, you need to consider which option suits your need better.
+TiDB Cloud 提供以下几种集群方案选项。无论你是刚刚起步，还是需要扩展以满足不断增长的应用需求，这些服务方案都能为你提供所需的灵活性和能力。在创建集群之前，你需要考虑哪种选项更适合你的需求。
 
-- [TiDB Cloud Serverless](#tidb-cloud-serverless)
+- [TiDB Cloud Serverless](#tidb-cloud-serverless)（现称 Starter）
+- [Essential](#essential)
 - [TiDB Cloud Dedicated](#tidb-cloud-dedicated)
+
+> **Note:**
+>
+> 部分 TiDB Cloud 功能在 Starter 和 Essential 上仅部分支持或不支持。详情请参见 [Starter 和 Essential 限制](/tidb-cloud/serverless-limitations.md)。
 
 ## TiDB Cloud Serverless
 
-<!--To be confirmed-->
-TiDB Cloud Serverless is a fully managed, multi-tenant TiDB offering. It delivers an instant, autoscaling MySQL-compatible database and offers a generous free tier and consumption based billing once free limits are exceeded.
+TiDB Cloud Serverless（现称 Starter）是一款全托管的多租户 TiDB 服务。它提供了一个即时、自动弹性扩展的 MySQL 兼容数据库，并在超出免费额度后，按消耗计费。
 
-### Cluster plans
+免费集群方案非常适合刚开始使用 Starter 的用户。它为开发者和小型团队提供以下基本功能：
 
-TiDB Cloud Serverless offers two service plans to meet different user requirements. Whether you are just getting started or scaling to meet the increasing application demands, these service plans provide the flexibility and capability you need.
+- **No cost**：该方案完全免费，无需信用卡即可开始使用。
+- **Storage**：提供初始 5 GiB 的行存储和 5 GiB 的列存储。
+- **Request Units**：包含 5000 万 [Request Units (RUs)](/tidb-cloud/tidb-cloud-glossary.md#request-unit) 用于数据库操作。
 
-#### Free cluster plan
+### 使用配额
 
-The free cluster plan is ideal for those who are getting started with TiDB Cloud Serverless. It provides developers and small teams with the following essential features:
+对于 TiDB Cloud 中的每个组织，默认最多可以创建 5 个免费的 Starter 集群。要创建更多 Starter 集群，你需要添加信用卡并设置消费上限。
 
-- **No cost**: This plan is completely free, with no credit card required to get started.
-- **Storage**: Provides an initial 5 GiB of row-based storage and 5 GiB of columnar storage.
-- **Request Units**: Includes 50 million [Request Units (RUs)](/tidb-cloud/tidb-cloud-glossary.md#request-unit) for database operations.
-- **Easy upgrade**: Offers a smooth transition to the [scalable cluster plan](#scalable-cluster-plan) as your needs grow.
+对于组织中的前 5 个 Starter 集群，无论是免费还是可扩展，TiDB Cloud 都为每个集群提供如下免费使用配额：
 
-#### Scalable cluster plan
+- 行存储：5 GiB
+- 列存储：5 GiB
+- Request Units (RUs)：每月 5000 万 RU
 
-For applications experiencing growing workloads and needing scalability in real time, the scalable cluster plan provides the flexibility and performance to keep pace with your business growth with the following features:
+Request Unit (RU) 是用于表示单个数据库请求消耗的资源量的度量单位。每个请求消耗的 RU 数量取决于多种因素，例如操作类型或检索/修改的数据量。
 
-- **Enhanced capabilities**: Includes all capabilities of the free cluster plan, along with the capacity to handle larger and more complex workloads, as well as advanced security features.
-- **Automatic scaling**: Automatically adjusts storage and computing resources to efficiently meet changing workload demands.
-- **Predictable pricing**: Although this plan requires a credit card, you are only charged for the resources you use, ensuring cost-effective scalability.
+一旦集群达到其使用配额，将立即拒绝任何新的连接尝试，直到你 [增加配额](/tidb-cloud/manage-serverless-spend-limit.md#update-spending-limit) 或在新月开始时重置使用量。已建立的连接在达到配额前会保持活跃，但会受到限流。例如，当免费集群的行存储超过 5 GiB 时，集群会自动限制任何新的连接尝试。
 
-### Usage quota
+如需了解不同资源（包括读、写、SQL CPU 和网络出口）的 RU 消耗、定价详情以及限流信息，请参见 [Starter 价格详情](https://www.pingcap.com/tidb-cloud-starter-pricing-details/)。
 
-For each organization in TiDB Cloud, you can create a maximum of five [free clusters](#free-cluster-plan) by default. To create more TiDB Cloud Serverless clusters, you need to add a credit card and create [scalable clusters](#scalable-cluster-plan) for the usage.
+## Essential {#essential}
 
-For the first five TiDB Cloud Serverless clusters in your organization, whether they are free or scalable, TiDB Cloud provides a free usage quota for each of them as follows:
+对于工作负载不断增长、需要实时扩展的应用，Essential 集群方案提供了灵活性和性能，助力你的业务增长，具备以下特性：
 
-- Row-based storage: 5 GiB
-- Columnar storage: 5 GiB
-- Request Units (RUs): 50 million RUs per month
+- **Enhanced capabilities**：包含 Starter 方案的所有功能，并具备处理更大、更复杂工作负载的能力，以及高级安全特性。
+- **Automatic scaling**：自动调整存储和计算资源，高效应对不断变化的工作负载需求。
+- **High availability**：内置容错和冗余机制，确保你的应用在基础设施故障时依然可用且具备弹性。
+- **Predictable pricing**：基于存储和计算资源的 Request Capacity Units (RCUs) 计费，提供透明、按用量计费的定价方式，随需扩展，让你只为实际使用的资源付费，无额外意外支出。
 
-A Request Unit (RU) is a unit of measure used to represent the amount of resources consumed by a single request to the database. The amount of RUs consumed by a request depends on various factors, such as the operation type or the amount of data being retrieved or modified.
-
-Once a cluster reaches its usage quota, it immediately denies any new connection attempts until you [increase the quota](/tidb-cloud/manage-serverless-spend-limit.md#update-spending-limit) or the usage is reset upon the start of a new month. Existing connections established before reaching the quota will remain active but will experience throttling. For example, when the row-based storage of a cluster exceeds 5 GiB for a free cluster, the cluster automatically restricts any new connection attempts.
-
-To learn more about the RU consumption of different resources (including read, write, SQL CPU, and network egress), the pricing details, and the throttled information, see [TiDB Cloud Serverless Pricing Details](https://www.pingcap.com/tidb-cloud-serverless-pricing-details).
-
-### User name prefix
+## User name prefix
 
 <!--Important: Do not update the section name "User name prefix" because this section is referenced by TiDB backend error messages.-->
 
-For each TiDB Cloud Serverless cluster, TiDB Cloud generates a unique prefix to distinguish it from other clusters.
+对于每个 Starter 或 Essential 集群，TiDB Cloud 会生成一个唯一的前缀，以便与其他集群区分。
 
-Whenever you use or set a database user name, you must include the prefix in the user name. For example, assume that the prefix of your cluster is `3pTAoNNegb47Uc8`.
+每当你使用或设置数据库用户名时，必须在用户名中包含该前缀。例如，假设你的集群前缀为 `3pTAoNNegb47Uc8`。
 
-- To connect to your cluster:
+- 连接到你的集群：
 
     ```shell
     mysql -u '3pTAoNNegb47Uc8.root' -h <host> -P 4000 -D test --ssl-mode=VERIFY_IDENTITY --ssl-ca=<CA_root_path> -p
@@ -71,32 +69,28 @@ Whenever you use or set a database user name, you must include the prefix in the
 
     > **Note:**
     >
-    > TiDB Cloud Serverless requires TLS connection. To find the CA root path on your system, see [Root certificate default path](/tidb-cloud/secure-connections-to-serverless-clusters.md#root-certificate-default-path).
+    > Starter 和 Essential 需要使用 TLS 连接。要查找你系统上的 CA 根证书路径，请参见 [Root certificate default path](/tidb-cloud/secure-connections-to-serverless-clusters.md#root-certificate-default-path)。
 
-- To create a database user:
+- 创建数据库用户：
 
     ```sql
     CREATE USER '3pTAoNNegb47Uc8.jeffrey';
     ```
 
-To get the prefix for your cluster, take the following steps:
+获取你的集群前缀，请按照以下步骤操作：
 
-1. Navigate to the [**Clusters**](https://tidbcloud.com/console/clusters) page.
-2. Click the name of your target cluster to go to its overview page, and then click **Connect** in the upper-right corner. A connection dialog is displayed.
-3. In the dialog, get the prefix from the connection string.
-
-### TiDB Cloud Serverless special terms and conditions
-
-Some of TiDB Cloud features are partially supported or not supported on TiDB Cloud Serverless. See [TiDB Cloud Serverless Limitations](/tidb-cloud/serverless-limitations.md) for details.
+1. 进入 [**Clusters**](https://tidbcloud.com/project/clusters) 页面。
+2. 点击目标集群名称进入其概览页面，然后点击右上角的 **Connect**。此时会弹出连接对话框。
+3. 在对话框中，从连接字符串中获取前缀。
 
 ## TiDB Cloud Dedicated
 
-TiDB Cloud Dedicated is for production use with the benefits of cross-zone high availability, horizontal scaling, and [HTAP](https://en.wikipedia.org/wiki/Hybrid_transactional/analytical_processing).
+TiDB Cloud Dedicated 适用于生产环境，具备跨可用区高可用性、水平扩展能力和 [HTAP](https://en.wikipedia.org/wiki/Hybrid_transactional/analytical_processing) 优势。
 
-For TiDB Cloud Dedicated clusters, you can customize the cluster size of TiDB, TiKV, and TiFlash easily according to your business need. For each TiKV node and TiFlash node, the data on the node is replicated and distributed in different availability zones for [high availability](/tidb-cloud/high-availability-with-multi-az.md).
+对于 TiDB Cloud Dedicated 集群，你可以根据业务需求灵活定制 TiDB、TiKV 和 TiFlash 的集群规模。对于每个 TiKV 节点和 TiFlash 节点，节点上的数据会在不同可用区进行复制和分布，以实现 [高可用性](/tidb-cloud/high-availability-with-multi-az.md)。
 
-To create a TiDB Cloud Dedicated cluster, you need to [add a payment method](/tidb-cloud/tidb-cloud-billing.md#payment-method) or [apply for a Proof of Concept (PoC) trial](/tidb-cloud/tidb-cloud-poc.md).
+要创建 TiDB Cloud Dedicated 集群，你需要 [添加支付方式](/tidb-cloud/tidb-cloud-billing.md#payment-method) 或 [申请 PoC（概念验证）试用](/tidb-cloud/tidb-cloud-poc.md)。
 
 > **Note:**
 >
-> You cannot decrease the node storage after your cluster is created.
+> 集群创建后，节点存储空间无法减少。

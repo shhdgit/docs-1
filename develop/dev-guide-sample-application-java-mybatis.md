@@ -1,96 +1,96 @@
 ---
-title: Connect to TiDB with MyBatis
-summary: Learn how to connect to TiDB using MyBatis. This tutorial gives Java sample code snippets that work with TiDB using MyBatis.
+title: 使用 MyBatis 连接 TiDB
+summary: 学习如何使用 MyBatis 连接 TiDB。本教程提供了可与 TiDB 搭配使用的 Java 示例代码片段。
 ---
 
-# Connect to TiDB with MyBatis
+# 使用 MyBatis 连接 TiDB
 
-TiDB is a MySQL-compatible database, and [MyBatis](https://mybatis.org/mybatis-3/index.html) is a popular open-source Java ORM.
+TiDB 是一个兼容 MySQL 的数据库，[MyBatis](https://mybatis.org/mybatis-3/index.html) 是一个流行的开源 Java ORM 框架。
 
-In this tutorial, you can learn how to use TiDB and MyBatis to accomplish the following tasks:
+在本教程中，你可以学习如何使用 TiDB 和 MyBatis 完成以下任务：
 
-- Set up your environment.
-- Connect to your TiDB cluster using MyBatis.
-- Build and run your application. Optionally, you can find [sample code snippets](#sample-code-snippets) for basic CRUD operations.
+- 搭建你的开发环境。
+- 使用 MyBatis 连接到你的 TiDB 集群。
+- 构建并运行你的应用程序。你还可以在 [示例代码片段](#sample-code-snippets) 中找到基本的 CRUD 操作示例。
 
 > **Note:**
 >
-> This tutorial works with {{{ .starter }}}, TiDB Cloud Dedicated, and TiDB Self-Managed.
+> 本教程适用于 TiDB Cloud Serverless、TiDB Cloud Essential、TiDB Cloud Dedicated 以及自托管 TiDB。
 
-## Prerequisites
+## 前提条件
 
-To complete this tutorial, you need:
+完成本教程，你需要：
 
-- **Java Development Kit (JDK) 17** or higher. You can choose [OpenJDK](https://openjdk.org/) or [Oracle JDK](https://www.oracle.com/hk/java/technologies/downloads/) based on your business and personal requirements.
-- [Maven](https://maven.apache.org/install.html) **3.8** or higher.
-- [Git](https://git-scm.com/downloads).
-- A TiDB cluster.
+- **Java Development Kit (JDK) 17** 或更高版本。你可以根据业务和个人需求选择 [OpenJDK](https://openjdk.org/) 或 [Oracle JDK](https://www.oracle.com/hk/java/technologies/downloads/)。
+- [Maven](https://maven.apache.org/install.html) **3.8** 或更高版本。
+- [Git](https://git-scm.com/downloads)。
+- 一个 TiDB 集群。
 
 <CustomContent platform="tidb">
 
-**If you don't have a TiDB cluster, you can create one as follows:**
+**如果你还没有 TiDB 集群，可以按如下方式创建：**
 
-- (Recommended) Follow [Creating a {{{ .starter }}} cluster](/develop/dev-guide-build-cluster-in-cloud.md) to create your own TiDB Cloud cluster.
-- Follow [Deploy a local test TiDB cluster](/quick-start-with-tidb.md#deploy-a-local-test-cluster) or [Deploy a production TiDB cluster](/production-deployment-using-tiup.md) to create a local cluster.
+- （推荐）参考 [创建 TiDB Cloud Serverless 集群](/develop/dev-guide-build-cluster-in-cloud.md) 创建属于你自己的 TiDB Cloud 集群。
+- 参考 [部署本地测试 TiDB 集群](/quick-start-with-tidb.md#deploy-a-local-test-cluster) 或 [部署生产环境 TiDB 集群](/production-deployment-using-tiup.md) 创建本地集群。
 
 </CustomContent>
 <CustomContent platform="tidb-cloud">
 
-**If you don't have a TiDB cluster, you can create one as follows:**
+**如果你还没有 TiDB 集群，可以按如下方式创建：**
 
-- (Recommended) Follow [Creating a {{{ .starter }}} cluster](/develop/dev-guide-build-cluster-in-cloud.md) to create your own TiDB Cloud cluster.
-- Follow [Deploy a local test TiDB cluster](https://docs.pingcap.com/tidb/stable/quick-start-with-tidb#deploy-a-local-test-cluster) or [Deploy a production TiDB cluster](https://docs.pingcap.com/tidb/stable/production-deployment-using-tiup) to create a local cluster.
+- （推荐）参考 [创建 TiDB Cloud Serverless 集群](/develop/dev-guide-build-cluster-in-cloud.md) 创建属于你自己的 TiDB Cloud 集群。
+- 参考 [部署本地测试 TiDB 集群](https://docs.pingcap.com/tidb/stable/quick-start-with-tidb#deploy-a-local-test-cluster) 或 [部署生产环境 TiDB 集群](https://docs.pingcap.com/tidb/stable/production-deployment-using-tiup) 创建本地集群。
 
 </CustomContent>
 
-## Run the sample app to connect to TiDB
+## 运行示例应用连接 TiDB
 
-This section demonstrates how to run the sample application code and connect to TiDB.
+本节演示如何运行示例应用代码并连接到 TiDB。
 
-### Step 1: Clone the sample app repository
+### 步骤 1：克隆示例应用仓库
 
-Run the following commands in your terminal window to clone the sample code repository:
+在终端窗口中运行以下命令，克隆示例代码仓库：
 
 ```shell
 git clone https://github.com/tidb-samples/tidb-java-mybatis-quickstart.git
 cd tidb-java-mybatis-quickstart
 ```
 
-### Step 2: Configure connection information
+### 步骤 2：配置连接信息
 
-Connect to your TiDB cluster depending on the TiDB deployment option you've selected.
+根据你选择的 TiDB 部署方式，连接到你的 TiDB 集群。
 
 <SimpleTab>
-<div label="{{{ .starter }}}">
+<div label="TiDB Cloud Serverless or Essential">
 
-1. Navigate to the [**Clusters**](https://tidbcloud.com/console/clusters) page, and then click the name of your target cluster to go to its overview page.
+1. 进入 [**Clusters**](https://tidbcloud.com/console/clusters) 页面，然后点击目标集群名称进入其概览页面。
 
-2. Click **Connect** in the upper-right corner. A connection dialog is displayed.
+2. 点击右上角的 **Connect**，弹出连接对话框。
 
-3. Ensure the configurations in the connection dialog match your operating environment.
+3. 确保连接对话框中的配置与你的操作环境一致。
 
-    - **Connection Type** is set to `Public`
-    - **Branch** is set to `main`
-    - **Connect With** is set to `General`
-    - **Operating System** matches your environment.
-
-    > **Tip:**
-    >
-    > If your program is running in Windows Subsystem for Linux (WSL), switch to the corresponding Linux distribution.
-
-4. Click **Generate Password** to create a random password.
+    - **Connection Type** 设置为 `Public`
+    - **Branch** 设置为 `main`
+    - **Connect With** 设置为 `General`
+    - **Operating System** 与你的环境一致
 
     > **Tip:**
     >
-    > If you have created a password before, you can either use the original password or click **Reset Password** to generate a new one.
+    > 如果你的程序运行在 Windows Subsystem for Linux (WSL) 中，请切换到对应的 Linux 发行版。
 
-5. Run the following command to copy `env.sh.example` and rename it to `env.sh`:
+4. 点击 **Generate Password** 生成一个随机密码。
+
+    > **Tip:**
+    >
+    > 如果你之前已经创建过密码，可以继续使用原密码，或者点击 **Reset Password** 生成新密码。
+
+5. 运行以下命令，复制 `env.sh.example` 并重命名为 `env.sh`：
 
     ```shell
     cp env.sh.example env.sh
     ```
 
-6. Copy and paste the corresponding connection string into the `env.sh` file. The example result is as follows:
+6. 将对应的连接字符串复制粘贴到 `env.sh` 文件中。示例结果如下：
 
     ```shell
     export TIDB_HOST='{host}'  # e.g. gateway01.ap-northeast-1.prod.aws.tidbcloud.com
@@ -101,32 +101,32 @@ Connect to your TiDB cluster depending on the TiDB deployment option you've sele
     export USE_SSL='true'
     ```
 
-    Be sure to replace the placeholders `{}` with the connection parameters obtained from the connection dialog.
+    请确保将 {} 占位符替换为你在连接对话框中获得的连接参数。
 
-    {{{ .starter }}} requires a secure connection. Therefore, you need to set the value of `USE_SSL` to `true`.
+    TiDB Cloud Serverless 需要安全连接，因此你需要将 `USE_SSL` 的值设置为 `true`。
 
-7. Save the `env.sh` file.
+7. 保存 `env.sh` 文件。
 
 </div>
 <div label="TiDB Cloud Dedicated">
 
-1. Navigate to the [**Clusters**](https://tidbcloud.com/console/clusters) page, and then click the name of your target cluster to go to its overview page.
+1. 进入 [**Clusters**](https://tidbcloud.com/console/clusters) 页面，然后点击目标集群名称进入其概览页面。
 
-2. Click **Connect** in the upper-right corner. A connection dialog is displayed.
+2. 点击右上角的 **Connect**，弹出连接对话框。
 
-3. In the connection dialog, select **Public** from the **Connection Type** drop-down list, and then click **CA cert** to download the CA certificate.
+3. 在连接对话框中，从 **Connection Type** 下拉列表选择 **Public**，然后点击 **CA cert** 下载 CA 证书。
 
-    If you have not configured the IP access list, click **Configure IP Access List** or follow the steps in [Configure an IP Access List](https://docs.pingcap.com/tidbcloud/configure-ip-access-list) to configure it before your first connection.
+    如果你还没有配置 IP 访问列表，请点击 **Configure IP Access List**，或参考 [Configure an IP Access List](https://docs.pingcap.com/tidbcloud/configure-ip-access-list) 进行配置，以便首次连接。
 
-    In addition to the **Public** connection type, TiDB Cloud Dedicated supports **Private Endpoint** and **VPC Peering** connection types. For more information, see [Connect to Your TiDB Cloud Dedicated Cluster](https://docs.pingcap.com/tidbcloud/connect-to-tidb-cluster).
+    除了 **Public** 连接类型，TiDB Cloud Dedicated 还支持 **Private Endpoint** 和 **VPC Peering** 连接类型。更多信息请参考 [Connect to Your TiDB Cloud Dedicated Cluster](https://docs.pingcap.com/tidbcloud/connect-to-tidb-cluster)。
 
-4. Run the following command to copy `env.sh.example` and rename it to `env.sh`:
+4. 运行以下命令，复制 `env.sh.example` 并重命名为 `env.sh`：
 
     ```shell
     cp env.sh.example env.sh
     ```
 
-5. Copy and paste the corresponding connection string into the `env.sh` file. The example result is as follows:
+5. 将对应的连接字符串复制粘贴到 `env.sh` 文件中。示例结果如下：
 
     ```shell
     export TIDB_HOST='{host}'  # e.g. tidb.xxxx.clusters.tidb-cloud.com
@@ -137,20 +137,20 @@ Connect to your TiDB cluster depending on the TiDB deployment option you've sele
     export USE_SSL='false'
     ```
 
-    Be sure to replace the placeholders `{}` with the connection parameters obtained from the connection dialog.
+    请确保将 {} 占位符替换为你在连接对话框中获得的连接参数。
 
-6. Save the `env.sh` file.
+6. 保存 `env.sh` 文件。
 
 </div>
-<div label="TiDB Self-Managed">
+<div label="TiDB 自托管">
 
-1. Run the following command to copy `env.sh.example` and rename it to `env.sh`:
+1. 运行以下命令，复制 `env.sh.example` 并重命名为 `env.sh`：
 
     ```shell
     cp env.sh.example env.sh
     ```
 
-2. Copy and paste the corresponding connection string into the `env.sh` file. The example result is as follows:
+2. 将对应的连接字符串复制粘贴到 `env.sh` 文件中。示例结果如下：
 
     ```shell
     export TIDB_HOST='{host}'
@@ -161,32 +161,32 @@ Connect to your TiDB cluster depending on the TiDB deployment option you've sele
     export USE_SSL='false'
     ```
 
-    Be sure to replace the placeholders `{}` with the connection parameters, and set `USE_SSL` to `false`. If you are running TiDB locally, the default host address is `127.0.0.1`, and the password is empty.
+    请确保将 {} 占位符替换为你的连接参数，并将 `USE_SSL` 设置为 `false`。如果你在本地运行 TiDB，默认主机地址为 `127.0.0.1`，密码为空。
 
-3. Save the `env.sh` file.
+3. 保存 `env.sh` 文件。
 
 </div>
 </SimpleTab>
 
-### Step 3: Run the code and check the result
+### 步骤 3：运行代码并检查结果
 
-1. Execute the following command to run the sample code:
+1. 执行以下命令运行示例代码：
 
     ```shell
     make
     ```
 
-2. Check the [Expected-Output.txt](https://github.com/tidb-samples/tidb-java-mybatis-quickstart/blob/main/Expected-Output.txt) to see if the output matches.
+2. 检查 [Expected-Output.txt](https://github.com/tidb-samples/tidb-java-mybatis-quickstart/blob/main/Expected-Output.txt) 文件，确认输出是否一致。
 
-## Sample code snippets
+## 示例代码片段
 
-You can refer to the following sample code snippets to complete your own application development.
+你可以参考以下示例代码片段，完成你自己的应用开发。
 
-For complete sample code and how to run it, check out the [tidb-samples/tidb-java-mybatis-quickstart](https://github.com/tidb-samples/tidb-java-mybatis-quickstart) repository.
+完整示例代码及运行方法请参考 [tidb-samples/tidb-java-mybatis-quickstart](https://github.com/tidb-samples/tidb-java-mybatis-quickstart) 仓库。
 
-### Connect to TiDB
+### 连接 TiDB
 
-Edit the MyBatis configuration file `mybatis-config.xml`:
+编辑 MyBatis 配置文件 `mybatis-config.xml`：
 
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
@@ -220,7 +220,7 @@ Edit the MyBatis configuration file `mybatis-config.xml`:
 </configuration>
 ```
 
-Be sure to replace `${tidb_jdbc_url}`, `${tidb_user}`, and `${tidb_password}` with the actual values of your TiDB cluster. Also, replace `${mapper_location}` with the path of your mapper XML configuration file. For multiple mapper XML configuration files, you need to add a `<mapper/>` tag for each. Then, define the following function:
+请确保将 `${tidb_jdbc_url}`、`${tidb_user}` 和 `${tidb_password}` 替换为你 TiDB 集群的实际值。同时，将 `${mapper_location}` 替换为你的 mapper XML 配置文件路径。如果有多个 mapper XML 配置文件，需要为每个文件添加一个 `<mapper/>` 标签。然后，定义如下函数：
 
 ```java
 public SqlSessionFactory getSessionFactory() {
@@ -229,9 +229,9 @@ public SqlSessionFactory getSessionFactory() {
 }
 ```
 
-### Insert data
+### 插入数据
 
-Add a node in the mapper XML and add a function with the same name in the interface class configured in the `mapper.namespace` attribute of the XML configuration file:
+在 mapper XML 中添加一个节点，并在 XML 配置文件的 `mapper.namespace` 属性所配置的接口类中添加同名函数：
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -244,11 +244,11 @@ Add a node in the mapper XML and add a function with the same name in the interf
 </mapper>
 ```
 
-For more information, refer to [Insert data](/develop/dev-guide-insert-data.md).
+更多信息请参考 [插入数据](/develop/dev-guide-insert-data.md)。
 
-### Query data
+### 查询数据
 
-Add a node in the mapper XML and add a function with the same name in the interface class configured in the `mapper.namespace` attribute of the XML configuration file. Specifically, if you use `resultMap` as the return type for MyBatis query functions, make sure that the `<resultMap/>` node is configured correctly.
+在 mapper XML 中添加一个节点，并在 XML 配置文件的 `mapper.namespace` 属性所配置的接口类中添加同名函数。特别地，如果你在 MyBatis 查询函数中使用 `resultMap` 作为返回类型，请确保 `<resultMap/>` 节点配置正确。
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -270,11 +270,11 @@ Add a node in the mapper XML and add a function with the same name in the interf
 </mapper>
 ```
 
-For more information, refer to [Query data](/develop/dev-guide-get-data-from-single-table.md).
+更多信息请参考 [查询数据](/develop/dev-guide-get-data-from-single-table.md)。
 
-### Update data
+### 更新数据
 
-Add a node in the mapper XML and add a function with the same name in the interface class configured in the `mapper.namespace` attribute of the XML configuration file:
+在 mapper XML 中添加一个节点，并在 XML 配置文件的 `mapper.namespace` 属性所配置的接口类中添加同名函数：
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -289,11 +289,11 @@ Add a node in the mapper XML and add a function with the same name in the interf
 </mapper>
 ```
 
-For more information, refer to [Update data](/develop/dev-guide-update-data.md).
+更多信息请参考 [更新数据](/develop/dev-guide-update-data.md)。
 
-### Delete data
+### 删除数据
 
-Add a node in the mapper XML and add a function with the same name in the interface class configured in the `mapper.namespace` attribute of the XML configuration file:
+在 mapper XML 中添加一个节点，并在 XML 配置文件的 `mapper.namespace` 属性所配置的接口类中添加同名函数：
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -306,25 +306,25 @@ Add a node in the mapper XML and add a function with the same name in the interf
 </mapper>
 ```
 
-For more information, refer to [Delete data](/develop/dev-guide-delete-data.md).
+更多信息请参考 [删除数据](/develop/dev-guide-delete-data.md)。
 
-## Next steps
+## 后续步骤
 
-- Learn more usage of MyBatis from [the documentation of MyBatis](http://www.mybatis.org/mybatis-3/).
-- Learn the best practices for TiDB application development with the chapters in the [Developer guide](/develop/dev-guide-overview.md), such as [Insert data](/develop/dev-guide-insert-data.md), [Update data](/develop/dev-guide-update-data.md), [Delete data](/develop/dev-guide-delete-data.md), [Single table reading](/develop/dev-guide-get-data-from-single-table.md), [Transactions](/develop/dev-guide-transaction-overview.md), and [SQL performance optimization](/develop/dev-guide-optimize-sql-overview.md).
-- Learn through the professional [TiDB developer courses](https://www.pingcap.com/education/) and earn [TiDB certifications](https://www.pingcap.com/education/certification/) after passing the exam.
-- Learn through the course for Java developers: [Working with TiDB from Java](https://eng.edu.pingcap.com/catalog/info/id:212).
+- 通过 [MyBatis 官方文档](http://www.mybatis.org/mybatis-3/) 学习更多 MyBatis 的用法。
+- 通过 [开发者指南](/develop/dev-guide-overview.md) 各章节学习 TiDB 应用开发最佳实践，例如 [插入数据](/develop/dev-guide-insert-data.md)、[更新数据](/develop/dev-guide-update-data.md)、[删除数据](/develop/dev-guide-delete-data.md)、[单表读取](/develop/dev-guide-get-data-from-single-table.md)、[事务](/develop/dev-guide-transaction-overview.md) 以及 [SQL 性能优化](/develop/dev-guide-optimize-sql-overview.md)。
+- 通过专业的 [TiDB 开发者课程](https://www.pingcap.com/education/) 学习，并在通过考试后获得 [TiDB 认证](https://www.pingcap.com/education/certification/)。
+- 通过 Java 开发者课程学习：[Working with TiDB from Java](https://eng.edu.pingcap.com/catalog/info/id:212)。
 
-## Need help?
+## 需要帮助？
 
 <CustomContent platform="tidb">
 
-Ask the community on [Discord](https://discord.gg/DQZ2dy3cuc?utm_source=doc) or [Slack](https://slack.tidb.io/invite?team=tidb-community&channel=everyone&ref=pingcap-docs), or [submit a support ticket](/support.md).
+在 [Discord](https://discord.gg/DQZ2dy3cuc?utm_source=doc) 或 [Slack](https://slack.tidb.io/invite?team=tidb-community&channel=everyone&ref=pingcap-docs) 社区提问，或 [提交支持工单](/support.md)。
 
 </CustomContent>
 
 <CustomContent platform="tidb-cloud">
 
-Ask the community on [Discord](https://discord.gg/DQZ2dy3cuc?utm_source=doc) or [Slack](https://slack.tidb.io/invite?team=tidb-community&channel=everyone&ref=pingcap-docs), or [submit a support ticket](https://tidb.support.pingcap.com/).
+在 [Discord](https://discord.gg/DQZ2dy3cuc?utm_source=doc) 或 [Slack](https://slack.tidb.io/invite?team=tidb-community&channel=everyone&ref=pingcap-docs) 社区提问，或 [提交支持工单](https://tidb.support.pingcap.com/)。
 
 </CustomContent>

@@ -1,54 +1,53 @@
 ---
 title: Sink to TiDB Cloud
-summary: This document explains how to stream data from a TiDB Cloud Dedicated cluster to a TiDB Cloud Serverless cluster. There are restrictions on the number of changefeeds and regions available for the feature. Prerequisites include extending tidb_gc_life_time, backing up data, and obtaining the start position of TiDB Cloud sink. To create a TiDB Cloud sink, navigate to the cluster overview page, establish the connection, customize table and event filters, fill in the start replication position, specify the changefeed specification, review the configuration, and create the sink. Finally, restore tidb_gc_life_time to its original value.
+summary: 本文档介绍如何将数据从 TiDB Cloud Dedicated 集群实时同步到 TiDB Cloud Serverless 或 TiDB Cloud Essential 集群。该功能对 changefeed 和 region 的数量有限制。前提条件包括延长 tidb_gc_life_time、备份数据以及获取 TiDB Cloud sink 的起始位置。要创建 TiDB Cloud sink，请进入集群概览页面，建立连接，自定义表和事件过滤器，填写起始同步位点，指定 changefeed 规格，检查配置并创建 sink。最后，将 tidb_gc_life_time 恢复为原始值。
 ---
 
 # Sink to TiDB Cloud
 
-This document describes how to stream data from a TiDB Cloud Dedicated cluster to a TiDB Cloud Serverless cluster.
+本文档介绍如何将数据从 TiDB Cloud Dedicated 集群实时同步到 TiDB Cloud Serverless 或 TiDB Cloud Essential 集群。
 
-> **Note:**
+> **注意：**
 >
-> To use the Changefeed feature, make sure that your TiDB Cloud Dedicated cluster version is v6.1.3 or later.
+> 要使用 Changefeed 功能，请确保你的 TiDB Cloud Dedicated 集群版本为 v6.1.3 或更高版本。
 
-## Restrictions
+## 限制
 
-- For each TiDB Cloud cluster, you can create up to 100 changefeeds.
-- Because TiDB Cloud uses TiCDC to establish changefeeds, it has the same [restrictions as TiCDC](https://docs.pingcap.com/tidb/stable/ticdc-overview#unsupported-scenarios).
-- If the table to be replicated does not have a primary key or a non-null unique index, the absence of a unique constraint during replication could result in duplicated data being inserted downstream in some retry scenarios.
-- The **Sink to TiDB Cloud** feature is only available to TiDB Cloud Dedicated clusters that are in the following AWS regions and created after November 9, 2022:
+- 每个 TiDB Cloud 集群最多可以创建 100 个 changefeed。
+- 由于 TiDB Cloud 使用 TiCDC 建立 changefeed，因此具有与 [TiCDC 相同的限制](https://docs.pingcap.com/tidb/stable/ticdc-overview#unsupported-scenarios)。
+- 如果需要同步的表没有主键或非空唯一索引，在某些重试场景下，由于缺少唯一约束，可能会导致下游插入重复数据。
+- **Sink to TiDB Cloud** 功能仅对以下 AWS 区域且创建时间在 2022 年 11 月 9 日之后的 TiDB Cloud Dedicated 集群开放：
 
     - AWS Oregon (us-west-2)
     - AWS Frankfurt (eu-central-1)
     - AWS Singapore (ap-southeast-1)
     - AWS Tokyo (ap-northeast-1)
-    - AWS São Paulo (sa-east-1)
 
-- The source TiDB Cloud Dedicated cluster and the destination TiDB Cloud Serverless cluster must be in the same project and the same region.
-- The **Sink to TiDB Cloud** feature only supports network connection via private endpoints. When you create a changefeed to stream data from a TiDB Cloud Dedicated cluster to a TiDB Cloud Serverless cluster, TiDB Cloud will automatically set up the private endpoint connection between the two clusters.
+- 源 TiDB Cloud Dedicated 集群和目标 TiDB Cloud Serverless 或 TiDB Cloud Essential 集群必须在同一个项目和同一个区域内。
+- **Sink to TiDB Cloud** 功能仅支持通过私有终端节点进行网络连接。当你创建 changefeed，将数据从 TiDB Cloud Dedicated 集群同步到 TiDB Cloud Serverless 或 TiDB Cloud Essential 集群时，TiDB Cloud 会自动在两个集群之间建立私有终端节点连接。
 
-## Prerequisites
+## 前提条件
 
-The **Sink to TiDB Cloud** connector can only sink incremental data from a TiDB Cloud Dedicated cluster to a TiDB Cloud Serverless cluster after a certain [TSO](https://docs.pingcap.com/tidb/stable/glossary#tso).
+**Sink to TiDB Cloud** 连接器只能在某个 [TSO](https://docs.pingcap.com/tidb/stable/glossary#tso) 之后，将 TiDB Cloud Dedicated 集群的增量数据同步到 TiDB Cloud Serverless 或 TiDB Cloud Essential 集群。
 
-Before creating a changefeed, you need to export existing data from the source TiDB Cloud Dedicated cluster and load the data to the destination TiDB Cloud Serverless cluster.
+在创建 changefeed 之前，你需要先将源 TiDB Cloud Dedicated 集群的现有数据导出，并将数据加载到目标 TiDB Cloud Serverless 或 TiDB Cloud Essential 集群。
 
-1. Extend the [tidb_gc_life_time](https://docs.pingcap.com/tidb/stable/system-variables#tidb_gc_life_time-new-in-v50) to be longer than the total time of the following two operations, so that historical data during the time is not garbage collected by TiDB.
+1. 将 [tidb_gc_life_time](https://docs.pingcap.com/tidb/stable/system-variables#tidb_gc_life_time-new-in-v50) 设置为大于以下两个操作总耗时的值，以确保这段时间内的历史数据不会被 TiDB 垃圾回收。
 
-    - The time to export and import the existing data
-    - The time to create **Sink to TiDB Cloud**
+    - 导出和导入现有数据所需的时间
+    - 创建 **Sink to TiDB Cloud** 所需的时间
 
-    For example:
+    例如：
 
     ```sql
     SET GLOBAL tidb_gc_life_time = '720h';
     ```
 
-2. [Back up data](/tidb-cloud/backup-and-restore.md#backup) from your TiDB Cloud Dedicated cluster, then use community tools such as [mydumper/myloader](https://centminmod.com/mydumper.html) to load data to the destination TiDB Cloud Serverless cluster.
+2. 使用 [Dumpling](https://docs.pingcap.com/tidb/stable/dumpling-overview) 从 TiDB Cloud Dedicated 集群导出数据，然后使用[导入功能](/tidb-cloud/import-csv-files-serverless.md)将数据加载到目标 TiDB Cloud Serverless 或 TiDB Cloud Essential 集群。
 
-3. From the [exported files of Dumpling](https://docs.pingcap.com/tidb/stable/dumpling-overview#format-of-exported-files), get the start position of TiDB Cloud sink from the metadata file:
+3. 从 [Dumpling 导出的文件](https://docs.pingcap.com/tidb/stable/dumpling-overview#format-of-exported-files)中，获取 TiDB Cloud sink 的起始位置（TSO），该信息位于 metadata 文件中：
 
-    The following is a part of an example metadata file. The `Pos` of `SHOW MASTER STATUS` is the TSO of the existing data, which is also the start position of TiDB Cloud sink.
+    以下是一个示例 metadata 文件片段。`SHOW MASTER STATUS` 的 `Pos` 字段即为现有数据的 TSO，也是 TiDB Cloud sink 的起始位置。
 
     ```
     Started dump at: 2023-03-28 10:40:19
@@ -58,50 +57,56 @@ Before creating a changefeed, you need to export existing data from the source T
     Finished dump at: 2023-03-28 10:40:20
     ```
 
-## Create a TiDB Cloud sink
+## 创建 TiDB Cloud sink
 
-After completing the prerequisites, you can sink your data to the destination TiDB Cloud Serverless cluster.
+完成前提条件后，你可以将数据同步到目标 TiDB Cloud Serverless 或 TiDB Cloud Essential 集群。
 
-1. Navigate to the cluster overview page of the target TiDB cluster, and then click **Changefeed** in the left navigation pane.
+1. 进入目标 TiDB 集群的集群概览页面，在左侧导航栏点击 **Data** > **Changefeed**。
 
-2. Click **Create Changefeed**, and select **TiDB Cloud** as the destination.
+2. 点击 **Create Changefeed**，并选择 **TiDB Cloud** 作为目标。
 
-3. In the **TiDB Cloud Connection** area, select the destination TiDB Cloud Serverless cluster, and then fill in the user name and password of the destination cluster.
+3. 在 **TiDB Cloud Connection** 区域，选择目标 TiDB Cloud Serverless 或 TiDB Cloud Essential 集群，并填写目标集群的用户名和密码。
 
-4. Click **Next** to establish the connection between the two TiDB clusters and test whether the changefeed can connect them successfully:
+4. 点击 **Next**，建立两个 TiDB 集群之间的连接，并测试 changefeed 是否可以成功连接：
 
-    - If yes, you are directed to the next step of configuration.
-    - If not, a connectivity error is displayed, and you need to handle the error. After the error is resolved, click **Next** again.
+    - 如果连接成功，将进入下一步配置。
+    - 如果连接失败，会显示连接错误，你需要处理该错误。错误解决后，重新点击 **Next**。
 
-5. Customize **Table Filter** to filter the tables that you want to replicate. For the rule syntax, refer to [table filter rules](/table-filter.md).
+5. 自定义 **Table Filter**，筛选你需要同步的表。规则语法可参考 [table filter rules](/table-filter.md)。
 
-    - **Filter Rules**: you can set filter rules in this column. By default, there is a rule `*.*`, which stands for replicating all tables. When you add a new rule, TiDB Cloud queries all the tables in TiDB and displays only the tables that match the rules in the box on the right. You can add up to 100 filter rules.
-    - **Tables with valid keys**: this column displays the tables that have valid keys, including primary keys or unique indexes.
-    - **Tables without valid keys**: this column shows tables that lack primary keys or unique keys. These tables present a challenge during replication because the absence of a unique identifier can result in inconsistent data when the downstream handles duplicate events. To ensure data consistency, it is recommended to add unique keys or primary keys to these tables before initiating the replication. Alternatively, you can add filter rules to exclude these tables. For example, you can exclude the table `test.tbl1` by using the rule `"!test.tbl1"`.
+    - **Filter Rules**：你可以在此列设置过滤规则。默认有一条规则 `*.*`，表示同步所有表。添加新规则后，TiDB Cloud 会查询所有表，并在右侧仅显示匹配规则的表。最多可添加 100 条过滤规则。
+    - **Tables with valid keys**：此列显示具有有效键（主键或唯一索引）的表。
+    - **Tables without valid keys**：此列显示缺少主键或唯一键的表。这类表在同步时存在风险，因为下游处理重复事件时可能导致数据不一致。为保证数据一致性，建议在同步前为这些表添加唯一键或主键，或者通过添加过滤规则排除这些表。例如，可以通过规则 `"!test.tbl1"` 排除表 `test.tbl1`。
 
-6. Customize **Event Filter** to filter the events that you want to replicate.
+6. 自定义 **Event Filter**，筛选你需要同步的事件。
 
-    - **Tables matching**: you can set which tables the event filter will be applied to in this column. The rule syntax is the same as that used for the preceding **Table Filter** area. You can add up to 10 event filter rules per changefeed.
-    - **Ignored events**: you can set which types of events the event filter will exclude from the changefeed.
+    - **Tables matching**：你可以在此列设置事件过滤器应用的表，规则语法与前述 **Table Filter** 区域相同。每个 changefeed 最多可添加 10 条事件过滤规则。
+    - **Event Filter**：你可以使用以下事件过滤器，从 changefeed 中排除特定事件：
+        - **Ignore event**：排除指定类型的事件。
+        - **Ignore SQL**：排除匹配指定表达式的 DDL 事件。例如，`^drop` 排除以 `DROP` 开头的语句，`add column` 排除包含 `ADD COLUMN` 的语句。
+        - **Ignore insert value expression**：排除满足特定条件的 `INSERT` 语句。例如，`id >= 100` 排除 `id` 大于等于 100 的 `INSERT` 语句。
+        - **Ignore update new value expression**：排除新值满足指定条件的 `UPDATE` 语句。例如，`gender = 'male'` 排除更新后 `gender` 为 `male` 的操作。
+        - **Ignore update old value expression**：排除旧值满足指定条件的 `UPDATE` 语句。例如，`age < 18` 排除旧值 `age` 小于 18 的更新操作。
+        - **Ignore delete value expression**：排除满足指定条件的 `DELETE` 语句。例如，`name = 'john'` 排除 `name` 为 `'john'` 的删除操作。
 
-7. In the **Start Replication Position** area, fill in the TSO that you get from Dumpling exported metadata files.
+7. 在 **Start Replication Position** 区域，填写你从 Dumpling 导出 metadata 文件中获取的 TSO。
 
-8. Click **Next** to configure your changefeed specification.
+8. 点击 **Next**，配置 changefeed 规格。
 
-    - In the **Changefeed Specification** area, specify the number of Replication Capacity Units (RCUs) to be used by the changefeed.
-    - In the **Changefeed Name** area, specify a name for the changefeed.
+    - 在 **Changefeed Specification** 区域，指定 changefeed 使用的 Replication Capacity Units（RCU）数量。
+    - 在 **Changefeed Name** 区域，为 changefeed 指定一个名称。
 
-9. Click **Next** to review the changefeed configuration.
+9. 点击 **Next**，检查 changefeed 配置。
 
-    If you confirm that all configurations are correct, check the compliance of cross-region replication, and click **Create**.
+    如果确认所有配置无误，勾选跨区域同步合规性，并点击 **Create**。
 
-    If you want to modify some configurations, click **Previous** to go back to the previous configuration page.
+    如果需要修改配置，点击 **Previous** 返回上一步进行修改。
 
-10. The sink starts soon, and you can see the status of the sink changes from **Creating** to **Running**.
+10. sink 很快会启动，你可以看到 sink 的状态从 **Creating** 变为 **Running**。
 
-    Click the changefeed name, and you can see more details about the changefeed, such as the checkpoint, replication latency, and other metrics.
+    点击 changefeed 名称，可以查看更多关于 changefeed 的详细信息，如 checkpoint、同步延迟及其他指标。
 
-11. Restore [tidb_gc_life_time](https://docs.pingcap.com/tidb/stable/system-variables#tidb_gc_life_time-new-in-v50) to its original value (the default value is `10m`) after the sink is created:
+11. sink 创建完成后，将 [tidb_gc_life_time](https://docs.pingcap.com/tidb/stable/system-variables#tidb_gc_life_time-new-in-v50) 恢复为原始值（默认值为 `10m`）：
 
     ```sql
     SET GLOBAL tidb_gc_life_time = '10m';

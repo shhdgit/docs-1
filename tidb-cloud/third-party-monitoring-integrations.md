@@ -1,46 +1,30 @@
 ---
-title: Third-Party Metrics Integrations（Beta）
-summary: Learn how to use third-party metrics integrations.
+title: 第三方指标集成
+summary: 了解如何使用第三方指标集成。
 ---
 
-# Third-Party Metrics Integrations（Beta）
+# 第三方指标集成
 
-You can integrate TiDB Cloud with third-party metrics services to receive TiDB Cloud alerts and view the performance metrics of your TiDB cluster using the metrics services. The third-party metrics integrations are currently in beta.
+你可以将 TiDB Cloud 与以下第三方指标服务集成，在这些服务中接收 TiDB Cloud 警报并查看 TiDB 集群的性能指标：
 
-## Required access
+- [Datadog 集成（预览版）](#datadog-集成预览版)
+- [Prometheus 和 Grafana 集成（测试版）](#prometheus-和-grafana-集成测试版)
+- [New Relic 集成（预览版）](#new-relic-集成预览版)
 
-To edit third-party integration settings, you must be in the `Organization Owner` role of your organization or the `Project Owner` role of the target project.
+## Datadog 集成（预览版）
 
-## View or modify third-party integrations
+通过 Datadog 集成，你可以配置 TiDB Cloud，将关于 TiDB 集群的指标数据发送到 [Datadog](https://www.datadoghq.com/)，并在你的 Datadog 仪表盘中查看这些指标。
 
-1. Log in to the [TiDB Cloud console](https://tidbcloud.com).
-2. Click <MDSvgIcon name="icon-left-projects" /> in the lower-left corner, switch to the target project if you have multiple projects, and then click **Project Settings**.
-3. On the **Project Settings** page of your project, click **Integrations** in the left navigation pane.
+有关详细的集成步骤以及 Datadog 跟踪的指标列表，请参阅 [Integrate TiDB Cloud with Datadog](/tidb-cloud/monitor-datadog-integration.md)。
 
-The available third-party integrations are displayed.
+## Prometheus 和 Grafana 集成（测试版）
 
-## Limitation
+通过 Prometheus 和 Grafana 集成，你可以从 TiDB Cloud 获取一个用于 Prometheus 的 `scrape_config` 文件，并使用该文件中的内容来配置 Prometheus。你可以在你的 Grafana 仪表盘中查看这些指标。
 
-- For [TiDB Cloud Serverless](/tidb-cloud/select-cluster-tier.md#tidb-cloud-serverless) clusters, third-party metrics integrations are not supported.
+有关详细的集成步骤以及 Prometheus 跟踪的指标列表，请参阅 [Integrate TiDB Cloud with Prometheus and Grafana](/tidb-cloud/monitor-prometheus-and-grafana-integration.md)。
 
-- Third-party metrics integrations are not available when the cluster status is **CREATING**, **RESTORING**, **PAUSED**, or **RESUMING**.
+## New Relic 集成（预览版）
 
-## Available integrations
+通过 New Relic 集成，你可以配置 TiDB Cloud，将关于 TiDB 集群的指标数据发送到 [New Relic](https://newrelic.com/)，并在你的 New Relic 仪表盘中查看这些指标。
 
-### Datadog integration (beta)
-
-With the Datadog integration, you can configure TiDB Cloud to send metric data about your TiDB clusters to [Datadog](https://www.datadoghq.com/) and view these metrics in your Datadog dashboards.
-
-For the detailed integration steps and a list of metrics that Datadog tracks, refer to [Integrate TiDB Cloud with Datadog](/tidb-cloud/monitor-datadog-integration.md).
-
-### Prometheus and Grafana integration (beta)
-
-With the Prometheus and Grafana integration, you can get a `scrape_config` file for Prometheus from TiDB Cloud and use the content from the file to configure Prometheus. You can view these metrics in your Grafana dashboards.
-
-For the detailed integration steps and a list of metrics that Prometheus tracks, see [Integrate TiDB Cloud with Prometheus and Grafana](/tidb-cloud/monitor-prometheus-and-grafana-integration.md).
-
-### New Relic integration (beta)
-
-With the New Relic integration, you can configure TiDB Cloud to send metric data about your TiDB clusters to [New Relic](https://newrelic.com/) and view these metrics in your New Relic dashboards.
-
-For the detailed integration steps and a list of metrics that New Relic tracks, see [Integrate TiDB Cloud with New Relic](/tidb-cloud/monitor-new-relic-integration.md).
+有关详细的集成步骤以及 New Relic 跟踪的指标列表，请参阅 [Integrate TiDB Cloud with New Relic](/tidb-cloud/monitor-new-relic-integration.md)。

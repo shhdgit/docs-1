@@ -1,28 +1,28 @@
 ---
-title: BACKUP | TiDB SQL Statement Reference
-summary: An overview of the usage of BACKUP for the TiDB database.
+title: BACKUP | TiDB SQL 语句参考
+summary: TiDB 数据库 BACKUP 语句用法概述。
 ---
 
 # BACKUP
 
-This statement is used to perform a distributed backup of the TiDB cluster.
+该语句用于对 TiDB 集群执行分布式备份。
 
 > **Warning:**
 >
-> - This feature is experimental. It is not recommended that you use it in the production environment. This feature might be changed or removed without prior notice. If you find a bug, you can report an [issue](https://github.com/pingcap/tidb/issues) on GitHub.
-> - This feature is not available on [{{{ .starter }}}](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) clusters.
+> - 该功能为实验性功能。不建议在生产环境中使用。该功能可能会在没有提前通知的情况下更改或移除。如果你发现了 bug，可以在 GitHub 上提交一个 [issue](https://github.com/pingcap/tidb/issues)。
+> - 该功能在 [TiDB Cloud Serverless](https://docs.pingcap.com/tidbcloud/select-cluster-tier#tidb-cloud-serverless) 和 [TiDB Cloud Essential](https://docs.pingcap.com/tidbcloud/select-cluster-tier#essential) 集群中不可用。
 
-The `BACKUP` statement uses the same engine as the [BR tool](https://docs.pingcap.com/tidb/stable/backup-and-restore-overview) does, except that the backup process is driven by TiDB itself rather than a separate BR tool. All benefits and warnings of BR also apply to this statement.
+`BACKUP` 语句使用与 [BR 工具](https://docs.pingcap.com/tidb/stable/backup-and-restore-overview) 相同的引擎，不同之处在于备份过程由 TiDB 自身驱动，而不是单独的 BR 工具。BR 的所有优势和注意事项同样适用于该语句。
 
-Executing `BACKUP` requires either the `BACKUP_ADMIN` or `SUPER` privilege. Additionally, both the TiDB node executing the backup and all TiKV nodes in the cluster must have read or write permission to the destination. Local storage (storage paths starting with `local://`) is not permitted when [Security Enhanced Mode](/system-variables.md#tidb_enable_enhanced_security) is enabled.
+执行 `BACKUP` 需要 `BACKUP_ADMIN` 或 `SUPER` 权限。此外，执行备份的 TiDB 节点以及集群中的所有 TiKV 节点都必须对目标路径具有读写权限。当启用 [安全增强模式](/system-variables.md#tidb_enable_enhanced_security) 时，不允许使用本地存储（以 `local://` 开头的存储路径）。
 
-The `BACKUP` statement is blocked until the entire backup task is finished, failed, or canceled. A long-lasting connection should be prepared for executing `BACKUP`. The task can be canceled using the [`KILL TIDB QUERY`](/sql-statements/sql-statement-kill.md) statement.
+`BACKUP` 语句会被阻塞，直到整个备份任务完成、失败或被取消。建议为执行 `BACKUP` 准备一个长时间保持的连接。可以使用 [`KILL TIDB QUERY`](/sql-statements/sql-statement-kill.md) 语句取消该任务。
 
-Only one `BACKUP` and [`RESTORE`](/sql-statements/sql-statement-restore.md) task can be executed at a time. If a `BACKUP` or `RESTORE` statement is already being executed on the same TiDB server, the new `BACKUP` execution will wait until all previous tasks are finished.
+同一时间只能执行一个 `BACKUP` 或 [`RESTORE`](/sql-statements/sql-statement-restore.md) 任务。如果同一个 TiDB 服务器上已经有 `BACKUP` 或 `RESTORE` 语句在执行，新的 `BACKUP` 执行会等待所有之前的任务完成。
 
-`BACKUP` can only be used with "tikv" storage engine. Using `BACKUP` with the "unistore" engine will fail.
+`BACKUP` 只能用于 "tikv" 存储引擎。使用 "unistore" 引擎执行 `BACKUP` 会失败。
 
-## Synopsis
+## 语法
 
 ```ebnf+diagram
 BackupStmt ::=
@@ -51,11 +51,9 @@ BackupTSO ::=
     LengthNum | stringLit
 ```
 
-## Examples
+## 示例
 
-### Back up databases
-
-{{< copyable "sql" >}}
+### 备份数据库
 
 ```sql
 BACKUP DATABASE `test` TO 'local:///mnt/backup/2020/04/';
@@ -70,78 +68,66 @@ BACKUP DATABASE `test` TO 'local:///mnt/backup/2020/04/';
 1 row in set (58.453 sec)
 ```
 
-In the example above, the `test` database is backed up into the local filesystem. The data is saved as SST files in the `/mnt/backup/2020/04/` directories distributed among all TiDB and TiKV nodes.
+在上面的示例中，`test` 数据库被备份到本地文件系统。数据以 SST 文件的形式保存在分布于所有 TiDB 和 TiKV 节点的 `/mnt/backup/2020/04/` 目录下。
 
-The first row of the result above is described as follows:
+上述结果的第一行各列说明如下：
 
-| Column | Description |
+| 列名 | 说明 |
 | :-------- | :--------- |
-| `Destination` | The destination URL |
-| `Size` |  The total size of the backup archive, in bytes |
-| `BackupTS` | The TSO of the snapshot when the backup is created (useful for [incremental backup](#incremental-backup)) |
-| `Queue Time` | The timestamp (in current time zone) when the `BACKUP` task is queued. |
-| `Execution Time` | The timestamp (in current time zone) when the `BACKUP` task starts to run. |
+| `Destination` | 目标 URL |
+| `Size` |  备份归档的总大小，单位为字节 |
+| `BackupTS` | 创建备份时快照的 TSO（用于 [增量备份](#incremental-backup)） |
+| `Queue Time` | `BACKUP` 任务进入队列的时间戳（当前时区） |
+| `Execution Time` | `BACKUP` 任务开始执行的时间戳（当前时区） |
 
-### Back up tables
-
-{{< copyable "sql" >}}
+### 备份数据表
 
 ```sql
 BACKUP TABLE `test`.`sbtest01` TO 'local:///mnt/backup/sbtest01/';
 ```
 
-{{< copyable "sql" >}}
-
 ```sql
 BACKUP TABLE sbtest02, sbtest03, sbtest04 TO 'local:///mnt/backup/sbtest/';
 ```
 
-### Back up the entire cluster
-
-{{< copyable "sql" >}}
+### 备份整个集群
 
 ```sql
 BACKUP DATABASE * TO 'local:///mnt/backup/full/';
 ```
 
-Note that the system tables (`mysql.*`, `INFORMATION_SCHEMA.*`, `PERFORMANCE_SCHEMA.*`, …) will not be included into the backup.
+注意，系统表（`mysql.*`、`INFORMATION_SCHEMA.*`、`PERFORMANCE_SCHEMA.*` 等）不会被包含在备份中。
 
-### External storages
+### 外部存储
 
-BR supports backing up data to S3 or GCS:
-
-{{< copyable "sql" >}}
+BR 支持将数据备份到 S3 或 GCS：
 
 ```sql
 BACKUP DATABASE `test` TO 's3://example-bucket-2020/backup-05/?access-key={YOUR_ACCESS_KEY}&secret-access-key={YOUR_SECRET_KEY}';
 ```
 
-The URL syntax is further explained in [URI Formats of External Storage Services](/external-storage-uri.md).
+URL 语法详见 [外部存储服务的 URI 格式](/external-storage-uri.md)。
 
-When running on cloud environment where credentials should not be distributed, set the `SEND_CREDENTIALS_TO_TIKV` option to `FALSE`:
-
-{{< copyable "sql" >}}
+在云环境下，如果不希望分发凭证，可以将 `SEND_CREDENTIALS_TO_TIKV` 选项设置为 `FALSE`：
 
 ```sql
 BACKUP DATABASE `test` TO 's3://example-bucket-2020/backup-05/'
     SEND_CREDENTIALS_TO_TIKV = FALSE;
 ```
 
-### Performance fine-tuning
+### 性能调优
 
-Use `RATE_LIMIT` to limit the average upload speed per TiKV node to reduce network bandwidth.
+使用 `RATE_LIMIT` 可以限制每个 TiKV 节点的平均上传速度，以减少网络带宽占用。
 
-Before the backup is completed, `BACKUP` would perform a checksum against the data on the cluster to verify correctness by default. The default concurrency for checksum tasks on a single table is 4, which you can adjust using the `CHECKSUM_CONCURRENCY` parameter. If you are confident that the data verification is unnecessary, you can disable the check by setting the `CHECKSUM` parameter to `FALSE`.
+在备份完成前，`BACKUP` 默认会对集群中的数据进行校验（checksum）以验证正确性。单表校验任务的默认并发数为 4，可以通过 `CHECKSUM_CONCURRENCY` 参数进行调整。如果你确信无需数据校验，可以将 `CHECKSUM` 参数设置为 `FALSE` 以关闭校验。
 
-To specify the number of concurrent tasks that BR can execute for backing up tables and indices, use the `CONCURRENCY` parameter. This parameter controls the thread pool size within BR, optimizing the performance and efficiency of backup operations.
+如需指定 BR 备份表和索引时可执行的并发任务数，可使用 `CONCURRENCY` 参数。该参数控制 BR 内部的线程池大小，从而优化备份操作的性能和效率。
 
-One task represents one table range or one index range, according to the backup schemas. For one table with one index, two tasks are used to back up this table. The default value of `CONCURRENCY` is `4`. If you need to back up lots of tables or indices, increase its value.
+根据备份的 schema，一个任务代表一个表范围或一个索引范围。例如，一个带有一个索引的表会使用两个任务进行备份。`CONCURRENCY` 的默认值为 `4`。如果需要备份大量表或索引，可以适当增大该值。
 
-Statistics are not backed up by default. To back up statistics, you need to set the `IGNORE_STATS` parameter to `FALSE`.
+统计信息默认不会被备份。如需备份统计信息，需要将 `IGNORE_STATS` 参数设置为 `FALSE`。
 
-By default, the SST files generated by backup use the `zstd` compression algorithm. If needed, you can specify a different compression algorithm using the `COMPRESSION_TYPE` parameter. Supported algorithms include `lz4`, `zstd`, and `snappy`. You can also adjust the compression level with the `COMPRESSION_LEVEL` parameter; the higher the level number, the higher the compression ratio, but the higher the CPU consumption.
-
-{{< copyable "sql" >}}
+备份生成的 SST 文件默认使用 `zstd` 压缩算法。如果需要，可以通过 `COMPRESSION_TYPE` 参数指定其他压缩算法。支持的算法包括 `lz4`、`zstd` 和 `snappy`。你还可以通过 `COMPRESSION_LEVEL` 参数调整压缩级别，级别数值越高，压缩比越高，但 CPU 消耗也越大。
 
 ```sql
 BACKUP DATABASE `test` TO 's3://example-bucket-2020/backup-06/'
@@ -150,11 +136,9 @@ BACKUP DATABASE `test` TO 's3://example-bucket-2020/backup-06/'
     CHECKSUM = FALSE;
 ```
 
-### Snapshot
+### 快照
 
-Specify a timestamp, TSO or relative time to backup historical data.
-
-{{< copyable "sql" >}}
+可以通过指定时间戳、TSO 或相对时间来备份历史数据。
 
 ```sql
 -- relative time
@@ -170,7 +154,7 @@ BACKUP DATABASE `test` TO 'local:///mnt/backup/hist03'
     SNAPSHOT = 415685305958400;
 ```
 
-The supported units for relative time are:
+相对时间支持的单位有：
 
 * MICROSECOND
 * SECOND
@@ -179,13 +163,11 @@ The supported units for relative time are:
 * DAY
 * WEEK
 
-Note that, following SQL standard, the units are always singular.
+注意，按照 SQL 标准，单位始终为单数形式。
 
-### Incremental backup
+### 增量备份
 
-Supply the `LAST_BACKUP` option to only backup the changes between the last backup to the current snapshot.
-
-{{< copyable "sql" >}}
+通过指定 `LAST_BACKUP` 选项，仅备份上次备份到当前快照之间的变更数据。
 
 ```sql
 -- timestamp (in current time zone)
@@ -197,11 +179,11 @@ BACKUP DATABASE `test` TO 'local:///mnt/backup/hist03'
     LAST_BACKUP = 415685305958400;
 ```
 
-## MySQL compatibility
+## MySQL 兼容性
 
-This statement is a TiDB extension to MySQL syntax.
+该语句是 TiDB 对 MySQL 语法的扩展。
 
-## See also
+## 参见
 
 * [RESTORE](/sql-statements/sql-statement-restore.md)
 * [SHOW BACKUPS](/sql-statements/sql-statement-show-backups.md)

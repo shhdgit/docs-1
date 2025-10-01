@@ -1,32 +1,36 @@
 ---
-title: TiDB Cloud API Overview
-summary: Learn about what is TiDB Cloud API, its features, and how to use API to manage your TiDB Cloud clusters.
+title: TiDB Cloud API 概览
+summary: 了解什么是 TiDB Cloud API、其功能，以及如何使用 API 管理你的 TiDB Cloud 集群。
 ---
 
-# TiDB Cloud API Overview <span style="color: #fff; background-color: #00bfff; border-radius: 4px; font-size: 0.5em; vertical-align: middle; margin-left: 16px; padding: 0 2px;">Beta</span>
+# TiDB Cloud API 概览（Beta）
 
 > **Note:**
 >
-> TiDB Cloud API is in beta.
+> TiDB Cloud API 目前处于 beta 阶段。
 
-The TiDB Cloud API is a [REST interface](https://en.wikipedia.org/wiki/Representational_state_transfer) that provides you with programmatic access to manage administrative objects within TiDB Cloud. Through this API, you can automatically and efficiently manage resources such as Projects, Clusters, Backups, Restores, Imports, Billings, and resources in the [Data Service](/tidb-cloud/data-service-overview.md).
+TiDB Cloud API 是一个 [REST 接口](https://en.wikipedia.org/wiki/Representational_state_transfer)，为你提供以编程方式管理 TiDB Cloud 内部管理对象的能力。通过该 API，你可以自动且高效地管理诸如项目、集群、备份、恢复、导入、计费以及 [Data Service](/tidb-cloud/data-service-overview.md) 中的资源等。
 
-The API has the following features:
+该 API 具有以下特性：
 
-- **JSON entities.** All entities are expressed in JSON.
-- **HTTPS-only.** You can only access the API via HTTPS, ensuring all the data sent over the network is encrypted with TLS.
-- **Key-based access and digest authentication.** Before you access TiDB Cloud API, you must generate an API key, refer to [API Key Management](https://docs.pingcap.com/tidbcloud/api/v1beta#section/Authentication/API-key-management). All requests are authenticated through [HTTP Digest Authentication](https://en.wikipedia.org/wiki/Digest_access_authentication), ensuring the API key is never sent over the network.
+- **JSON entities.** 所有实体均以 JSON 格式表示。
+- **HTTPS-only.** 你只能通过 HTTPS 访问 API，确保所有通过网络传输的数据都经过 TLS 加密。
+- **Key-based access and digest authentication.** 在访问 TiDB Cloud API 之前，你必须生成 API key，参考 [API Key Management](https://docs.pingcap.com/tidbcloud/api/v1beta#section/Authentication/API-key-management)。所有请求都通过 [HTTP Digest Authentication](https://en.wikipedia.org/wiki/Digest_access_authentication) 进行身份验证，确保 API key 永远不会通过网络明文传输。
 
-To start using TiDB Cloud API, refer to the following resources in TiDB Cloud API Documentation:
+TiDB Cloud API 提供两个版本：
 
-- [Get Started](https://docs.pingcap.com/tidbcloud/api/v1beta#section/Get-Started)
-- [Authentication](https://docs.pingcap.com/tidbcloud/api/v1beta#section/Authentication)
-- [Rate Limiting](https://docs.pingcap.com/tidbcloud/api/v1beta#section/Rate-Limiting)
-- API Full References
-    - v1beta1
-        - [Billing](https://docs.pingcap.com/tidbcloud/api/v1beta1/billing)
-        - [Data Service](https://docs.pingcap.com/tidbcloud/api/v1beta1/dataservice)
-        - [IAM](https://docs.pingcap.com/tidbcloud/api/v1beta1/iam)
-        - [MSP](https://docs.pingcap.com/tidbcloud/api/v1beta1/msp)
-    - [v1beta](https://docs.pingcap.com/tidbcloud/api/v1beta#tag/Project)
-- [Changelog](https://docs.pingcap.com/tidbcloud/api/v1beta#section/API-Changelog)
+- v1beta1
+    - 集群级资源：
+        - [TiDB Cloud Starter 或 Essential 集群](https://docs.pingcap.com/tidbcloud/api/v1beta1/serverless)：管理 TiDB Cloud Starter 或 Essential 集群的集群、分支、数据导出任务和数据导入任务。
+        - [TiDB Cloud Dedicated 集群](https://docs.pingcap.com/tidbcloud/api/v1beta1/dedicated)：管理 TiDB Cloud Dedicated 集群的集群、区域、私有端点连接和数据导入任务。
+    - 组织或项目级资源：
+        - [计费](https://docs.pingcap.com/tidbcloud/api/v1beta1/billing)：管理 TiDB Cloud 集群的计费。
+        - [Data Service](https://docs.pingcap.com/tidbcloud/api/v1beta1/dataservice)：管理 TiDB Cloud 集群中 Data Service 的资源。
+        - [IAM](https://docs.pingcap.com/tidbcloud/api/v1beta1/iam)：管理 TiDB Cloud 集群的 API key。
+        - [MSP（已废弃）](https://docs.pingcap.com/tidbcloud/api/v1beta1/msp)
+- [v1beta](https://docs.pingcap.com/tidbcloud/api/v1beta)
+    - [项目](https://docs.pingcap.com/tidbcloud/api/v1beta/#tag/Project)
+    - [集群](https://docs.pingcap.com/tidbcloud/api/v1beta/#tag/Cluster)
+    - [备份](https://docs.pingcap.com/tidbcloud/api/v1beta/#tag/Backup)
+    - [导入（已废弃）](https://docs.pingcap.com/tidbcloud/api/v1beta/#tag/Import)
+    - [恢复](https://docs.pingcap.com/tidbcloud/api/v1beta/#tag/Restore)

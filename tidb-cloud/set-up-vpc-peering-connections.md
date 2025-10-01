@@ -1,183 +1,178 @@
 ---
-title: Connect to TiDB Cloud Dedicated via VPC Peering
-summary: Learn how to connect to TiDB Cloud Dedicated via VPC peering.
+title: 通过 VPC Peering 连接 TiDB Cloud Dedicated
+summary: 了解如何通过 VPC Peering 连接 TiDB Cloud Dedicated。
 ---
 
-# Connect to TiDB Cloud Dedicated via VPC Peering
+# 通过 VPC Peering 连接 TiDB Cloud Dedicated
 
 > **Note:**
 >
-> VPC peering connection is only available for TiDB Cloud Dedicated clusters. You cannot connect to [TiDB Cloud Serverless clusters](/tidb-cloud/select-cluster-tier.md#tidb-cloud-serverless) using VPC peering.
+> VPC Peering 连接仅适用于托管在 AWS 和 Google Cloud 上的 TiDB Cloud Dedicated 集群。
 
-To connect your application to TiDB Cloud via VPC peering, you need to set up [VPC peering](/tidb-cloud/tidb-cloud-glossary.md#vpc-peering) with TiDB Cloud. This document walks you through setting up VPC peering connections [on AWS](#set-up-vpc-peering-on-aws) and [on Google Cloud](#set-up-vpc-peering-on-google-cloud) and connecting to TiDB Cloud via a VPC peering.
+要通过 VPC Peering 将你的应用程序连接到 TiDB Cloud，你需要与 TiDB Cloud 设置 [VPC Peering](/tidb-cloud/tidb-cloud-glossary.md#vpc-peering)。本文档将指导你在 [AWS 上设置 VPC Peering](#set-up-vpc-peering-on-aws) 和 [Google Cloud 上设置 VPC Peering](#set-up-vpc-peering-on-google-cloud)，并通过 VPC Peering 连接到 TiDB Cloud。
 
-VPC peering connection is a networking connection between two VPCs that enables you to route traffic between them using private IP addresses. Instances in either VPC can communicate with each other as if they are within the same network.
+VPC Peering 连接是两个 VPC 之间的网络连接，使你能够使用私有 IP 地址在它们之间路由流量。任一 VPC 中的实例都可以像在同一网络中一样相互通信。
 
-Currently, TiDB clusters of the same project in the same region are created in the same VPC. Therefore, once VPC peering is set up in a region of a project, all the TiDB clusters created in the same region of this project can be connected in your VPC. VPC peering setup differs among cloud providers.
+目前，同一项目同一区域下的 TiDB 集群会创建在同一个 VPC 中。因此，一旦在某个项目的某个区域设置了 VPC Peering，该项目在同一区域内创建的所有 TiDB 集群都可以在你的 VPC 中连接。不同云服务商的 VPC Peering 设置方式不同。
 
 > **Tip:**
 >
-> To connect your application to TiDB Cloud, you can also set up [private endpoint connection](/tidb-cloud/set-up-private-endpoint-connections.md) with TiDB Cloud, which is secure and private, and does not expose your data to the public internet. It is recommended to use private endpoints over VPC peering connections.
+> 你也可以通过与 TiDB Cloud 设置 [私有终端节点连接](/tidb-cloud/set-up-private-endpoint-connections.md) 来连接你的应用程序到 TiDB Cloud，这种方式安全且私密，不会将你的数据暴露在公网上。推荐优先使用私有终端节点而不是 VPC Peering 连接。
 
-## Prerequisite: Set a CIDR for a region
+## 前置条件：为区域设置 CIDR
 
-CIDR (Classless Inter-Domain Routing) is the CIDR block used for creating VPC for TiDB Cloud Dedicated clusters.
+CIDR（无类域间路由）是用于为 TiDB Cloud Dedicated 集群创建 VPC 的 CIDR 块。
 
-Before adding VPC Peering requests to a region, you must set a CIDR for that region and create an initial TiDB Cloud Dedicated cluster in that region. Once the first Dedicated cluster is created, TiDB Cloud will create the VPC of the cluster, allowing you to establish a peering link to your application's VPC.
+在向某个区域添加 VPC Peering 请求之前，你必须为该区域设置 CIDR，并在该区域创建首个 TiDB Cloud Dedicated 集群。首个 Dedicated 集群创建完成后，TiDB Cloud 会为该集群创建 VPC，从而允许你建立与应用程序 VPC 的 Peering 连接。
 
-You can set the CIDR when creating the first TiDB Cloud Dedicated cluster. If you want to set the CIDR before creating the cluster, perform the following operations:
+你可以在创建首个 TiDB Cloud Dedicated 集群时设置 CIDR。如果你希望在创建集群前设置 CIDR，请执行以下操作：
 
-1. Log in to the [TiDB Cloud console](https://tidbcloud.com).
-2. Click <MDSvgIcon name="icon-left-projects" /> in the lower-left corner, switch to the target project if you have multiple projects, and then click **Project Settings**.
-3. On the **Project Settings** page of your project, click **Network Access** in the left navigation pane, click the **Project CIDR** tab, and then select **AWS** or **Google Cloud** according to your cloud provider.
-4. In the upper-right corner, click **Create CIDR**. Specify the region and CIDR value in the **Create AWS CIDR** or **Create Google Cloud CIDR** dialog, and then click **Confirm**.
+1. 在 [TiDB Cloud 控制台](https://tidbcloud.com) 中，使用左上角的下拉框切换到目标项目。
+2. 在左侧导航栏，点击 **Project Settings** > **Network Access**。
+3. 在 **Network Access** 页面，点击 **Project CIDR** 标签页，然后根据你的云服务商选择 **AWS** 或 **Google Cloud**。
+4. 在右上角，点击 **Create CIDR**。在 **Create AWS CIDR** 或 **Create Google Cloud CIDR** 对话框中指定区域和 CIDR 值，然后点击 **Confirm**。
 
     ![Project-CIDR4](/media/tidb-cloud/Project-CIDR4.png)
 
     > **Note:**
     >
-    > - To avoid any conflicts with the CIDR of the VPC where your application is located, you need to set a different project CIDR in this field.
-    > - For AWS Region, it is recommended to configure an IP range size between `/16` and `/23`. Supported network addresses include:
+    > - 为避免与你的应用程序所在 VPC 的 CIDR 冲突，你需要在此字段中设置不同的项目 CIDR。
+    > - 对于 AWS 区域，建议配置 `/16` 到 `/23` 之间的 IP 范围。支持的网络地址包括：
     >     - 10.250.0.0 - 10.251.255.255
     >     - 172.16.0.0 - 172.31.255.255
     >     - 192.168.0.0 - 192.168.255.255
-    > - For Google Cloud Region, it is recommended to configure an IP range size between `/19` and `/20`. If you want to configure an IP range size between `/16` and `/18`, contact [TiDB Cloud Support](/tidb-cloud/tidb-cloud-support.md). Supported network addresses include:
+    > - 对于 Google Cloud 区域，建议配置 `/19` 到 `/20` 之间的 IP 范围。如果你希望配置 `/16` 到 `/18` 之间的 IP 范围，请联系 [TiDB Cloud Support](/tidb-cloud/tidb-cloud-support.md)。支持的网络地址包括：
     >     - 10.250.0.0 - 10.251.255.255
     >     - 172.16.0.0 - 172.17.255.255
     >     - 172.30.0.0 - 172.31.255.255
-    > - TiDB Cloud limits the number of TiDB Cloud nodes in a region of a project based on the CIDR block size of the region.
+    > - TiDB Cloud 会根据区域的 CIDR 块大小限制该项目在该区域内的 TiDB Cloud 节点数量。
 
-5. View the CIDR of the cloud provider and the specific region.
+5. 查看云服务商及具体区域的 CIDR。
 
-    The CIDR is inactive by default. To activate the CIDR, you need to create a cluster in the target region. When the region CIDR is active, you can create VPC Peering for the region.
+    CIDR 默认处于未激活状态。要激活 CIDR，你需要在目标区域创建集群。当区域 CIDR 激活后，你就可以为该区域创建 VPC Peering。
 
     ![Project-CIDR2](/media/tidb-cloud/Project-CIDR2.png)
 
-## Set up VPC peering on AWS
+## 在 AWS 上设置 VPC Peering
 
-This section describes how to set up VPC peering connections on AWS. For Google Cloud, see [Set up VPC peering on Google Cloud](#set-up-vpc-peering-on-google-cloud).
+本节介绍如何在 AWS 上设置 VPC Peering 连接。关于 Google Cloud，请参见 [在 Google Cloud 上设置 VPC Peering](#set-up-vpc-peering-on-google-cloud)。
 
-### Step 1. Add VPC peering requests
+### 步骤 1. 添加 VPC Peering 请求
 
-You can add VPC peering requests on either the project-level **Network Access** page or the cluster-level **Networking** page in the TiDB Cloud console.
+你可以在 TiDB Cloud 控制台的项目级 **Network Access** 页面或集群级 **Networking** 页面添加 VPC Peering 请求。
 
 <SimpleTab>
-<div label="VPC peering setting on the project-level Network Access page">
+<div label="项目级 Network Access 页面设置 VPC Peering">
 
-1. Log in to the [TiDB Cloud console](https://tidbcloud.com).
-2. Click <MDSvgIcon name="icon-left-projects" /> in the lower-left corner, switch to the target project if you have multiple projects, and then click **Project Settings**.
-3. On the **Project Settings** page of your project, click **Network Access** in the left navigation pane, and click the **VPC Peering** > **AWS** tab.
+1. 在 [TiDB Cloud 控制台](https://tidbcloud.com) 中，使用左上角的下拉框切换到目标项目。
+2. 在左侧导航栏，点击 **Project Settings** > **Network Access**。
+3. 在 **Network Access** 页面，点击 **VPC Peering** 标签页，然后点击 **AWS** 子标签。
 
-    The **VPC Peering** configuration is displayed by default.
+    默认会显示 **VPC Peering** 配置。
 
-4. In the upper-right corner, click **Create VPC Peering**, select the **TiDB Cloud VPC Region**, and then fill in the required information of your existing AWS VPC:
+4. 在右上角，点击 **Create VPC Peering**，选择 **TiDB Cloud VPC Region**，然后填写你现有 AWS VPC 的相关信息：
 
     - Your VPC Region
     - AWS Account ID
     - VPC ID
     - VPC CIDR
 
-    You can get such information from your VPC details page of the [AWS Management Console](https://console.aws.amazon.com/). TiDB Cloud supports creating VPC peerings between VPCs in the same region or from two different regions.
+    你可以在 [AWS 管理控制台](https://console.aws.amazon.com/) 的 VPC 详情页获取这些信息。TiDB Cloud 支持在同一区域或不同区域的 VPC 之间创建 VPC Peering。
 
     ![VPC peering](/media/tidb-cloud/vpc-peering/vpc-peering-creating-infos.png)
 
-5. Click **Create** to send the VPC peering request, and then view the VPC peering information on the **VPC Peering** > **AWS** tab. The status of the newly created VPC peering is **System Checking**.
+5. 点击 **Create** 发送 VPC Peering 请求，然后在 **VPC Peering** > **AWS** 标签页查看 VPC Peering 信息。新建的 VPC Peering 状态为 **System Checking**。
 
-6. To view detailed information about your newly created VPC peering, click **...** > **View** in the **Action** column. The **VPC Peering Details** page is displayed.
+6. 若要查看新建 VPC Peering 的详细信息，在 **Action** 列点击 **...** > **View**。会显示 **VPC Peering Details** 页面。
 
 </div>
-<div label="VPC peering setting on the cluster-level Networking page">
+<div label="集群级 Networking 页面设置 VPC Peering">
 
-1. Open the overview page of the target cluster.
+1. 打开目标集群的概览页面。
 
-    1. Log in to the [TiDB Cloud console](https://tidbcloud.com/) and navigate to the [**Clusters**](https://tidbcloud.com/console/clusters) page of your project.
+    1. 登录 [TiDB Cloud 控制台](https://tidbcloud.com/)，进入项目的 [**Clusters**](https://tidbcloud.com/project/clusters) 页面。
 
         > **Tip:**
         >
-        > If you have multiple projects, you can click <MDSvgIcon name="icon-left-projects" /> in the lower-left corner and switch to another project.
+        > 你可以使用左上角的下拉框在组织、项目和集群之间切换。
 
-    2. Click the name of your target cluster to go to its overview page.
+    2. 点击目标集群名称，进入其概览页面。
 
-2. In the left navigation pane, click **Networking**, and then click **Create VPC Peering**.
+2. 在左侧导航栏，点击 **Settings** > **Networking**。
 
-3. Fill in the required information of your existing AWS VPC:
+3. 在 **Networking** 页面，点击 **Create VPC Peering**，然后填写你现有 AWS VPC 的相关信息：
 
     - Your VPC Region
     - AWS Account ID
     - VPC ID
     - VPC CIDR
 
-    You can get such information from your VPC details page of the [AWS Management Console](https://console.aws.amazon.com/). TiDB Cloud supports creating VPC peerings between VPCs in the same region or from two different regions.
+    你可以在 [AWS 管理控制台](https://console.aws.amazon.com/) 的 VPC 详情页获取这些信息。TiDB Cloud 支持在同一区域或不同区域的 VPC 之间创建 VPC Peering。
 
     ![VPC peering](/media/tidb-cloud/vpc-peering/vpc-peering-creating-infos.png)
 
-4. Click **Create** to send the VPC peering request, and then view the VPC peering information on the **Networking** > **AWS VPC Peering** section. The status of the newly created VPC peering is **System Checking**.
+4. 点击 **Create** 发送 VPC Peering 请求，然后在 **Networking** > **AWS VPC Peering** 区域查看 VPC Peering 信息。新建的 VPC Peering 状态为 **System Checking**。
 
-5. To view detailed information about your newly created VPC peering, click **...** > **View** in the **Action** column. The **AWS VPC Peering Details** page is displayed.
+5. 若要查看新建 VPC Peering 的详细信息，在 **Action** 列点击 **...** > **View**。会显示 **AWS VPC Peering Details** 页面。
 
 </div>
 </SimpleTab>
 
-### Step 2. Approve and configure the VPC peering
+### 步骤 2. 审批并配置 VPC Peering
 
-You can approve and configure the VPC peering connection using AWS CLI or AWS dashboard.
+你可以使用 AWS CLI 或 AWS 控制台来审批并配置 VPC Peering 连接。
 
 <SimpleTab>
-<div label="Use AWS CLI">
+<div label="使用 AWS CLI">
 
-1. Install AWS Command Line Interface (AWS CLI).
+1. 安装 AWS 命令行工具（AWS CLI）。
 
-    {{< copyable "shell-regular" >}}
-
+    
     ```bash
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
     unzip awscliv2.zip
     sudo ./aws/install
     ```
 
-2. Configure AWS CLI according to your account information. To get the information required by AWS CLI, see [AWS CLI configuration basics](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html).
+2. 根据你的账户信息配置 AWS CLI。获取 AWS CLI 所需信息，请参见 [AWS CLI 配置基础](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html)。
 
-    {{< copyable "shell-regular" >}}
-
+    
     ```bash
     aws configure
     ```
 
-3. Replace the following variable values with your account information.
+3. 用你的账户信息替换以下变量值。
 
-    {{< copyable "shell-regular" >}}
-
+    
     ```bash
-    # Sets up the related variables.
+    # 设置相关变量。
     pcx_tidb_to_app_id="<TiDB peering id>"
     app_region="<APP Region>"
     app_vpc_id="<Your VPC ID>"
     tidbcloud_project_cidr="<TiDB Cloud Project VPC CIDR>"
     ```
 
-    For example:
+    例如：
 
     ```
-    # Sets up the related variables
+    # 设置相关变量
     pcx_tidb_to_app_id="pcx-069f41efddcff66c8"
     app_region="us-west-2"
     app_vpc_id="vpc-0039fb90bb5cf8698"
     tidbcloud_project_cidr="10.250.0.0/16"
     ```
 
-4. Run the following commands.
+4. 运行以下命令。
 
-    {{< copyable "shell-regular" >}}
-
+    
     ```bash
-    # Accepts the VPC peering connection request.
+    # 接受 VPC Peering 连接请求。
     aws ec2 accept-vpc-peering-connection --vpc-peering-connection-id "$pcx_tidb_to_app_id"
     ```
 
-    {{< copyable "shell-regular" >}}
-
+    
     ```bash
-    # Creates route table rules.
+    # 创建路由表规则。
     aws ec2 describe-route-tables --region "$app_region" --filters Name=vpc-id,Values="$app_vpc_id" --query 'RouteTables[*].RouteTableId' --output text | tr "\t" "\n" | while read row
     do
         app_route_table_id="$row"
@@ -187,128 +182,127 @@ You can approve and configure the VPC peering connection using AWS CLI or AWS da
 
     > **Note:**
     >
-    > Sometimes, even if the route table rules are successfully created, you might still get the `An error occurred (MissingParameter) when calling the CreateRoute operation: The request must contain the parameter routeTableId` error. In this case, you can check the created rules and ignore the error.
+    > 有时即使路由表规则已成功创建，你仍可能收到 `An error occurred (MissingParameter) when calling the CreateRoute operation: The request must contain the parameter routeTableId` 错误。此时你可以检查已创建的规则并忽略该错误。
 
-    {{< copyable "shell-regular" >}}
-
+    
     ```bash
-    # Modifies the VPC attribute to enable DNS-hostname and DNS-support.
+    # 修改 VPC 属性以启用 DNS-hostname 和 DNS-support。
     aws ec2 modify-vpc-attribute --vpc-id "$app_vpc_id" --enable-dns-hostnames
     aws ec2 modify-vpc-attribute --vpc-id "$app_vpc_id" --enable-dns-support
     ```
 
-After finishing the configuration, the VPC peering has been created. You can [connect to the TiDB cluster](#connect-to-the-tidb-cluster) to verify the result.
+完成配置后，VPC Peering 已创建。你可以 [连接到 TiDB 集群](#connect-to-the-tidb-cluster) 验证结果。
 
 </div>
-<div label="Use the AWS dashboard">
+<div label="使用 AWS 控制台">
 
-You can also use the AWS dashboard to configure the VPC peering connection.
+你也可以使用 AWS 控制台配置 VPC Peering 连接。
 
-1. Confirm to accept the peer connection request in your [AWS Management Console](https://console.aws.amazon.com/).
+1. 在你的 [AWS 管理控制台](https://console.aws.amazon.com/) 中确认接受 Peering 连接请求。
 
-    1. Sign in to the [AWS Management Console](https://console.aws.amazon.com/) and click **Services** on the top menu bar. Enter `VPC` in the search box and go to the VPC service page.
+    1. 登录 [AWS 管理控制台](https://console.aws.amazon.com/)，点击顶部菜单栏的 **Services**。在搜索框输入 `VPC` 并进入 VPC 服务页面。
 
         ![AWS dashboard](/media/tidb-cloud/vpc-peering/aws-vpc-guide-1.jpg)
 
-    2. From the left navigation bar, open the **Peering Connections** page. On the **Create Peering Connection** tab, a peering connection is in the **Pending Acceptance** status.
+    2. 在左侧导航栏，打开 **Peering Connections** 页面。在 **Create Peering Connection** 标签页下，Peering 连接状态为 **Pending Acceptance**。
 
-    3. Confirm that the requester owner and the requester VPC match **TiDB Cloud AWS Account ID** and **TiDB Cloud VPC ID** on the **VPC Peering Details** page of the [TiDB Cloud console](https://tidbcloud.com). Right-click the peering connection and select **Accept Request** to accept the request in the **Accept VPC peering connection request** dialog.
+    3. 确认请求方 owner 和请求方 VPC 与 [TiDB Cloud 控制台](https://tidbcloud.com) **VPC Peering Details** 页面上的 **TiDB Cloud AWS Account ID** 和 **TiDB Cloud VPC ID** 匹配。右键点击该 Peering 连接，选择 **Accept Request**，在 **Accept VPC peering connection request** 对话框中接受请求。
 
         ![AWS VPC peering requests](/media/tidb-cloud/vpc-peering/aws-vpc-guide-3.png)
 
-2. Add a route to the TiDB Cloud VPC for each of your VPC subnet route tables.
+2. 为你的每个 VPC 子网路由表添加到 TiDB Cloud VPC 的路由。
 
-    1. From the left navigation bar, open the **Route Tables** page.
+    1. 在左侧导航栏，打开 **Route Tables** 页面。
 
-    2. Search all the route tables that belong to your application VPC.
+    2. 搜索属于你的应用程序 VPC 的所有路由表。
 
         ![Search all route tables related to VPC](/media/tidb-cloud/vpc-peering/aws-vpc-guide-4.png)
 
-    3. Right-click each route table and select **Edit routes**. On the edit page, add a route with a destination to the TiDB Cloud CIDR (by checking the **VPC Peering** configuration page in the TiDB Cloud console) and fill in your peering connection ID in the **Target** column.
+    3. 右键点击每个路由表，选择 **Edit routes**。在编辑页面，添加一条目标为 TiDB Cloud CIDR（可在 TiDB Cloud 控制台 **VPC Peering** 配置页面查看）的路由，并在 **Target** 列填写你的 Peering 连接 ID。
 
         ![Edit all route tables](/media/tidb-cloud/vpc-peering/aws-vpc-guide-5.png)
 
-3. Make sure you have enabled private DNS hosted zone support for your VPC.
+3. 确保你的 VPC 已启用私有 DNS 托管区域支持。
 
-    1. From the left navigation bar, open the **Your VPCs** page.
+    1. 在左侧导航栏，打开 **Your VPCs** 页面。
 
-    2. Select your application VPC.
+    2. 选择你的应用程序 VPC。
 
-    3. Right click on the selected VPC. The setting drop-down list displays.
+    3. 右键点击所选 VPC，显示设置下拉列表。
 
-    4. From the setting drop-down list, click **Edit DNS hostnames**. Enable DNS hostnames and click **Save**.
+    4. 在设置下拉列表中，点击 **Edit DNS hostnames**。启用 DNS hostnames 并点击 **Save**。
 
-    5. From the setting drop-down list, click **Edit DNS resolution**. Enable DNS resolution and click **Save**.
+    5. 在设置下拉列表中，点击 **Edit DNS resolution**。启用 DNS resolution 并点击 **Save**。
 
-Now you have successfully set up the VPC peering connection. Next, [connect to the TiDB cluster via VPC peering](#connect-to-the-tidb-cluster).
+现在你已成功设置 VPC Peering 连接。接下来，[通过 VPC Peering 连接到 TiDB 集群](#connect-to-the-tidb-cluster)。
 
 </div>
 </SimpleTab>
 
-## Set up VPC peering on Google Cloud
+## 在 Google Cloud 上设置 VPC Peering
 
-### Step 1. Add VPC peering requests
+### 步骤 1. 添加 VPC Peering 请求
 
-You can add VPC peering requests on either the project-level **Network Access** page or the cluster-level **Networking** page in the TiDB Cloud console.
+你可以在 TiDB Cloud 控制台的项目级 **Network Access** 页面或集群级 **Networking** 页面添加 VPC Peering 请求。
 
 <SimpleTab>
-<div label="VPC peering setting on the project-level Network Access page">
+<div label="项目级 Network Access 页面设置 VPC Peering">
 
-1. Log in to the [TiDB Cloud console](https://tidbcloud.com).
-2. Click <MDSvgIcon name="icon-left-projects" /> in the lower-left corner, switch to the target project if you have multiple projects, and then click **Project Settings**.
-3. On the **Project Settings** page of your project, click **Network Access** in the left navigation pane, and click the **VPC Peering** > **Google Cloud** tab.
+1. 在 [TiDB Cloud 控制台](https://tidbcloud.com) 中，使用左上角的下拉框切换到目标项目。
+2. 在左侧导航栏，点击 **Project Settings** > **Network Access**。
+3. 在 **Network Access** 页面，点击 **VPC Peering** 标签页，然后点击 **Google Cloud** 子标签。
 
-    The **VPC Peering** configuration is displayed by default.
+    默认会显示 **VPC Peering** 配置。
 
-4. In the upper-right corner, click **Create VPC Peering**, select the **TiDB Cloud VPC Region**, and then fill in the required information of your existing Google Cloud VPC:
+4. 在右上角，点击 **Create VPC Peering**，选择 **TiDB Cloud VPC Region**，然后填写你现有 Google Cloud VPC 的相关信息：
 
     > **Tip:**
     >
-    > You can follow instructions next to the **Google Cloud Project ID** and **VPC Network Name** fields to find the project ID and VPC network name.
+    > 你可以按照 **Google Cloud Project ID** 和 **VPC Network Name** 字段旁的说明查找项目 ID 和 VPC 网络名称。
 
     - Google Cloud Project ID
     - VPC Network Name
     - VPC CIDR
 
-5. Click **Create** to send the VPC peering request, and then view the VPC peering information on the **VPC Peering** > **Google Cloud** tab. The status of the newly created VPC peering is **System Checking**.
+5. 点击 **Create** 发送 VPC Peering 请求，然后在 **VPC Peering** > **Google Cloud** 标签页查看 VPC Peering 信息。新建的 VPC Peering 状态为 **System Checking**。
 
-6. To view detailed information about your newly created VPC peering, click **...** > **View** in the **Action** column. The **VPC Peering Details** page is displayed.
+6. 若要查看新建 VPC Peering 的详细信息，在 **Action** 列点击 **...** > **View**。会显示 **VPC Peering Details** 页面。
 
 </div>
-<div label="VPC peering setting on the cluster-level Networking page">
+<div label="集群级 Networking 页面设置 VPC Peering">
 
-1. Open the overview page of the target cluster.
+1. 打开目标集群的概览页面。
 
-    1. Log in to the [TiDB Cloud console](https://tidbcloud.com/) and navigate to the [**Clusters**](https://tidbcloud.com/console/clusters) page of your project.
+    1. 登录 [TiDB Cloud 控制台](https://tidbcloud.com/)，进入项目的 [**Clusters**](https://tidbcloud.com/project/clusters) 页面。
 
         > **Tip:**
         >
-        > If you have multiple projects, you can click <MDSvgIcon name="icon-left-projects" /> in the lower-left corner and switch to another project.
+        > 你可以使用左上角的下拉框在组织、项目和集群之间切换。
 
-    2. Click the name of your target cluster to go to its overview page.
+    2. 点击目标集群名称，进入其概览页面。
 
-2. In the left navigation pane, click **Networking**, and then click **Create VPC Peering**.
+2. 在左侧导航栏，点击 **Settings** > **Networking**。
 
-3. Fill in the required information of your existing Google Cloud VPC:
+3. 在 **Networking** 页面，点击 **Create VPC Peering**，然后填写你现有 Google Cloud VPC 的相关信息：
 
     > **Tip:**
     >
-    > You can follow instructions next to the **Google Cloud Project ID** and **VPC Network Name** fields to find the project ID and VPC network name.
+    > 你可以按照 **Google Cloud Project ID** 和 **VPC Network Name** 字段旁的说明查找项目 ID 和 VPC 网络名称。
 
     - Google Cloud Project ID
     - VPC Network Name
     - VPC CIDR
 
-4. Click **Create** to send the VPC peering request, and then view the VPC peering information on the **Networking** > **Google Cloud VPC Peering** section. The status of the newly created VPC peering is **System Checking**.
+4. 点击 **Create** 发送 VPC Peering 请求，然后在 **Networking** > **Google Cloud VPC Peering** 区域查看 VPC Peering 信息。新建的 VPC Peering 状态为 **System Checking**。
 
-5. To view detailed information about your newly created VPC peering, click **...** > **View** in the **Action** column. The **Google Cloud VPC Peering Details** page is displayed.
+5. 若要查看新建 VPC Peering 的详细信息，在 **Action** 列点击 **...** > **View**。会显示 **Google Cloud VPC Peering Details** 页面。
 
 </div>
 </SimpleTab>
 
-### Step 2. Approve the VPC peering
+### 步骤 2. 审批 VPC Peering
 
-Execute the following command to finish the setup of VPC peering:
+执行以下命令完成 VPC Peering 的设置：
 
 ```bash
 gcloud beta compute networks peerings create <your-peer-name> --project <your-project-id> --network <your-vpc-network-name> --peer-project <tidb-project-id> --peer-network <tidb-vpc-network-name>
@@ -316,18 +310,18 @@ gcloud beta compute networks peerings create <your-peer-name> --project <your-pr
 
 > **Note:**
 >
-> You can name `<your-peer-name>` as you like.
+> 你可以自定义 `<your-peer-name>`。
 
-Now you have successfully set up the VPC peering connection. Next, [connect to the TiDB cluster via VPC peering](#connect-to-the-tidb-cluster).
+现在你已成功设置 VPC Peering 连接。接下来，[通过 VPC Peering 连接到 TiDB 集群](#connect-to-the-tidb-cluster)。
 
-## Connect to the TiDB cluster
+## 连接到 TiDB 集群
 
-1. On the [**Clusters**](https://tidbcloud.com/console/clusters) page, click the name of your target cluster to go to its overview page.
+1. 在项目的 [**Clusters**](https://tidbcloud.com/project/clusters) 页面，点击目标集群名称进入其概览页面。
 
-2. Click **Connect** in the upper-right corner, and select **VPC Peering** from the **Connection Type** drop-down list.
+2. 点击右上角的 **Connect**，并在 **Connection Type** 下拉列表中选择 **VPC Peering**。
 
-    Wait for the VPC peering connection status to change from **system checking** to **active** (approximately 5 minutes).
+    等待 VPC Peering 连接状态从 **system checking** 变为 **active**（大约 5 分钟）。
 
-3. In the **Connect With** drop-down list, select your preferred connection method. The corresponding connection string is displayed at the bottom of the dialog.
+3. 在 **Connect With** 下拉列表中选择你偏好的连接方式。对话框底部会显示对应的连接字符串。
 
-4. Connect to your cluster with the connection string.
+4. 使用该连接字符串连接到你的集群。

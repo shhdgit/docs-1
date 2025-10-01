@@ -1,129 +1,129 @@
 ---
 title: Security
-summary: Learn about security concepts for TiDB Cloud.
+summary: 了解 TiDB Cloud 的安全概念。
 ---
 
 # Security
 
-TiDB Cloud provides a robust and flexible security framework designed to protect data, enforce access control, and meet modern compliance standards. This framework combines advanced security features with operational efficiency to support organizational needs at scale.
+TiDB Cloud 提供了强大且灵活的安全框架，旨在保护数据、实施访问控制，并满足现代合规标准。该框架将先进的安全特性与高效的运维能力相结合，以支持大规模组织的需求。
 
 **Key components**
 
-- **Identity and Access Management (IAM)**: Secure and flexible authentication and permission management for both the TiDB Cloud console and database environments.
+- **Identity and Access Management (IAM)**：为 TiDB Cloud 控制台和数据库环境提供安全且灵活的身份认证与权限管理。
 
-- **Network access control**: Configurable connectivity options, including private endpoints, VPC peering, TLS encryption, and IP access lists.
+- **Network access control**：可配置的连接选项，包括私有端点、VPC 对等、TLS 加密和 IP 访问列表。
 
-- **Data access control**: Advanced encryption capabilities, such as Customer-Managed Encryption Keys (CMEK), to safeguard data at rest.
+- **Data access control**：高级加密能力，如 Customer-Managed Encryption Keys (CMEK)，用于保护静态数据安全。
 
-- **Audit logging**: Comprehensive activity tracking for both console actions and database operations, ensuring accountability and transparency.
+- **Audit logging**：对控制台操作和数据库操作进行全面的活动追踪，确保问责和透明。
 
-By integrating these capabilities, TiDB Cloud empowers organizations to safeguard sensitive data, streamline access control, and optimize security operations.
+通过集成这些能力，TiDB Cloud 使组织能够保护敏感数据、简化访问控制并优化安全运维。
 
 ## Identity and access management (IAM)
 
-TiDB Cloud employs Identity and Access Management (IAM) to securely and efficiently manage user identities and permissions across both the console and database environments. IAM features are designed to meet organizational security and compliance needs through a combination of authentication options, role-based access control, and a hierarchical resource structure.
+TiDB Cloud 采用 Identity and Access Management (IAM) 来安全高效地管理控制台和数据库环境中的用户身份与权限。IAM 功能通过多种认证方式、基于角色的访问控制以及分层资源结构，满足组织的安全与合规需求。
 
 ### TiDB Cloud user accounts
 
-TiDB Cloud user accounts are the foundation for managing identity and access to resources. Each account represents an individual or entity within the platform and supports multiple authentication methods to suit organizational needs:
+TiDB Cloud 用户账户是管理资源身份和访问的基础。每个账户代表平台内的个人或实体，并支持多种认证方式以适应组织需求：
 
 - **Default username and password**
 
-    - Users create accounts with an email address and password.
+    - 用户通过邮箱和密码创建账户。
 
-    - Suitable for small teams or individuals without an external identity provider.
+    - 适用于没有外部身份提供方的小型团队或个人。
 
 - **Standard SSO authentication**
 
-    - Users log in via GitHub, Google, or Microsoft accounts.
+    - 用户可通过 GitHub、Google 或 Microsoft 账户登录。
 
-    - Enabled by default for all organizations.
+    - 默认对所有组织启用。
 
-    - **Best practice**: Use for smaller teams or those without strict compliance needs.
+    - **Best practice**：适用于小型团队或无严格合规需求的团队。
 
-    - For more information, see [Standard SSO Authentication](/tidb-cloud/tidb-cloud-sso-authentication.md).
+    - 详细信息参见 [Standard SSO Authentication](/tidb-cloud/tidb-cloud-sso-authentication.md)。
 
 - **Organization SSO authentication**
 
-    - Integrates with corporate identity providers (IdPs) using OIDC or SAML protocols.
+    - 通过 OIDC 或 SAML 协议与企业身份提供方 (IdP) 集成。
 
-    - Enables features like MFA enforcement, password expiration policies, and domain restrictions.
+    - 支持如 MFA 强制、密码过期策略和域名限制等功能。
 
-    - **Best practice**: Ideal for larger organizations with advanced security and compliance requirements.
+    - **Best practice**：适用于有高级安全和合规要求的大型组织。
 
-    - For more information, see [Organization SSO Authentication](/tidb-cloud/tidb-cloud-org-sso-authentication.md).
+    - 详细信息参见 [Organization SSO Authentication](/tidb-cloud/tidb-cloud-org-sso-authentication.md)。
 
 ### Database access control
 
-TiDB Cloud provides granular database access control through user-based and role-based permissions. These mechanisms allow administrators to securely manage access to data objects and schemas while ensuring compliance with organizational security policies.
+TiDB Cloud 通过基于用户和基于角色的权限，提供细粒度的数据库访问控制。这些机制允许管理员安全地管理对数据对象和 schema 的访问，同时确保符合组织的安全策略。
 
 - **Best practices:**
 
-    - Implement the principle of least privilege by granting users only the permissions they need for their roles.
+    - 实施最小权限原则，仅授予用户其角色所需的权限。
 
-    - Regularly audit and update user access to align with changing organizational requirements.
+    - 定期审计和更新用户访问权限，以适应组织需求的变化。
 
 ### Database user accounts
 
-Database user accounts are stored in the `mysql.user` system table and uniquely identified by a username and client host.
+数据库用户账户存储在 `mysql.user` 系统表中，并通过用户名和客户端主机唯一标识。
 
-During database initialization, TiDB automatically creates a default account: `'root'@'%'`.
+在数据库初始化时，TiDB 会自动创建一个默认账户：`'root'@'%'`。
 
-For more information, see [TiDB User Account Management](https://docs.pingcap.com/tidb/stable/user-account-management#user-names-and-passwords).
+详细信息参见 [TiDB User Account Management](https://docs.pingcap.com/tidb/stable/user-account-management#user-names-and-passwords)。
 
 ### SQL Proxy accounts
 
-SQL Proxy accounts are special-purpose accounts automatically generated by TiDB Cloud. Key characteristics of these accounts include the following:
+SQL Proxy 账户是 TiDB Cloud 自动生成的特殊用途账户。其主要特性包括：
 
-- **Linked to TiDB Cloud user accounts:** Each SQL Proxy account corresponds to a specific TiDB Cloud user.
+- **Linked to TiDB Cloud user accounts:** 每个 SQL Proxy 账户对应一个特定的 TiDB Cloud 用户。
 
-- **Mapped to roles:** SQL Proxy accounts are granted the `role_admin` role.
+- **Mapped to roles:** SQL Proxy 账户被授予 `role_admin` 角色。
 
-- **Token-based:** SQL Proxy accounts use secure JWT tokens instead of passwords, ensuring seamless, restricted access through the TiDB Cloud Data Service or SQL Editor.
+- **Token-based:** SQL Proxy 账户使用安全的 JWT 令牌而非密码，确保通过 TiDB Cloud Data Service 或 SQL Editor 实现无缝且受限的访问。
 
 ### TiDB privileges and roles
 
-TiDB's privilege management system is based on MySQL 5.7, which enables fine-grained access to database objects. At the same time, TiDB also introduces MySQL 8.0's RBAC and dynamic privilege mechanism. This enables fine-grained and convenient management of database privileges.
+TiDB 的权限管理系统基于 MySQL 5.7，实现了对数据库对象的细粒度访问控制。同时，TiDB 也引入了 MySQL 8.0 的 RBAC 和动态权限机制，实现了数据库权限的细粒度和便捷管理。
 
 **Static privileges**
 
-- Supports fine-grained access control based on database objects, including tables, views, indexes, users, and other objects.
+- 支持基于数据库对象（如表、视图、索引、用户等）的细粒度访问控制。
 
-- *Example: Grant SELECT privileges on a specific table to a user.*
+- *示例：为某用户授予对特定表的 SELECT 权限。*
 
 **Dynamic privileges**
 
-- Supports reasonable splitting of database management privileges to achieve fine-grained control of system management privileges.
+- 支持对数据库管理权限的合理拆分，实现系统管理权限的细粒度控制。
 
-- Example: Assign `BACKUP_ADMIN` to accounts managing database backups without broader administrative permissions.
+- 示例：为负责数据库备份的账户分配 `BACKUP_ADMIN`，而无需更广泛的管理权限。
 
 **SQL roles (RBAC)**
 
-- Group permissions into roles that can be assigned to users, enabling streamlined privilege management and dynamic updates.
+- 将权限分组为角色，分配给用户，实现权限管理的简化和动态更新。
 
-- Example: Assign a read-write role to analysts to simplify user access control.
+- 示例：为分析师分配读写角色，简化用户访问控制。
 
-This system ensures flexibility and precision in managing user access while aligning with organizational policies.
+该系统确保了用户访问管理的灵活性和精确性，并与组织策略保持一致。
 
 ### Organization and projects
 
-TiDB Cloud manages users and resources with a hierarchical structure: organizations, projects, and clusters.
+TiDB Cloud 通过分层结构（组织、项目和集群）管理用户和资源。
 
 **Organizations**
 
-- The top-level entity for managing resources, roles, and billing.
+- 管理资源、角色和账单的顶层实体。
 
-- The organization owner has full permissions, including project creation and role assignment.
+- 组织所有者拥有全部权限，包括项目创建和角色分配。
 
 **Projects**
 
-- Subdivisions of an organization containing clusters and project-specific configurations.
+- 组织下的子单元，包含集群和项目级配置。
 
-- Managed by project owners responsible for clusters within their scope.
+- 由项目所有者管理，负责其范围内的集群。
 
 **Clusters**
 
-- Individual database instances within a project.
+- 项目内的独立数据库实例。
 
 ### Example structure
 
@@ -143,101 +143,116 @@ TiDB Cloud manages users and resources with a hierarchical structure: organizati
 ### Key features
 
 - **Granular permissions**:
-    - Assign specific roles at both the organization and project levels for precise access control.
+    - 可在组织和项目级分配特定角色，实现精确的访问控制。
 
-    - Ensure flexibility and security by carefully planning role assignments.
+    - 通过合理规划角色分配，确保灵活性和安全性。
 
 - **Billing management**:
-    - Billing is consolidated at the organization level, with detailed breakdowns available for each project.
+    - 账单在组织级统一管理，并可按项目进行详细拆分。
 
 ### Identity and Access Management (IAM) Roles
 
-TiDB Cloud provides role-based access control to manage permissions across organizations and projects:
+TiDB Cloud 提供基于角色的访问控制，以管理组织和项目范围内的权限：
 
-- **[Organization-Level roles](/tidb-cloud/manage-user-access.md#organization-roles)**: Grant permissions to manage the entire organization, including billing and project creation.
+- **[Organization-Level roles](/tidb-cloud/manage-user-access.md#organization-roles)**：授予管理整个组织（包括账单和项目创建）的权限。
 
-- **[Project-Level roles](/tidb-cloud/manage-user-access.md#project-roles)**: Assign permissions to manage specific projects, including clusters and configurations.
+- **[Project-Level roles](/tidb-cloud/manage-user-access.md#project-roles)**：分配管理特定项目（包括集群和配置）的权限。
 
 ## Network access control
 
-TiDB Cloud ensures secure cluster connectivity and data transmission through robust network access controls. Key features include:
+TiDB Cloud 通过强大的网络访问控制，确保集群连接和数据传输的安全。主要特性包括：
 
 ### Private endpoints
+
+<CustomContent language="en,zh">
+
+- 允许你在 Virtual Private Cloud (VPC) 内的 SQL 客户端安全连接到 TiDB Cloud Dedicated 集群。
+
+- 支持 [AWS PrivateLink](/tidb-cloud/set-up-private-endpoint-connections.md)、[Azure Private Link](/tidb-cloud/set-up-private-endpoint-connections-on-azure.md)、[Google Cloud Private Service Connect](/tidb-cloud/set-up-private-endpoint-connections-on-google-cloud.md) 和 [Alibaba Cloud Private Endpoint](/tidb-cloud/set-up-private-endpoint-connections-on-alibaba-cloud.md)。
+
+</CustomContent>
+
+<CustomContent language="ja">
 
 - Enables secure connectivity for SQL clients within your Virtual Private Cloud (VPC) to TiDB Cloud Dedicated clusters.
 
 - Supported by [AWS PrivateLink](/tidb-cloud/set-up-private-endpoint-connections.md), [Azure Private Link](/tidb-cloud/set-up-private-endpoint-connections-on-azure.md), and [Google Cloud Private Service Connect](/tidb-cloud/set-up-private-endpoint-connections-on-google-cloud.md).
 
-**Best practices:** Use private endpoints in production to minimize public exposure and review configurations regularly.
+</CustomContent>
+
+**Best practices:** 在生产环境中使用私有端点以最小化公网暴露，并定期检查配置。
 
 ### TLS (Transport Layer Security)
 
-- Encrypts communication between clients and servers to secure data transmission.
+- 加密客户端与服务器之间的通信，保障数据传输安全。
 
-- Setup guides available for both [Serverless](/tidb-cloud/secure-connections-to-serverless-clusters.md) and [Dedicated](/tidb-cloud/tidb-cloud-tls-connect-to-dedicated.md) clusters.
+- 配置指南：
 
-**Best practices:** Ensure TLS certificates are current and rotate them periodically.
+    - [TLS Connections to TiDB Cloud Serverless or Essential](/tidb-cloud/secure-connections-to-serverless-clusters.md)
+    - [TLS Connections to TiDB Cloud Dedicated](/tidb-cloud/tidb-cloud-tls-connect-to-dedicated.md)
+
+**Best practices:** 确保 TLS 证书为最新，并定期轮换。
 
 ### VPC peering
 
-- Establishes private connections between Virtual Private Clouds, enabling secure, seamless communication.
+- 建立虚拟私有云之间的私有连接，实现安全、无缝的通信。
 
-- For more information, see [Connect to TiDB Cloud Dedicated via VPC Peering](/tidb-cloud/set-up-vpc-peering-connections.md).
+- 详细信息参见 [Connect to TiDB Cloud Dedicated via VPC Peering](/tidb-cloud/set-up-vpc-peering-connections.md)。
 
-**Best practices:** Use for critical workloads to avoid public internet exposure and monitor performance.
+**Best practices:** 用于关键业务负载，避免公网暴露，并监控性能。
 
 ### IP access list
 
-- Acts as a firewall to restrict cluster access to trusted IP addresses.
+- 作为防火墙，仅允许受信任的 IP 地址访问集群。
 
-- For more information, see [Configure an IP Access List](/tidb-cloud/configure-ip-access-list.md).
+- 详细信息参见 [Configure an IP Access List](/tidb-cloud/configure-ip-access-list.md)。
 
-**Best practices:** Regularly audit and update the access list to maintain security.
+**Best practices:** 定期审计和更新访问列表，保障安全。
 
 ## Data access control
 
-TiDB Cloud safeguards static data with advanced encryption capabilities, ensuring security and compliance with industry regulations.
+TiDB Cloud 通过高级加密能力保护静态数据，确保安全性并符合行业法规。
 
 **Customer-Managed Encryption Key (CMEK)**
 
-- Provides organizations full control over encryption for TiDB Cloud Dedicated clusters.
+- 让组织对 TiDB Cloud Dedicated 集群的加密拥有完全控制权。
 
-- Encrypts static data and backups with CMEK keys when enabled.
+- 启用后，使用 CMEK 密钥对静态数据和备份进行加密。
 
-- For TiDB Cloud Dedicated clusters without CMEK, TiDB Cloud uses escrow keys; TiDB Cloud Serverless clusters rely exclusively on escrow keys.
+- 对于未启用 CMEK 的 TiDB Cloud Dedicated 集群，TiDB Cloud 使用托管密钥；TiDB Cloud Serverless 和 TiDB Cloud Essential 集群仅使用托管密钥。
 
 **Best practices:**
 
-- Regularly rotate CMEK keys to enhance security and meet compliance standards.
+- 定期轮换 CMEK 密钥，以提升安全性并满足合规要求。
 
-- Encrypt backups consistently with CMEK keys for added protection.
+- 始终使用 CMEK 密钥加密备份，增强保护。
 
-- Leverage CMEK for industries requiring strict compliance, such as HIPAA and GDPR.
+- 针对如 HIPAA 和 GDPR 等有严格合规要求的行业，建议使用 CMEK。
 
-For more information, see [Encryption at Rest Using Customer-Managed Encryption Keys](/tidb-cloud/tidb-cloud-encrypt-cmek.md).
+详细信息参见 [Encryption at Rest Using Customer-Managed Encryption Keys on AWS](/tidb-cloud/tidb-cloud-encrypt-cmek-aws.md) 和 [Encryption at Rest Using Customer-Managed Encryption Keys on Azure](/tidb-cloud/tidb-cloud-encrypt-cmek-azure.md)。
 
 ## Audit logging
 
-TiDB Cloud provides comprehensive audit logging to monitor user activities and database operations, ensuring security, accountability, and compliance.
+TiDB Cloud 提供全面的审计日志功能，用于监控用户活动和数据库操作，确保安全、问责和合规。
 
 ### Console audit logging
 
-Tracks key actions on the TiDB Cloud console, such as inviting users or managing clusters.
+追踪 TiDB Cloud 控制台上的关键操作，如邀请用户或管理集群。
 
 **Best practices:**
 
-- Integrate logs with SIEM tools for real-time monitoring and alerts.
+- 将日志集成到 SIEM 工具，实现实时监控和告警。
 
-- Set retention policies to meet compliance requirements.
+- 设置日志保留策略，以满足合规要求。
 
 ### Database audit logging
 
-Records detailed database operations, including executed SQL statements and user access.
+记录详细的数据库操作，包括执行的 SQL 语句和用户访问情况。
 
 **Best practices:**
 
-- Regularly review logs for unusual activity or unauthorized access.
+- 定期审查日志，排查异常活动或未授权访问。
 
-- Use logs for compliance reporting and forensic analysis.
+- 利用日志进行合规报告和取证分析。
 
-For more information, see [Console Audit Logging](/tidb-cloud/tidb-cloud-console-auditing.md) and [Database Audit Logging](/tidb-cloud/tidb-cloud-auditing.md).
+详细信息参见 [Console Audit Logging](/tidb-cloud/tidb-cloud-console-auditing.md) 和 [Database Audit Logging](/tidb-cloud/tidb-cloud-auditing.md)。

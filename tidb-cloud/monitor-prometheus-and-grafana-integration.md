@@ -1,95 +1,111 @@
 ---
-title: Integrate TiDB Cloud with Prometheus and Grafana (Beta)
-summary: Learn how to monitor your TiDB cluster with the Prometheus and Grafana integration.
+title: 将 TiDB Cloud 集成到 Prometheus 和 Grafana（Beta）
+summary: 了解如何通过 Prometheus 和 Grafana 集成监控你的 TiDB 集群。
 ---
 
-# Integrate TiDB Cloud with Prometheus and Grafana (Beta)
+# 将 TiDB Cloud 集成到 Prometheus 和 Grafana（Beta）
 
-TiDB Cloud provides a [Prometheus](https://prometheus.io/) API endpoint (beta). If you have a Prometheus service, you can monitor key metrics of TiDB Cloud from the endpoint easily.
+TiDB Cloud 提供了一个 [Prometheus](https://prometheus.io/) API 端点（Beta）。如果你有 Prometheus 服务，可以通过该端点轻松监控 TiDB Cloud 的关键指标。
 
-This document describes how to configure your Prometheus service to read key metrics from the TiDB Cloud endpoint and how to view the metrics using [Grafana](https://grafana.com/).
+本文档介绍了如何配置 Prometheus 服务以从 TiDB Cloud 端点读取关键指标，以及如何使用 [Grafana](https://grafana.com/) 查看这些指标。
 
-## Prerequisites
+## 前提条件
 
-- To integrate TiDB Cloud with Prometheus, you must have a self-hosted or managed Prometheus service.
+- 要将 TiDB Cloud 集成到 Prometheus，你必须拥有自托管或托管的 Prometheus 服务。
 
-- To edit third-party integration settings of TiDB Cloud, you must have the `Organization Owner` access to your organization or `Project Member` access to the target project in TiDB Cloud.
+- 要编辑 TiDB Cloud 的第三方集成设置，你必须拥有组织的 `Organization Owner` 权限，或在 TiDB Cloud 中拥有目标项目的 `Project Member` 权限。
 
-## Limitation
+## 限制
 
-- You cannot use the Prometheus and Grafana integration in [TiDB Cloud Serverless](/tidb-cloud/select-cluster-tier.md#tidb-cloud-serverless) clusters.
+- 你无法在 [TiDB Cloud Serverless](/tidb-cloud/select-cluster-tier.md#tidb-cloud-serverless) 或 [TiDB Cloud Essential](/tidb-cloud/select-cluster-tier.md#essential) 集群中使用 Prometheus 和 Grafana 集成。
 
-- Prometheus and Grafana integrations are not available when the cluster status is **CREATING**, **RESTORING**, **PAUSED**, or **RESUMING**.
+- 当集群状态为 **CREATING**、**RESTORING**、**PAUSED** 或 **RESUMING** 时，Prometheus 和 Grafana 集成不可用。
 
-## Steps
+## 步骤
 
-### Step 1. Get a scrape_config file for Prometheus
+### 步骤 1. 获取 Prometheus 的 scrape_config 文件
 
-Before configuring your Prometheus service to read metrics of TiDB Cloud, you need to generate a `scrape_config` YAML file in TiDB Cloud first. The `scrape_config` file contains a unique bearer token that allows the Prometheus service to monitor any database clusters in the current project.
+在配置 Prometheus 服务以读取 TiDB Cloud 指标之前，你需要先在 TiDB Cloud 中生成一个 `scrape_config` YAML 文件。该 `scrape_config` 文件包含一个唯一的 bearer token，允许 Prometheus 服务监控当前项目中的所有数据库集群。
 
-To get the `scrape_config` file for Prometheus, do the following:
+要获取 Prometheus 的 `scrape_config` 文件，请执行以下操作：
 
-1. Log in to the [TiDB Cloud console](https://tidbcloud.com).
-2. Click <MDSvgIcon name="icon-left-projects" /> in the lower-left corner, switch to the target project if you have multiple projects, and then click **Project Settings**.
-3. On the **Project Settings** page of your project, click **Integrations** in the left navigation pane, and then click **Integration to Prometheus (BETA)**.
-4. Click **Add File** to generate and show the scrape_config file for the current project.
+1. 在 [TiDB Cloud 控制台](https://tidbcloud.com) 中，使用左上角的下拉框切换到你的目标项目。
+2. 在左侧导航栏，点击 **Project Settings** > **Integrations**。
+3. 在 **Integrations** 页面，点击 **Integration to Prometheus (BETA)**。
+4. 点击 **Add File**，为当前项目生成并显示 scrape_config 文件。
 
-5. Make a copy of the `scrape_config` file content for later use.
+5. 复制 `scrape_config` 文件的内容，以备后续使用。
 
     > **Note:**
     >
-    > For security reasons, TiDB Cloud only shows a newly generated `scrape_config` file once. Ensure that you copy the content before closing the file window. If you forget to do so, you need to delete the `scrape_config` file in TiDB Cloud and generate a new one. To delete a `scrape_config` file, select the file, click **...**, and then click **Delete**.
+    > 出于安全考虑，TiDB Cloud 只会显示新生成的 `scrape_config` 文件一次。请确保在关闭文件窗口前复制内容。如果忘记复制，需要在 TiDB Cloud 中删除该 `scrape_config` 文件并重新生成。要删除 `scrape_config` 文件，选择该文件，点击 **...**，然后点击 **Delete**。
 
-### Step 2. Integrate with Prometheus
+### 步骤 2. 集成到 Prometheus
 
-1. In the monitoring directory specified by your Prometheus service, locate the Prometheus configuration file.
+1. 在你的 Prometheus 服务指定的监控目录中，找到 Prometheus 配置文件。
 
-    For example, `/etc/prometheus/prometheus.yml`.
+    例如，`/etc/prometheus/prometheus.yml`。
 
-2. In the Prometheus configuration file, locate the `scrape_configs` section, and then copy the `scrape_config` file content obtained from TiDB Cloud to the section.
+2. 在 Prometheus 配置文件中，找到 `scrape_configs` 部分，然后将从 TiDB Cloud 获取的 `scrape_config` 文件内容复制到该部分。
 
-3. In your Prometheus service, check **Status** > **Targets** to confirm that the new `scrape_config` file has been read. If not, you might need to restart the Prometheus service.
+3. 在你的 Prometheus 服务中，检查 **Status** > **Targets**，确认新的 `scrape_config` 文件已被读取。如果没有，你可能需要重启 Prometheus 服务。
 
-### Step 3. Use Grafana GUI dashboards to visualize the metrics
+### 步骤 3. 使用 Grafana GUI 仪表盘可视化指标
 
-After your Prometheus service is reading metrics from TiDB Cloud, you can use Grafana GUI dashboards to visualize the metrics as follows:
+当你的 Prometheus 服务已从 TiDB Cloud 读取指标后，可以按如下方式使用 Grafana GUI 仪表盘进行可视化：
 
-1. Download the Grafana dashboard JSON of TiDB Cloud [here](https://github.com/pingcap/docs/blob/master/tidb-cloud/monitor-prometheus-and-grafana-integration-grafana-dashboard-UI.json).
-2. [Import this JSON to your own Grafana GUI](https://grafana.com/docs/grafana/v8.5/dashboards/export-import/#import-dashboard) to visualize the metrics.
-3. (Optional) Customize the dashboard as needed by adding or removing panels, changing data sources, and modifying display options.
+1. 在 [这里](https://github.com/pingcap/docs/blob/master/tidb-cloud/monitor-prometheus-and-grafana-integration-grafana-dashboard-UI.json) 下载 TiDB Cloud 的 Grafana 仪表盘 JSON 文件。
 
-For more information about how to use Grafana, see [Grafana documentation](https://grafana.com/docs/grafana/latest/getting-started/getting-started-prometheus/).
+2. [将该 JSON 导入到你自己的 Grafana GUI](https://grafana.com/docs/grafana/v8.5/dashboards/export-import/#import-dashboard) 以可视化指标。
+    
+    > **Note:**
+    >
+    > 如果你已经在使用 Prometheus 和 Grafana 监控 TiDB Cloud，并希望引入新可用的指标，建议新建一个仪表盘，而不是直接更新现有仪表盘的 JSON。
 
-## Best practice of rotating scrape_config
+3. （可选）根据需要自定义仪表盘，例如添加或移除面板、更改数据源、修改显示选项等。
 
-To improve data security, it is a general best practice to periodically rotate `scrape_config` file bearer tokens.
+关于如何使用 Grafana 的更多信息，请参见 [Grafana 文档](https://grafana.com/docs/grafana/latest/getting-started/getting-started-prometheus/)。
 
-1. Follow [Step 1](#step-1-get-a-scrape_config-file-for-prometheus) to create a new `scrape_config` file for Prometheus.
-2. Add the content of the new file to your Prometheus configuration file.
-3. Once you have confirmed that your Prometheus service is still able to read from TiDB Cloud, remove the content of the old `scrape_config` file from your Prometheus configuration file.
-4. On the **Integration** page of your project, delete the corresponding old `scrape_config` file to block anyone else from using it to read from the TiDB Cloud Prometheus endpoint.
+## scrape_config 的轮换最佳实践
 
-## Metrics available to Prometheus
+为提升数据安全性，建议定期轮换 `scrape_config` 文件的 bearer token。
 
-Prometheus tracks the following metric data for your TiDB clusters.
+1. 按照 [步骤 1](#step-1-get-a-scrape_config-file-for-prometheus) 为 Prometheus 创建一个新的 `scrape_config` 文件。
+2. 将新文件的内容添加到你的 Prometheus 配置文件中。
+3. 确认 Prometheus 服务仍能从 TiDB Cloud 读取数据后，从 Prometheus 配置文件中移除旧的 `scrape_config` 文件内容。
+4. 在项目的 **Integrations** 页面，删除对应的旧 `scrape_config` 文件，以阻止其他人使用它从 TiDB Cloud Prometheus 端点读取数据。
 
-| Metric name |  Metric type  | Labels | Description |
+## Prometheus 可用的指标
+
+Prometheus 会跟踪你的 TiDB 集群的以下指标数据。
+
+| 指标名称 |  指标类型  | 标签 | 描述 |
 |:--- |:--- |:--- |:--- |
-| tidbcloud_db_queries_total| count | sql_type: `Select\|Insert\|...`<br/>cluster_name: `<cluster name>`<br/>instance: `tidb-0\|tidb-1…`<br/>component: `tidb` | The total number of statements executed |
-| tidbcloud_db_failed_queries_total | count | type: `planner:xxx\|executor:2345\|...`<br/>cluster_name: `<cluster name>`<br/>instance: `tidb-0\|tidb-1…`<br/>component: `tidb` | The total number of execution errors |
-| tidbcloud_db_connections | gauge | cluster_name: `<cluster name>`<br/>instance: `tidb-0\|tidb-1…`<br/>component: `tidb` | Current number of connections in your TiDB server |
-| tidbcloud_db_query_duration_seconds | histogram | sql_type: `Select\|Insert\|...`<br/>cluster_name: `<cluster name>`<br/>instance: `tidb-0\|tidb-1…`<br/>component: `tidb` | The duration histogram of statements |
-| tidbcloud_changefeed_latency | gauge | changefeed_id | The data replication latency between the upstream and the downstream of a changefeed |
-| tidbcloud_changefeed_replica_rows | gauge | changefeed_id | The number of replicated rows that a changefeed writes to the downstream per second |
-| tidbcloud_node_storage_used_bytes | gauge | cluster_name: `<cluster name>`<br/>instance: `tikv-0\|tikv-1…\|tiflash-0\|tiflash-1…`<br/>component: `tikv\|tiflash` | The disk usage bytes of TiKV/TiFlash nodes |
-| tidbcloud_node_storage_capacity_bytes | gauge | cluster_name: `<cluster name>`<br/>instance: `tikv-0\|tikv-1…\|tiflash-0\|tiflash-1…`<br/>component: `tikv\|tiflash` | The disk capacity bytes of TiKV/TiFlash nodes |
-| tidbcloud_node_cpu_seconds_total | count | cluster_name: `<cluster name>`<br/>instance: `tidb-0\|tidb-1…\|tikv-0…\|tiflash-0…`<br/>component: `tidb\|tikv\|tiflash` | The CPU usage of TiDB/TiKV/TiFlash nodes |
-| tidbcloud_node_cpu_capacity_cores | gauge | cluster_name: `<cluster name>`<br/>instance: `tidb-0\|tidb-1…\|tikv-0…\|tiflash-0…`<br/>component: `tidb\|tikv\|tiflash` | The CPU limit cores of TiDB/TiKV/TiFlash nodes |
-| tidbcloud_node_memory_used_bytes | gauge | cluster_name: `<cluster name>`<br/>instance: `tidb-0\|tidb-1…\|tikv-0…\|tiflash-0…`<br/>component: `tidb\|tikv\|tiflash` | The used memory bytes of TiDB/TiKV/TiFlash nodes |
-| tidbcloud_node_memory_capacity_bytes | gauge | cluster_name: `<cluster name>`<br/>instance: `tidb-0\|tidb-1…\|tikv-0…\|tiflash-0…`<br/>component: `tidb\|tikv\|tiflash` | The memory capacity bytes of TiDB/TiKV/TiFlash nodes |
+| tidbcloud_db_queries_total| count | sql_type: `Select\|Insert\|...`<br/>cluster_name: `<cluster name>`<br/>instance: `tidb-0\|tidb-1…`<br/>component: `tidb` | 执行的语句总数 |
+| tidbcloud_db_failed_queries_total | count | type: `planner:xxx\|executor:2345\|...`<br/>cluster_name: `<cluster name>`<br/>instance: `tidb-0\|tidb-1…`<br/>component: `tidb` | 执行错误的总数 |
+| tidbcloud_db_connections | gauge | cluster_name: `<cluster name>`<br/>instance: `tidb-0\|tidb-1…`<br/>component: `tidb` | 当前 TiDB 实例的连接数 |
+| tidbcloud_db_query_duration_seconds | histogram | sql_type: `Select\|Insert\|...`<br/>cluster_name: `<cluster name>`<br/>instance: `tidb-0\|tidb-1…`<br/>component: `tidb` | 语句的耗时直方图 |
+| tidbcloud_changefeed_latency | gauge | changefeed_id | changefeed 上游与下游的数据同步延迟 |
+| tidbcloud_changefeed_checkpoint_ts | gauge | changefeed_id | changefeed 的检查点时间戳，表示已成功写入下游的最大 TSO（Timestamp Oracle） |
+| tidbcloud_changefeed_replica_rows | gauge | changefeed_id | changefeed 每秒写入下游的同步行数 |
+| tidbcloud_node_storage_used_bytes | gauge | cluster_name: `<cluster name>`<br/>instance: `tikv-0\|tikv-1…\|tiflash-0\|tiflash-1…`<br/>component: `tikv\|tiflash` | TiKV/TiFlash 节点的磁盘已用字节数 |
+| tidbcloud_node_storage_capacity_bytes | gauge | cluster_name: `<cluster name>`<br/>instance: `tikv-0\|tikv-1…\|tiflash-0\|tiflash-1…`<br/>component: `tikv\|tiflash` | TiKV/TiFlash 节点的磁盘容量字节数 |
+| tidbcloud_node_cpu_seconds_total | count | cluster_name: `<cluster name>`<br/>instance: `tidb-0\|tidb-1…\|tikv-0…\|tiflash-0…`<br/>component: `tidb\|tikv\|tiflash` | TiDB/TiKV/TiFlash 节点的 CPU 使用量 |
+| tidbcloud_node_cpu_capacity_cores | gauge | cluster_name: `<cluster name>`<br/>instance: `tidb-0\|tidb-1…\|tikv-0…\|tiflash-0…`<br/>component: `tidb\|tikv\|tiflash` | TiDB/TiKV/TiFlash 节点的 CPU 限制核数 |
+| tidbcloud_node_memory_used_bytes | gauge | cluster_name: `<cluster name>`<br/>instance: `tidb-0\|tidb-1…\|tikv-0…\|tiflash-0…`<br/>component: `tidb\|tikv\|tiflash` | TiDB/TiKV/TiFlash 节点的已用内存字节数 |
+| tidbcloud_node_memory_capacity_bytes | gauge | cluster_name: `<cluster name>`<br/>instance: `tidb-0\|tidb-1…\|tikv-0…\|tiflash-0…`<br/>component: `tidb\|tikv\|tiflash` | TiDB/TiKV/TiFlash 节点的内存容量字节数 |
+| tidbcloud_node_storage_available_bytes | gauge | instance: `tidb-0\|tidb-1\|...`<br/>component: `tikv\|tiflash`<br/>cluster_name: `<cluster name>` | TiKV/TiFlash 节点可用磁盘空间（字节） |
+| tidbcloud_disk_read_latency | histogram | instance: `tidb-0\|tidb-1\|...`<br/>component: `tikv\|tiflash`<br/>cluster_name: `<cluster name>`<br/>`device`: `nvme.*\|dm.*` | 每个存储设备的读延迟（秒） |
+| tidbcloud_disk_write_latency | histogram | instance: `tidb-0\|tidb-1\|...`<br/>component: `tikv\|tiflash`<br/>cluster_name: `<cluster name>`<br/>`device`: `nvme.*\|dm.*` | 每个存储设备的写延迟（秒） |
+| tidbcloud_kv_request_duration | histogram | instance: `tidb-0\|tidb-1\|...`<br/>component: `tikv`<br/>cluster_name: `<cluster name>`<br/>`type`: `BatchGet\|Commit\|Prewrite\|...` | TiKV 按类型请求的耗时（秒） |
+| tidbcloud_component_uptime | histogram | instance: `tidb-0\|tidb-1\|...`<br/>component: `tidb\|tikv\|tiflash`<br/>cluster_name: `<cluster name>` | TiDB 组件的运行时长（秒） |
+| tidbcloud_ticdc_owner_resolved_ts_lag | gauge | changefeed_id: `<changefeed-id>`<br/>cluster_name: `<cluster name>` | changefeed owner 的 resolved timestamp 延迟（秒） |
+| tidbcloud_changefeed_status | gauge | changefeed_id: `<changefeed-id>`<br/>cluster_name: `<cluster name>` | changefeed 状态：<br/>`-1`: 未知<br/>`0`: 正常<br/>`1`: 警告<br/>`2`: 失败<br/>`3`: 已停止<br/>`4`: 已完成<br/>`6`: 警告<br/>`7`: 其他 |
+| tidbcloud_resource_manager_resource_unit_read_request_unit | gauge | cluster_name: `<cluster name>`<br/>resource_group: `<group-name>` | Resource Manager 消耗的读请求单元数 |
+| tidbcloud_resource_manager_resource_unit_write_request_unit | gauge | cluster_name: `<cluster name>`<br/>resource_group: `<group-name>` | Resource Manager 消耗的写请求单元数 |
 
-## FAQ
+## 常见问题
 
-- Why does the same metric have different values on Grafana and the TiDB Cloud console at the same time?
+- 为什么同一指标在 Grafana 和 TiDB Cloud 控制台上同时显示的数值不同？
 
-    The aggregation calculation logic is different between Grafana and TiDB Cloud, so the displayed aggregated values might differ. You can adjust the `mini step` configuration in Grafana to get more fine-grained metric values.
+    Grafana 和 TiDB Cloud 的聚合计算逻辑不同，因此显示的聚合值可能会有差异。你可以在 Grafana 中调整 `mini step` 配置，以获得更细粒度的指标值。

@@ -1,123 +1,123 @@
 ---
-title: Integrate TiDB Cloud with Zapier
-summary: Learn how to connect TiDB Cloud to 5000+ Apps with Zapier.
+title: 集成 TiDB Cloud 与 Zapier
+summary: 了解如何通过 Zapier 将 TiDB Cloud 连接到 5000+ 应用。
 ---
 
-# Integrate TiDB Cloud with Zapier
+# 集成 TiDB Cloud 与 Zapier
 
-[Zapier](https://zapier.com) is a no-code automation tool that lets you easily create workflows that involve thousands of apps and services.
+[Zapier](https://zapier.com) 是一款无代码自动化工具，可以让你轻松创建涉及数千个应用和服务的工作流。
 
-Using the [TiDB Cloud app](https://zapier.com/apps/tidb-cloud/integrations) on Zapier enables you to:
+在 Zapier 上使用 [TiDB Cloud app](https://zapier.com/apps/tidb-cloud/integrations) 可以让你：
 
-- Use TiDB, a MySQL-compatible HTAP database. No need to build locally.
-- Make it easier to manage your TiDB Cloud.
-- Connect TiDB Cloud to 5000+ apps and automate your workflows.
+- 使用 TiDB，这是一款兼容 MySQL 的 HTAP 数据库。无需本地搭建。
+- 更便捷地管理你的 TiDB Cloud。
+- 将 TiDB Cloud 连接到 5000+ 应用，实现工作流自动化。
 
-This guide gives a high-level introduction to the TiDB Cloud app on Zapier and an example of how to use it.
+本指南将对 Zapier 上的 TiDB Cloud app 进行高层次介绍，并提供一个使用示例。
 
-## Quick start with template
+## 使用模板快速开始
 
-[Zap Templates](https://platform.zapier.com/partners/zap-templates) are ready made integrations or Zaps with the apps and core fields pre-selected, for publicly available Zapier integrations.
+[Zap Templates](https://platform.zapier.com/partners/zap-templates) 是为公开可用的 Zapier 集成预先选定应用和核心字段的现成集成或 Zap。
 
-In this section, we will use the **Add new Github global events to TiDB rows** template as an example to create a workflow. In this workflow, every time a new global event (any [GitHub event](https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types) happens from or to you, on any repo) is created from your GitHub account, Zapier adds a new row to your TiDB Cloud cluster.
+本节将以 **Add new Github global events to TiDB rows** 模板为例，创建一个工作流。在该工作流中，每当你的 GitHub 账户产生新的全局事件（任何 [GitHub 事件](https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types)，无论是你发起还是针对你的，发生在任意仓库），Zapier 都会向你的 TiDB Cloud 集群添加一行新数据。
 
-### Prerequisites
+### 前置条件
 
-Before you start, you need:
+在开始之前，你需要：
 
-- A [Zapier account](https://zapier.com/app/login).
-- A [GitHub account](https://github.com/login).
-- A [TiDB Cloud account](https://tidbcloud.com/signup) and a TiDB Cloud Serverless cluster on TiDB Cloud. For more details, see [TiDB Cloud Quick Start](https://docs.pingcap.com/tidbcloud/tidb-cloud-quickstart#step-1-create-a-tidb-cluster).
+- 一个 [Zapier 账户](https://zapier.com/app/login)。
+- 一个 [GitHub 账户](https://github.com/login)。
+- 一个 [TiDB Cloud 账户](https://tidbcloud.com/signup) 以及在 TiDB Cloud 上创建的 TiDB Cloud Serverless 集群。更多详情请参见 [TiDB Cloud 快速入门](https://docs.pingcap.com/tidbcloud/tidb-cloud-quickstart#step-1-create-a-tidb-cluster)。
 
-### Step 1: Get the template
+### 步骤 1：获取模板
 
-Go to [TiDB Cloud App on Zapier](https://zapier.com/apps/tidb-cloud/integrations). Choose the **Add new Github global events to TiDB rows** template and click **Try it**. Then you will enter the editor page.
+访问 [TiDB Cloud App on Zapier](https://zapier.com/apps/tidb-cloud/integrations)。选择 **Add new Github global events to TiDB rows** 模板并点击 **Try it**。随后你将进入编辑页面。
 
-### Step 2: Set up the trigger
+### 步骤 2：设置触发器
 
-In the editor page, you can see the trigger and action. Click the trigger to set it up.
+在编辑页面，你可以看到触发器和动作。点击触发器进行设置。
 
-1. Choose app & event
+1. 选择应用和事件
 
-    The template has set the app and the event by default, so you don't need to do anything here. Click **Continue**.
+    模板已默认设置好应用和事件，因此此处无需操作。点击 **Continue**。
 
-2. Choose account
+2. 选择账户
 
-    Choose a GitHub account that you want to connect with TiDB Cloud. You can either connect a new account or select an existing account. After you set up, click **Continue**.
+    选择你希望与 TiDB Cloud 连接的 GitHub 账户。你可以连接新账户或选择已有账户。设置完成后，点击 **Continue**。
 
-3. Set up trigger
+3. 设置触发器
 
-    The template has set the trigger by default. Click **Continue**.
+    模板已默认设置好触发器。点击 **Continue**。
 
-4. Test trigger
+4. 测试触发器
 
-    Click **Test trigger**. If the trigger is successfully set up, you can see the data of a new global event from the GitHub account. Click **Continue**.
+    点击 **Test trigger**。如果触发器设置成功，你可以看到来自 GitHub 账户的新全局事件数据。点击 **Continue**。
 
-### Step 3: Set up the `Find Table in TiDB Cloud` action
+### 步骤 3：设置 `Find Table in TiDB Cloud` 动作
 
-1. Choose app & event
+1. 选择应用和事件
 
-    Keep the default value `Find Table` set by the template. Click **Continue**.
+    保持模板默认设置的 `Find Table`。点击 **Continue**。
 
-2. Choose account
+2. 选择账户
 
-    1. Click the **Sign in** button, and you will be redirected to a new login page.
-    2. On the login page, fill in your public key and private key. To get the TiDB Cloud API key, follow the instructions in [TiDB Cloud API documentation](https://docs.pingcap.com/tidbcloud/api/v1beta#section/Authentication/API-Key-Management).
-    3. Click **Continue**.
+    1. 点击 **Sign in** 按钮，你将被重定向到新的登录页面。
+    2. 在登录页面，填写你的公钥和私钥。获取 TiDB Cloud API key 的方法请参见 [TiDB Cloud API 文档](https://docs.pingcap.com/tidbcloud/api/v1beta#section/Authentication/API-Key-Management)。
+    3. 点击 **Continue**。
 
     ![Account](/media/tidb-cloud/zapier/zapier-tidbcloud-account.png)
 
-3. Set up action
+3. 设置动作
 
-    In this step, you need to specify a table in your TiDB Cloud cluster to store the event data. If you do not already have a table, you can create one through this step.
+    在此步骤，你需要指定 TiDB Cloud 集群中的某个表来存储事件数据。如果你还没有表，可以在此步骤创建。
 
-    1. From the drop-down list, choose the project name and cluster name. The connection information of your cluster will be displayed automatically.
+    1. 在下拉列表中选择项目名称和集群名称。你的集群连接信息会自动显示。
 
         ![Set up project name and cluster name](/media/tidb-cloud/zapier/zapier-set-up-tidbcloud-project-and-cluster.png)
 
-    2. Enter your password.
+    2. 输入你的密码。
 
-    3. From the drop-down list, choose the database.
+    3. 在下拉列表中选择数据库。
 
         ![Set up database name](/media/tidb-cloud/zapier/zapier-set-up-tidbcloud-databse.png)
 
-        Zapier queries the databases from TiDB Cloud using the password you entered. If no database is found in your cluster, re-enter your password and refresh the page.
+        Zapier 会使用你输入的密码从 TiDB Cloud 查询数据库。如果在集群中未找到数据库，请重新输入密码并刷新页面。
 
-    4. In **The table you want to search** box, fill in `github_global_event`. If the table does not exist, the template uses the following DDL to create the table. Click **Continue**.
+    4. 在 **The table you want to search** 框中填写 `github_global_event`。如果该表不存在，模板会使用以下 DDL 创建表。点击 **Continue**。
 
         ![The create table DDL](/media/tidb-cloud/zapier/zapier-tidbcloud-create-table-ddl.png)
 
-4. Test action
+4. 测试动作
 
-    Click **Test action**, and Zapier will create the table. You can also skip the test, and the table will be created when this workflow is running for the first time.
+    点击 **Test action**，Zapier 会创建该表。你也可以跳过测试，首次运行该工作流时表会被自动创建。
 
-### Step 4: Set up the `Create Row in TiDB Cloud` action
+### 步骤 4：设置 `Create Row in TiDB Cloud` 动作
 
-1. Choose app & event
+1. 选择应用和事件
 
-    Keep the default value set by the template. Click **Continue**.
+    保持模板默认设置。点击 **Continue**。
 
-2. Choose account
+2. 选择账户
 
-    Select the account you have chosen when you set up the `Find Table in TiDB Cloud` action. Click **Continue**.
+    选择你在设置 `Find Table in TiDB Cloud` 动作时选择的账户。点击 **Continue**。
 
     ![Choose account](/media/tidb-cloud/zapier/zapier-tidbcloud-choose-account.png)
 
-3. Set up action
+3. 设置动作
 
-    1. Fill in the **Project Name**, **Cluster Name**, **TiDB Password**, and **Database Name** as in the previous step.
+    1. 按照上一步填写 **Project Name**、**Cluster Name**、**TiDB Password** 和 **Database Name**。
 
-    2. In the **Table Name**, choose the **github_global_event** table from the drop-down list. The columns of the table are displayed.
+    2. 在 **Table Name** 中，从下拉列表选择 **github_global_event** 表。表的各列会显示出来。
 
         ![Table columns](/media/tidb-cloud/zapier/zapier-set-up-tidbcloud-columns.png)
 
-    3. In the **Columns** box, choose the corresponding data from the trigger. Fill in all the columns, and click **Continue**.
+    3. 在 **Columns** 框中，从触发器中选择对应的数据。填写所有列后，点击 **Continue**。
 
         ![Fill in Columns](/media/tidb-cloud/zapier/zapier-fill-in-tidbcloud-triggers-data.png)
 
-4. Test action
+4. 测试动作
 
-    Click **Test action** to create a new row in the table. If you check your TiDB Cloud cluster, you can find the data is written successfully.
+    点击 **Test action**，即可在表中创建一行新数据。检查你的 TiDB Cloud 集群，可以看到数据已成功写入。
 
    ```sql
    mysql> SELECT * FROM test.github_global_event;
@@ -129,108 +129,108 @@ In the editor page, you can see the trigger and action. Click the trigger to set
    1 row in set (0.17 sec)
    ```
 
-### Step 5: Publish your zap
+### 步骤 5：发布你的 zap
 
-Click **Publish** to publish your zap. You can see the zap is running in the [home page](https://zapier.com/app/zaps).
+点击 **Publish** 发布你的 zap。你可以在 [主页](https://zapier.com/app/zaps) 看到 zap 正在运行。
 
 ![Publish the zap](/media/tidb-cloud/zapier/zapier-tidbcloud-publish.png)
 
-Now, this zap will automatically record all the global events from your GitHub account into TiDB Cloud.
+现在，该 zap 会自动将你 GitHub 账户的所有全局事件记录到 TiDB Cloud。
 
-## Triggers & Actions
+## 触发器与动作
 
-[Triggers and actions](https://zapier.com/how-it-works) are the key concepts in Zapier. By combining different triggers and actions, you can create various automation workflows.
+[触发器和动作](https://zapier.com/how-it-works) 是 Zapier 的核心概念。通过组合不同的触发器和动作，你可以创建各种自动化工作流。
 
-This section introduces the triggers and actions provided by TiDB Cloud App on Zapier.
+本节介绍 TiDB Cloud App 在 Zapier 上提供的触发器和动作。
 
-### Triggers
+### 触发器
 
-The following table lists the triggers supported by TiDB Cloud App.
+下表列出了 TiDB Cloud App 支持的触发器。
 
 | Trigger                | Description                                                                 |
 | ---------------------- |-----------------------------------------------------------------------------|
-| New Cluster            | Triggers when a new cluster is created.                                     |
-| New Table              | Triggers when a new table is created.                                       |
-| New Row                | Triggers when new rows are created. Only fetches the recent 10000 new rows. |
-| New Row (Custom Query) | Triggers when new rows are returned from a custom query that you provide.   |
+| New Cluster            | 当新集群被创建时触发。                                                     |
+| New Table              | 当新表被创建时触发。                                                       |
+| New Row                | 当新行被创建时触发。仅获取最近 10000 条新行。                               |
+| New Row (Custom Query) | 当你提供的自定义查询返回新行时触发。                                       |
 
-### Actions
+### 动作
 
-The following table lists the actions supported by TiDB Cloud App. Note that some actions need extra resources, and you need to prepare the corresponding resources before using the action.
+下表列出了 TiDB Cloud App 支持的动作。注意部分动作需要额外资源，你需要提前准备好相应资源。
 
 | Action | Description | Resource |
 |---|---|---|
-| Find Cluster | Finds an existing TiDB Cloud Serverless or TiDB Cloud Dedicated cluster. | None |
-| Create Cluster | Creates a new cluster. Only supports creating a TiDB Cloud Serverless cluster. | None |
-| Find Database | Finds an existing database. | A TiDB Cloud Serverless cluster |
-| Create Database | Creates a new database. | A TiDB Cloud Serverless cluster |
-| Find Table | Finds an existing Table. | A TiDB Cloud Serverless cluster and a database |
-| Create Table | Creates a new table. | A TiDB Cloud Serverless cluster and a database |
-| Create Row | Creates a new row. | A TiDB Cloud Serverless cluster, a database, and a table |
-| Update Row | Updates an existing row. | A TiDB Cloud Serverless cluster, a database, and a table |
-| Find Row | Finds a row in a table via a lookup column. | A TiDB Cloud Serverless cluster, a database, and a table |
-| Find Row (Custom Query) | Finds a row in a table via a custom query the you provide. | A TiDB Cloud Serverless cluster, a database, and a table |
+| Find Cluster | 查找已存在的 TiDB Cloud Serverless 或 TiDB Cloud Dedicated 集群。 | None |
+| Create Cluster | 创建新集群。仅支持创建 TiDB Cloud Serverless 集群。 | None |
+| Find Database | 查找已存在的数据库。 | 一个 TiDB Cloud Serverless 集群 |
+| Create Database | 创建新数据库。 | 一个 TiDB Cloud Serverless 集群 |
+| Find Table | 查找已存在的表。 | 一个 TiDB Cloud Serverless 集群和一个数据库 |
+| Create Table | 创建新表。 | 一个 TiDB Cloud Serverless 集群和一个数据库 |
+| Create Row | 创建新行。 | 一个 TiDB Cloud Serverless 集群、一个数据库和一个表 |
+| Update Row | 更新已存在的行。 | 一个 TiDB Cloud Serverless 集群、一个数据库和一个表 |
+| Find Row | 通过查找列在表中查找行。 | 一个 TiDB Cloud Serverless 集群、一个数据库和一个表 |
+| Find Row (Custom Query) | 通过你提供的自定义查询在表中查找行。 | 一个 TiDB Cloud Serverless 集群、一个数据库和一个表 |
 
-## TiDB Cloud App templates
+## TiDB Cloud App 模板
 
-TiDB Cloud provides some templates for you to use in Zapier directly. You can find all the templates in the [TiDB Cloud App](https://zapier.com/apps/tidb-cloud/integrations) page.
+TiDB Cloud 提供了一些可直接在 Zapier 使用的模板。你可以在 [TiDB Cloud App](https://zapier.com/apps/tidb-cloud/integrations) 页面找到所有模板。
 
-Here are some examples:
+以下是一些示例：
 
-- [Duplicate new TiDB Cloud rows in Google Sheets](https://zapier.com/apps/google-sheets/integrations/tidb-cloud/1134881/duplicate-new-tidb-cloud-rows-in-google-sheets).
-- [Send emails via Gmail from new custom TiDB queries](https://zapier.com/apps/gmail/integrations/tidb-cloud/1134903/send-emails-via-gmail-from-new-custom-tidb-queries).
-- [Add rows to TiDB Cloud from newly caught webhooks](https://zapier.com/apps/tidb-cloud/integrations/webhook/1134955/add-rows-to-tidb-cloud-from-newly-caught-webhooks).
-- [Store new Salesforce contacts on TiDB rows](https://zapier.com/apps/salesforce/integrations/tidb-cloud/1134923/store-new-salesforce-contacts-on-tidb-rows).
-- [Create TiDB rows for new Gmail emails with resumes and send direct Slack notifications](https://zapier.com/apps/gmail/integrations/slack/1135456/create-tidb-rows-for-new-gmail-emails-with-resumes-and-send-direct-slack-notifications)
+- [将新的 TiDB Cloud 行复制到 Google Sheets](https://zapier.com/apps/google-sheets/integrations/tidb-cloud/1134881/duplicate-new-tidb-cloud-rows-in-google-sheets)。
+- [通过 Gmail 发送来自新自定义 TiDB 查询的邮件](https://zapier.com/apps/gmail/integrations/tidb-cloud/1134903/send-emails-via-gmail-from-new-custom-tidb-queries)。
+- [将新捕获的 webhook 数据添加到 TiDB Cloud](https://zapier.com/apps/tidb-cloud/integrations/webhook/1134955/add-rows-to-tidb-cloud-from-newly-caught-webhooks)。
+- [将新的 Salesforce 联系人存储到 TiDB 行](https://zapier.com/apps/salesforce/integrations/tidb-cloud/1134923/store-new-salesforce-contacts-on-tidb-rows)。
+- [为带有简历的新 Gmail 邮件创建 TiDB 行并发送 Slack 直接通知](https://zapier.com/apps/gmail/integrations/slack/1135456/create-tidb-rows-for-new-gmail-emails-with-resumes-and-send-direct-slack-notifications)
 
-## FAQ
+## 常见问题
 
-### How can I set up the TiDB Cloud account in Zapier?
+### 如何在 Zapier 中设置 TiDB Cloud 账户？
 
-Zapier requires your **TiDB Cloud API key** to connect with your TiDB Cloud account. Zapier does not need your login account for TiDB Cloud.
+Zapier 需要你的 **TiDB Cloud API key** 来连接你的 TiDB Cloud 账户。Zapier 不需要你的 TiDB Cloud 登录账户。
 
-To get your TiDB Cloud API key, follow the [TiDB Cloud API documentation](https://docs.pingcap.com/tidbcloud/api/v1beta#section/Authentication/API-Key-Management).
+获取 TiDB Cloud API key 的方法请参见 [TiDB Cloud API 文档](https://docs.pingcap.com/tidbcloud/api/v1beta#section/Authentication/API-Key-Management)。
 
-### How do TiDB Cloud triggers perform de-duplication?
+### TiDB Cloud 触发器如何去重？
 
-Zapier triggers can work with a polling API call to check for new data periodically (the interval depends on your Zapier plan).
+Zapier 触发器可以通过轮询 API 定期检查新数据（间隔取决于你的 Zapier 计划）。
 
-TiDB Cloud triggers provide a polling API call that returns a lot of results. However, most of the results have been seen by Zapier before, that is, most of the results are duplication.
+TiDB Cloud 触发器提供了一个轮询 API，会返回大量结果。但大多数结果 Zapier 之前已经见过，即大多数结果是重复的。
 
-Since we don’t want to trigger an action multiple times when an item in your API exists in multiple distinct polls, TiDB Cloud triggers deduplicate the data with the `id` field.
+由于我们不希望当某个项目在你的 API 中出现在多个不同轮询中时多次触发动作，TiDB Cloud 触发器会用 `id` 字段进行数据去重。
 
-`New Cluster` and `New Table` triggers simply use the `cluster_id` or `table_id` as the `id` field to do the deduplication. You do not need to do anything for the two triggers.
+`New Cluster` 和 `New Table` 触发器直接使用 `cluster_id` 或 `table_id` 作为 `id` 字段进行去重。这两个触发器你无需额外操作。
 
 **New Row Trigger**
 
-The `New Row` trigger limits 10,000 results in every fetch. Therefore, if some new rows are not included in the 10,000 results, they cannot trigger Zapier.
+`New Row` 触发器每次最多获取 10000 条结果。因此，如果某些新行未包含在这 10000 条结果中，则无法触发 Zapier。
 
-One way to avoid this is to specify the `Order By` configuration in the trigger. For example, once you sort the rows by their creation time, the new rows will always be included in the 10,000 results.
+一种避免方法是在触发器中指定 `Order By` 配置。例如，一旦你按创建时间排序，新的行总会包含在 10000 条结果中。
 
-The `New Row` trigger also uses a flexible strategy to generate the `id` field to do the deduplication. The trigger generates the `id` field in the following order:
+`New Row` 触发器还采用灵活策略生成 `id` 字段进行去重。生成 `id` 字段的顺序如下：
 
-1. If the result contains an `id` column, use the `id` column.
-2. If you specify a `Dedupe Key` in the trigger configuration, use the `Dedupe Key`.
-3. If the table has a primary key, use the primary key. If there are multiple primary keys, use the first column.
-4. If the table has a unique key, use the unique key.
-5. Use the first column of the table.
+1. 如果结果包含 `id` 列，则使用 `id` 列。
+2. 如果你在触发器配置中指定了 `Dedupe Key`，则使用 `Dedupe Key`。
+3. 如果表有主键，则使用主键。如果有多个主键，使用第一个列。
+4. 如果表有唯一键，则使用唯一键。
+5. 使用表的第一列。
 
 **New Row (Custom Query) Trigger**
 
-The `New Row (Custom Query)` trigger limits 1,000,000 results in every fetch. 1,000,000 is a large number, and it is only set so as to protect the whole system. It is recommended that your query includes `ORDER BY` and `LIMIT`.
+`New Row (Custom Query)` 触发器每次最多获取 1,000,000 条结果。1,000,000 是一个很大的数字，仅用于保护整个系统。建议你的查询包含 `ORDER BY` 和 `LIMIT`。
 
-To perform deduplication, your query results must have a unique id field. Otherwise, you will get the `You must return the results with id field` error.
+为了去重，你的查询结果必须有唯一的 id 字段。否则，你会收到 `You must return the results with id field` 错误。
 
-Make sure that your custom query executes in less than 30 seconds. Otherwise, you will get the timeout error.
+确保你的自定义查询在 30 秒内执行完毕。否则会收到超时错误。
 
-### How do I use the `find or create` action?
+### 如何使用 `find or create` 动作？
 
-`Find or create` action enables you to create a resource if it does not exist. Here is an example:
+`Find or create` 动作允许你在资源不存在时创建资源。示例如下：
 
-1. Choose `Find Table` action
+1. 选择 `Find Table` 动作
 
-2. In the`set up action` step, tick the `Create TiDB Cloud Table if it doesn’t exist yet?` box to enable `find and create`.
+2. 在 `set up action` 步骤，勾选 `Create TiDB Cloud Table if it doesn’t exist yet?` 以启用 `find and create`。
 
    ![Find and create](/media/tidb-cloud/zapier/zapier-tidbcloud-find-and-create.png)
 
-This workflow creates a table if it does not exist yet. Note that the table will be created directly if you test your action.
+该工作流会在表不存在时自动创建表。注意，如果你测试该动作，表会被直接创建。

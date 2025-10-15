@@ -1,79 +1,77 @@
 ---
 title: Sink to MySQL
-summary: This document explains how to stream data from TiDB Cloud to MySQL using the Sink to MySQL changefeed. It includes restrictions, prerequisites, and steps to create a MySQL sink for data replication. The process involves setting up network connections, loading existing data to MySQL, and creating target tables in MySQL. After completing the prerequisites, users can create a MySQL sink to replicate data to MySQL.
+summary: 本文档介绍如何使用 **Sink to MySQL** changefeed 将数据从 TiDB Cloud 流式同步到 MySQL。内容包括限制、前置条件，以及创建用于数据复制的 MySQL sink 的步骤。该过程涉及网络连接设置、将现有数据加载到 MySQL 以及在 MySQL 中创建目标表。完成前置条件后，用户即可创建 MySQL sink，将数据复制到 MySQL。
 ---
 
 # Sink to MySQL
 
-This document describes how to stream data from TiDB Cloud to MySQL using the **Sink to MySQL** changefeed.
+本文档描述如何使用 **Sink to MySQL** changefeed，将数据从 TiDB Cloud 流式同步到 MySQL。
 
-> **Note:**
+> **注意：**
 >
-> - To use the changefeed feature, make sure that your TiDB Cloud Dedicated cluster version is v6.1.3 or later.
-> - For [TiDB Cloud Serverless clusters](/tidb-cloud/select-cluster-tier.md#tidb-cloud-serverless), the changefeed feature is unavailable.
+> - 要使用 changefeed 功能，请确保你的 TiDB Cloud Dedicated 集群版本为 v6.1.3 或更高版本。
+> - 对于 [TiDB Cloud Serverless](/tidb-cloud/select-cluster-tier.md#tidb-cloud-serverless) 和 [TiDB Cloud Essential](/tidb-cloud/select-cluster-tier.md#essential) 集群，changefeed 功能不可用。
 
-## Restrictions
+## 限制
 
-- For each TiDB Cloud cluster, you can create up to 100 changefeeds.
-- Because TiDB Cloud uses TiCDC to establish changefeeds, it has the same [restrictions as TiCDC](https://docs.pingcap.com/tidb/stable/ticdc-overview#unsupported-scenarios).
-- If the table to be replicated does not have a primary key or a non-null unique index, the absence of a unique constraint during replication could result in duplicated data being inserted downstream in some retry scenarios.
+- 每个 TiDB Cloud 集群最多可以创建 100 个 changefeed。
+- 由于 TiDB Cloud 使用 TiCDC 建立 changefeed，因此具有与 [TiCDC 相同的限制](https://docs.pingcap.com/tidb/stable/ticdc-overview#unsupported-scenarios)。
+- 如果待同步的表没有主键或非空唯一索引，在某些重试场景下，由于缺少唯一约束，可能会导致下游插入重复数据。
 
-## Prerequisites
+## 前置条件
 
-Before creating a changefeed, you need to complete the following prerequisites:
+在创建 changefeed 之前，你需要完成以下前置条件：
 
-- Set up your network connection
-- Export and load the existing data to MySQL (optional)
-- Create corresponding target tables in MySQL if you do not load the existing data and only want to replicate incremental data to MySQL
+- 设置网络连接
+- 导出并加载现有数据到 MySQL（可选）
+- 如果你不加载现有数据，仅希望将增量数据同步到 MySQL，则需要在 MySQL 中创建对应的目标表
 
-### Network
+### 网络
 
-Make sure that your TiDB Cluster can connect to the MySQL service.
+确保你的 TiDB 集群可以连接到 MySQL 服务。
 
-If your MySQL service is in an AWS VPC that has no public internet access, take the following steps:
+如果你的 MySQL 服务位于没有公网访问权限的 AWS VPC 中，请按照以下步骤操作：
 
-1. [Set up a VPC peering connection](/tidb-cloud/set-up-vpc-peering-connections.md) between the VPC of the MySQL service and your TiDB cluster.
-2. Modify the inbound rules of the security group that the MySQL service is associated with.
+1. 在 MySQL 服务所在 VPC 与 TiDB 集群之间 [建立 VPC 对等连接](/tidb-cloud/set-up-vpc-peering-connections.md)。
+2. 修改 MySQL 服务关联的安全组的入站规则。
 
-    You must add [the CIDR of the region where your TiDB Cloud cluster is located](/tidb-cloud/set-up-vpc-peering-connections.md#prerequisite-set-a-cidr-for-a-region) to the inbound rules. Doing so allows the traffic to flow from your TiDB Cluster to the MySQL instance.
+    你必须将 [TiDB Cloud 集群所在区域的 CIDR](/tidb-cloud/set-up-vpc-peering-connections.md#prerequisite-set-a-cidr-for-a-region) 添加到入站规则中。这样可以允许来自 TiDB 集群到 MySQL 实例的流量。
 
-3. If the MySQL URL contains a hostname, you need to allow TiDB Cloud to be able to resolve the DNS hostname of the MySQL service.
+3. 如果 MySQL URL 包含主机名，你需要允许 TiDB Cloud 能够解析 MySQL 服务的 DNS 主机名。
 
-    1. Follow the steps in [Enable DNS resolution for a VPC peering connection](https://docs.aws.amazon.com/vpc/latest/peering/modify-peering-connections.html#vpc-peering-dns).
-    2. Enable the **Accepter DNS resolution** option.
+    1. 按照 [为 VPC 对等连接启用 DNS 解析](https://docs.aws.amazon.com/vpc/latest/peering/modify-peering-connections.html#vpc-peering-dns) 的步骤操作。
+    2. 启用 **Accepter DNS resolution** 选项。
 
-If your MySQL service is in a Google Cloud VPC that has no public internet access, take the following steps:
+如果你的 MySQL 服务位于没有公网访问权限的 Google Cloud VPC 中，请按照以下步骤操作：
 
-1. If your MySQL service is Google Cloud SQL, you must expose a MySQL endpoint in the associated VPC of the Google Cloud SQL instance. You may need to use the [**Cloud SQL Auth proxy**](https://cloud.google.com/sql/docs/mysql/sql-proxy) which is developed by Google.
-2. [Set up a VPC peering connection](/tidb-cloud/set-up-vpc-peering-connections.md) between the VPC of the MySQL service and your TiDB cluster.
-3. Modify the ingress firewall rules of the VPC where MySQL is located.
+1. 如果你的 MySQL 服务是 Google Cloud SQL，必须在 Google Cloud SQL 实例关联的 VPC 中暴露一个 MySQL 端点。你可能需要使用 Google 提供的 [**Cloud SQL Auth proxy**](https://cloud.google.com/sql/docs/mysql/sql-proxy)。
+2. 在 MySQL 服务所在 VPC 与 TiDB 集群之间 [建立 VPC 对等连接](/tidb-cloud/set-up-vpc-peering-connections.md)。
+3. 修改 MySQL 所在 VPC 的 ingress 防火墙规则。
 
-    You must add [the CIDR of the region where your TiDB Cloud cluster is located](/tidb-cloud/set-up-vpc-peering-connections.md#prerequisite-set-a-cidr-for-a-region) to the ingress firewall rules. Doing so allows the traffic to flow from your TiDB Cluster to the MySQL endpoint.
+    你必须将 [TiDB Cloud 集群所在区域的 CIDR](/tidb-cloud/set-up-vpc-peering-connections.md#prerequisite-set-a-cidr-for-a-region) 添加到 ingress 防火墙规则中。这样可以允许来自 TiDB 集群到 MySQL 端点的流量。
 
-### Load existing data (optional)
+### 加载现有数据（可选）
 
-The **Sink to MySQL** connector can only sink incremental data from your TiDB cluster to MySQL after a certain timestamp. If you already have data in your TiDB cluster, you can export and load the existing data of your TiDB cluster into MySQL before enabling **Sink to MySQL**.
+**Sink to MySQL** 连接器只能将 TiDB 集群中某一时间戳之后的增量数据同步到 MySQL。如果你的 TiDB 集群中已经有数据，可以在启用 **Sink to MySQL** 之前，将 TiDB 集群的现有数据导出并加载到 MySQL。
 
-To load the existing data:
+加载现有数据的步骤如下：
 
-1. Extend the [tidb_gc_life_time](https://docs.pingcap.com/tidb/stable/system-variables#tidb_gc_life_time-new-in-v50) to be longer than the total time of the following two operations, so that historical data during the time is not garbage collected by TiDB.
+1. 将 [tidb_gc_life_time](https://docs.pingcap.com/tidb/stable/system-variables#tidb_gc_life_time-new-in-v50) 设置为大于以下两个操作总耗时的值，以避免这段时间内的历史数据被 TiDB 垃圾回收。
 
-    - The time to export and import the existing data
-    - The time to create **Sink to MySQL**
+    - 导出和导入现有数据所需的时间
+    - 创建 **Sink to MySQL** 所需的时间
 
-    For example:
-
-    {{< copyable "sql" >}}
+    例如：
 
     ```sql
     SET GLOBAL tidb_gc_life_time = '720h';
     ```
 
-2. Use [Dumpling](https://docs.pingcap.com/tidb/stable/dumpling-overview) to export data from your TiDB cluster, then use community tools such as [mydumper/myloader](https://centminmod.com/mydumper.html) to load data to the MySQL service.
+2. 使用 [Dumpling](https://docs.pingcap.com/tidb/stable/dumpling-overview) 从 TiDB 集群导出数据，然后使用社区工具如 [mydumper/myloader](https://centminmod.com/mydumper.html) 将数据加载到 MySQL 服务。
 
-3. From the [exported files of Dumpling](https://docs.pingcap.com/tidb/stable/dumpling-overview#format-of-exported-files), get the start position of MySQL sink from the metadata file:
+3. 从 [Dumpling 导出的文件](https://docs.pingcap.com/tidb/stable/dumpling-overview#format-of-exported-files) 中，获取 MySQL sink 的起始位置（start position），该信息位于 metadata 文件中：
 
-    The following is a part of an example metadata file. The `Pos` of `SHOW MASTER STATUS` is the TSO of the existing data, which is also the start position of MySQL sink.
+    以下是示例 metadata 文件的一部分。`SHOW MASTER STATUS` 的 `Pos` 即为现有数据的 TSO，也是 MySQL sink 的起始位置。
 
     ```
     Started dump at: 2020-11-10 10:40:19
@@ -83,60 +81,65 @@ To load the existing data:
     Finished dump at: 2020-11-10 10:40:20
     ```
 
-### Create target tables in MySQL
+### 在 MySQL 中创建目标表
 
-If you do not load the existing data, you need to create corresponding target tables in MySQL manually to store the incremental data from TiDB. Otherwise, the data will not be replicated.
+如果你没有加载现有数据，需要在 MySQL 中手动创建对应的目标表，用于存储来自 TiDB 的增量数据。否则，数据将无法被同步。
 
-## Create a MySQL sink
+## 创建 MySQL sink
 
-After completing the prerequisites, you can sink your data to MySQL.
+完成前置条件后，你可以将数据同步到 MySQL。
 
-1. Navigate to the cluster overview page of the target TiDB cluster, and then click **Changefeed** in the left navigation pane.
+1. 进入目标 TiDB 集群的集群概览页面，然后在左侧导航栏点击 **Data** > **Changefeed**。
 
-2. Click **Create Changefeed**, and select **MySQL** as **Target Type**.
+2. 点击 **Create Changefeed**，并选择 **MySQL** 作为 **Destination**。
 
-3. Fill in the MySQL endpoints, user name, and password in **MySQL Connection**.
+3. 在 **MySQL Connection** 中填写 MySQL 的端点、用户名和密码。
 
-4. Click **Next** to test whether TiDB can connect to MySQL successfully:
+4. 点击 **Next**，测试 TiDB 是否可以成功连接到 MySQL：
 
-    - If yes, you are directed to the next step of configuration.
-    - If not, a connectivity error is displayed, and you need to handle the error. After the error is resolved, click **Next** again.
+    - 如果可以连接，将进入下一步配置。
+    - 如果连接失败，会显示连接错误，你需要处理该错误。错误解决后，再次点击 **Next**。
 
-5. Customize **Table Filter** to filter the tables that you want to replicate. For the rule syntax, refer to [table filter rules](/table-filter.md).
+5. 自定义 **Table Filter**，筛选你希望同步的表。规则语法请参考 [table filter rules](/table-filter.md)。
 
-    - **Filter Rules**: you can set filter rules in this column. By default, there is a rule `*.*`, which stands for replicating all tables. When you add a new rule, TiDB Cloud queries all the tables in TiDB and displays only the tables that match the rules in the box on the right. You can add up to 100 filter rules.
-    - **Tables with valid keys**: this column displays the tables that have valid keys, including primary keys or unique indexes.
-    - **Tables without valid keys**: this column shows tables that lack primary keys or unique keys. These tables present a challenge during replication because the absence of a unique identifier can result in inconsistent data when the downstream handles duplicate events. To ensure data consistency, it is recommended to add unique keys or primary keys to these tables before initiating the replication. Alternatively, you can add filter rules to exclude these tables. For example, you can exclude the table `test.tbl1` by using the rule `"!test.tbl1"`.
+    - **Case Sensitive**：你可以设置筛选规则中数据库和表名的匹配是否区分大小写。默认情况下，匹配不区分大小写。
+    - **Filter Rules**：你可以在此列设置筛选规则。默认有一条规则 `*.*`，表示同步所有表。当你添加新规则时，TiDB Cloud 会查询 TiDB 中所有表，并在右侧框中仅显示匹配规则的表。最多可添加 100 条筛选规则。
+    - **Tables with valid keys**：此列显示具有有效键（包括主键或唯一索引）的表。
+    - **Tables without valid keys**：此列显示缺少主键或唯一键的表。这些表在同步过程中存在挑战，因为缺少唯一标识符可能导致下游处理重复事件时数据不一致。为保证数据一致性，建议在同步前为这些表添加唯一键或主键。或者，你也可以添加筛选规则排除这些表。例如，可以使用规则 `"!test.tbl1"` 排除表 `test.tbl1`。
 
-6. Customize **Event Filter** to filter the events that you want to replicate.
+6. 自定义 **Event Filter**，筛选你希望同步的事件。
 
-    - **Tables matching**: you can set which tables the event filter will be applied to in this column. The rule syntax is the same as that used for the preceding **Table Filter** area. You can add up to 10 event filter rules per changefeed.
-    - **Ignored events**: you can set which types of events the event filter will exclude from the changefeed.
+    - **Tables matching**：你可以在此列设置事件过滤器将应用于哪些表。规则语法与前述 **Table Filter** 区域相同。每个 changefeed 最多可添加 10 条事件过滤规则。
+    - **Event Filter**：你可以使用以下事件过滤器，从 changefeed 中排除特定事件：
+        - **Ignore event**：排除指定类型的事件。
+        - **Ignore SQL**：排除匹配指定表达式的 DDL 事件。例如，`^drop` 排除以 `DROP` 开头的语句，`add column` 排除包含 `ADD COLUMN` 的语句。
+        - **Ignore insert value expression**：排除满足特定条件的 `INSERT` 语句。例如，`id >= 100` 排除 `id` 大于等于 100 的 `INSERT` 语句。
+        - **Ignore update new value expression**：排除新值满足指定条件的 `UPDATE` 语句。例如，`gender = 'male'` 排除更新后 `gender` 为 `male` 的更新。
+        - **Ignore update old value expression**：排除旧值满足指定条件的 `UPDATE` 语句。例如，`age < 18` 排除旧值 `age` 小于 18 的更新。
+        - **Ignore delete value expression**：排除满足指定条件的 `DELETE` 语句。例如，`name = 'john'` 排除 `name` 为 `'john'` 的删除语句。
 
-7. In **Start Replication Position**, configure the starting position for your MySQL sink.
+7. 在 **Start Replication Position** 中，配置 MySQL sink 的起始同步位置。
 
-    - If you have [loaded the existing data](#load-existing-data-optional) using Dumpling, select **Start replication from a specific TSO** and fill in the TSO that you get from Dumpling exported metadata files.
-    - If you do not have any data in the upstream TiDB cluster, select **Start replication from now on**.
-    - Otherwise, you can customize the start time point by choosing **Start replication from a specific time**.
+    - 如果你已通过 Dumpling [加载了现有数据](#load-existing-data-optional)，请选择 **Start replication from a specific TSO**，并填写从 Dumpling 导出的 metadata 文件中获取的 TSO。
+    - 如果上游 TiDB 集群中没有任何数据，选择 **Start replication from now on**。
+    - 否则，你可以通过选择 **Start replication from a specific time** 自定义起始时间点。
 
-8. Click **Next** to configure your changefeed specification.
+8. 点击 **Next**，配置 changefeed 规格。
 
-    - In the **Changefeed Specification** area, specify the number of Replication Capacity Units (RCUs) to be used by the changefeed.
-    - In the **Changefeed Name** area, specify a name for the changefeed.
+    - 在 **Changefeed Specification** 区域，指定 changefeed 使用的 Replication Capacity Units（RCUs）数量。
+    - 在 **Changefeed Name** 区域，指定 changefeed 的名称。
 
-9. Click **Next** to review the changefeed configuration.
+9. 点击 **Next**，检查 changefeed 配置。
 
-    If you confirm that all configurations are correct, check the compliance of cross-region replication, and click **Create**.
+    如果确认所有配置无误，勾选跨区域同步合规性，并点击 **Create**。
 
-    If you want to modify some configurations, click **Previous** to go back to the previous configuration page.
+    如果需要修改某些配置，点击 **Previous** 返回上一步配置页面。
 
-10. The sink starts soon, and you can see the status of the sink changes from **Creating** to **Running**.
+10. sink 很快会启动，你可以看到 sink 的状态从 **Creating** 变为 **Running**。
 
-    Click the changefeed name, and you can see more details about the changefeed, such as the checkpoint, replication latency, and other metrics.
+    点击 changefeed 名称，可以查看更多 changefeed 详情，如 checkpoint、同步延迟及其他指标。
 
-11. If you have [loaded the existing data](#load-existing-data-optional) using Dumpling, you need to restore the GC time to its original value (the default value is `10m`) after the sink is created:
-
-{{< copyable "sql" >}}
+11. 如果你已通过 Dumpling [加载了现有数据](#load-existing-data-optional)，在 sink 创建完成后，需要将 GC 时间恢复为原值（默认值为 `10m`）：
 
 ```sql
 SET GLOBAL tidb_gc_life_time = '10m';

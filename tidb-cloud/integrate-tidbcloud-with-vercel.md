@@ -1,105 +1,105 @@
 ---
-title: Integrate TiDB Cloud with Vercel
-summary: Learn how to connect your TiDB Cloud clusters to Vercel projects.
+title: 集成 TiDB Cloud 与 Vercel
+summary: 了解如何将你的 TiDB Cloud 集群连接到 Vercel 项目。
 ---
 
 <!-- markdownlint-disable MD029 -->
 
-# Integrate TiDB Cloud with Vercel
+# 集成 TiDB Cloud 与 Vercel
 
-[Vercel](https://vercel.com/) is a platform for frontend developers, providing the speed and reliability innovators need to create at the moment of inspiration.
+[Vercel](https://vercel.com/) 是一个面向前端开发者的平台，提供创新者在灵感迸发时所需的速度与可靠性。
 
-Using TiDB Cloud with Vercel enables you to build new frontend applications faster with a MySQL-compatible relational model and grow your app with confidence with a platform built for resilience, scale, and the highest levels of data privacy and security.
+将 TiDB Cloud 与 Vercel 结合使用，可以让你基于兼容 MySQL 的关系模型更快地构建新的前端应用，并借助具备高可用性、可扩展性以及最高级别数据隐私和安全的平台，放心地扩展你的应用。
 
-This guide describes how to connect your TiDB Cloud clusters to Vercel projects using one of the following methods:
+本指南介绍了如何通过以下任一方式将你的 TiDB Cloud 集群连接到 Vercel 项目：
 
-* [Connect via the TiDB Cloud Vercel integration](#connect-via-the-tidb-cloud-vercel-integration)
-* [Connect via manually configuring environment variables](#connect-via-manually-setting-environment-variables)
+* [通过 TiDB Cloud Vercel 集成连接](#connect-via-the-tidb-cloud-vercel-integration)
+* [通过手动配置环境变量连接](#connect-via-manually-setting-environment-variables)
 
-For both of the preceding methods, TiDB Cloud provides the following options for programmatically connecting to your database:
+对于上述两种方式，TiDB Cloud 提供了以下可编程连接数据库的选项：
 
-- Cluster: connect your TiDB Cloud cluster to your Vercel project with direct connections or [serverless driver](/tidb-cloud/serverless-driver.md).
-- [Data App](/tidb-cloud/data-service-manage-data-app.md): access data of your TiDB Cloud cluster through a collection of HTTP endpoints.
+- 集群：通过直连或 [serverless driver](/tidb-cloud/serverless-driver.md) 将你的 TiDB Cloud 集群连接到 Vercel 项目。
+- [Data App](/tidb-cloud/data-service-manage-data-app.md)：通过一组 HTTP 端点访问 TiDB Cloud 集群的数据。
 
-## Prerequisites
+## 前置条件
 
-Before connection, make sure the following prerequisites are met.
+在连接前，请确保满足以下前置条件。
 
-### A Vercel account and a Vercel project
+### 一个 Vercel 账号和一个 Vercel 项目
 
-You are expected to have an account and a project in Vercel. If you do not have any, refer to the following Vercel documents to create one:
+你需要在 Vercel 中拥有一个账号和一个项目。如果还没有，请参考以下 Vercel 文档创建：
 
-* [Creating a new personal account](https://vercel.com/docs/teams-and-accounts#creating-a-personal-account) or [Creating a new team](https://vercel.com/docs/teams-and-accounts/create-or-join-a-team#creating-a-team).
-* [Creating a project](https://vercel.com/docs/concepts/projects/overview#creating-a-project) in Vercel, or if you do not have an application to deploy, you can use the [TiDB Cloud Starter Template](https://vercel.com/templates/next.js/tidb-cloud-starter) to have a try.
+* [创建个人账号](https://vercel.com/docs/teams-and-accounts#creating-a-personal-account) 或 [创建团队](https://vercel.com/docs/teams-and-accounts/create-or-join-a-team#creating-a-team)。
+* 在 Vercel 中[创建项目](https://vercel.com/docs/concepts/projects/overview#creating-a-project)，如果你还没有可部署的应用，可以使用 [TiDB Cloud Starter Template](https://vercel.com/templates/next.js/tidb-cloud-starter) 进行尝试。
 
-One Vercel project can only connect to one TiDB Cloud cluster. To change the integration, you need to first disconnect the current cluster and then connect to a new cluster.
+一个 Vercel 项目只能连接一个 TiDB Cloud 集群。如需更换集成，需先断开当前集群，再连接新集群。
 
-### A TiDB Cloud account and a TiDB cluster
+### 一个 TiDB Cloud 账号和一个 TiDB 集群
 
-You are expected to have an account and a cluster in TiDB Cloud. If you do not have any, refer to the following to create one:
+你需要在 TiDB Cloud 中拥有一个账号和一个集群。如果还没有，请参考以下内容创建：
 
-- [Create a TiDB Cloud Serverless cluster](/tidb-cloud/create-tidb-cluster-serverless.md)
-
-    > **Note:**
-    >
-    > The TiDB Cloud Vercel integration supports creating TiDB Cloud Serverless clusters. You can also create one later during the integration process.
-
-- [Create a TiDB Cloud Dedicated cluster](/tidb-cloud/create-tidb-cluster.md)
+- [创建 TiDB Cloud Serverless 或 TiDB Cloud Essential 集群](/tidb-cloud/create-tidb-cluster-serverless.md)
 
     > **Note:**
     >
-    > For TiDB Cloud Dedicated clusters, make sure that the traffic filter of the cluster allows all IP addresses (set to `0.0.0.0/0`) for connection, because Vercel deployments use [dynamic IP addresses](https://vercel.com/guides/how-to-allowlist-deployment-ip-address).
+    > TiDB Cloud Vercel 集成支持创建 TiDB Cloud Serverless 和 TiDB Cloud Essential 集群。你也可以在集成过程中创建。
 
-To [integrate with Vercel via the TiDB Cloud Vercel Integration](#connect-via-the-tidb-cloud-vercel-integration), you are expected to be in the `Organization Owner` role of your organization or the `Project Owner` role of the target project in TiDB Cloud. For more information, see [User roles](/tidb-cloud/manage-user-access.md#user-roles).
+- [创建 TiDB Cloud Dedicated 集群](/tidb-cloud/create-tidb-cluster.md)
 
-One TiDB Cloud cluster can connect to multiple Vercel projects.
+    > **Note:**
+    >
+    > 对于 TiDB Cloud Dedicated 集群，请确保集群的流量过滤器允许所有 IP 地址（设置为 `0.0.0.0/0`）进行连接，因为 Vercel 部署使用 [动态 IP 地址](https://vercel.com/guides/how-to-allowlist-deployment-ip-address)。
 
-### A Data App and endpoints
+如需[通过 TiDB Cloud Vercel 集成与 Vercel 集成](#connect-via-the-tidb-cloud-vercel-integration)，你需要是 TiDB Cloud 组织的 `Organization Owner` 角色或目标项目的 `Project Owner` 角色。更多信息请参见 [用户角色](/tidb-cloud/manage-user-access.md#user-roles)。
 
-If you want to connect to your TiDB Cloud cluster via a [Data App](/tidb-cloud/data-service-manage-data-app.md), you are expected to have the target Data App and endpoints in TiDB Cloud in advance. If you do not have any, refer to the following to create one:
+一个 TiDB Cloud 集群可以连接多个 Vercel 项目。
 
-1. In the [TiDB Cloud console](https://tidbcloud.com), go to the [**Data Service**](https://tidbcloud.com/console/data-service) page of your project.
-2. [Create a Data App](/tidb-cloud/data-service-manage-data-app.md#create-a-data-app) for your project.
-3. [Link the Data App](/tidb-cloud/data-service-manage-data-app.md#manage-linked-data-sources) to the target TiDB Cloud cluster.
-4. [Manage endpoints](/tidb-cloud/data-service-manage-endpoint.md) so that you can customize them to execute SQL statements.
+### 一个 Data App 和端点
 
-One Vercel project can only connect to one TiDB Cloud Data App. To change the Data App for your Vercel project, you need to first disconnect the current App and then connect to a new App.
+如果你希望通过 [Data App](/tidb-cloud/data-service-manage-data-app.md) 连接 TiDB Cloud 集群，需要提前在 TiDB Cloud 中拥有目标 Data App 和端点。如果还没有，请参考以下步骤创建：
 
-## Connect via the TiDB Cloud Vercel integration
+1. 在 [TiDB Cloud 控制台](https://tidbcloud.com)中，进入项目的 [**Data Service**](https://tidbcloud.com/project/data-service) 页面。
+2. [为项目创建 Data App](/tidb-cloud/data-service-manage-data-app.md#create-a-data-app)。
+3. [将 Data App 关联](/tidb-cloud/data-service-manage-data-app.md#manage-linked-data-sources) 到目标 TiDB Cloud 集群。
+4. [管理端点](/tidb-cloud/data-service-manage-endpoint.md)，以便自定义执行 SQL 语句。
 
-To connect via the TiDB Cloud Vercel integration, go to the [TiDB Cloud integration](https://vercel.com/integrations/tidb-cloud) page from the [Vercel's Integrations Marketplace](https://vercel.com/integrations). Using this method, you can choose which cluster to connect to, and TiDB Cloud will automatically generate all the necessary environment variables for your Vercel projects.
+一个 Vercel 项目只能连接一个 TiDB Cloud Data App。如需更换 Vercel 项目的 Data App，需先断开当前 App，再连接新 App。
+
+## 通过 TiDB Cloud Vercel 集成连接
+
+要通过 TiDB Cloud Vercel 集成连接，请前往 [Vercel 的 Integrations Marketplace](https://vercel.com/integrations) 中的 [TiDB Cloud integration](https://vercel.com/integrations/tidb-cloud) 页面。使用此方法，你可以选择要连接的集群，TiDB Cloud 会自动为你的 Vercel 项目生成所有必要的环境变量。
 
 > **Note:**
 >
-> This method is only available for TiDB Cloud Serverless clusters. If you want to connect to a TiDB Cloud Dedicated cluster, use the [manual method](#connect-via-manually-setting-environment-variables).
+> 此方法仅适用于 TiDB Cloud Serverless 和 TiDB Cloud Essential 集群。如果你想连接 TiDB Cloud Dedicated 集群，请使用[手动方法](#connect-via-manually-setting-environment-variables)。
 
-### Integration workflow
+### 集成流程
 
-The detailed steps are as follows:
+详细步骤如下：
 
 <SimpleTab>
 <div label="Cluster">
 
-1. Click **Add Integration** in the upper-right area of the [TiDB Cloud Vercel integration](https://vercel.com/integrations/tidb-cloud) page. The **Add TiDB Cloud** dialog is displayed.
-2. Select the scope of your integration in the drop-down list and click **Continue**.
-3. Select the Vercel projects to which the integration will be added and click **Continue**.
-4. Confirm the required permissions for integration and click **Add Integration**. Then you are directed to an integration page of the TiDB Cloud console.
-5. On the integration page, do the following:
+1. 在 [TiDB Cloud Vercel integration](https://vercel.com/integrations/tidb-cloud) 页面右上角点击 **Add Integration**，弹出 **Add TiDB Cloud** 对话框。
+2. 在下拉列表中选择集成范围，点击 **Continue**。
+3. 选择要添加集成的 Vercel 项目，点击 **Continue**。
+4. 确认集成所需权限，点击 **Add Integration**。随后会跳转到 TiDB Cloud 控制台的集成页面。
+5. 在集成页面，按以下步骤操作：
 
-    1. Select your target Vercel projects and click **Next**.
-    2. Select your target TiDB Cloud organization and project.
-    3. Select **Cluster** as your connection type.
-    4. Select your target TiDB Cloud cluster. If the **Cluster** drop-down list is empty or you want to select a new TiDB Cloud Serverless cluster, click **+ Create Cluster** in the list to create one.
-    5. Select the database that you want to connect to. If the **Database** drop-down list is empty or you want to select a new Database, click **+ Create Database** in the list to create one.
-    6. Select the framework that your Vercel projects are using. If the target framework is not listed, select **General**. Different frameworks determine different environment variables.
-    7. Choose whether to enable **Branching** to create new branches for preview environments.
-    8. Click **Add Integration and Return to Vercel**.
+    1. 选择目标 Vercel 项目，点击 **Next**。
+    2. 选择目标 TiDB Cloud 组织和项目。
+    3. 选择 **Cluster** 作为连接类型。
+    4. 选择目标 TiDB Cloud 集群。如果 **Cluster** 下拉列表为空，或你想选择新的 TiDB Cloud Serverless 或 TiDB Cloud Essential 集群，可点击列表中的 **+ Create Cluster** 创建。
+    5. 选择要连接的数据库。如果 **Database** 下拉列表为空，或你想选择新的数据库，可点击列表中的 **+ Create Database** 创建。
+    6. 选择 Vercel 项目所用的框架。如果目标框架未列出，选择 **General**。不同框架会决定不同的环境变量。
+    7. 选择是否启用 **Branching**，以为预览环境创建新分支。
+    8. 点击 **Add Integration and Return to Vercel**。
 
 ![Vercel Integration Page](/media/tidb-cloud/vercel/integration-link-cluster-page.png)
 
-6. Get back to your Vercel dashboard, go to your Vercel project, click **Settings** > **Environment Variables**, and check whether the environment variables for your target TiDB cluster have been automatically added.
+6. 返回 Vercel 控制台，进入你的 Vercel 项目，点击 **Settings** > **Environment Variables**，检查目标 TiDB 集群的环境变量是否已自动添加。
 
-    If the following variables have been added, the integration is completed.
+    如果以下变量已添加，说明集成完成。
 
     **General**
 
@@ -127,23 +127,23 @@ The detailed steps are as follows:
 
 <div label="Data App">
 
-1. Click **Add Integration** in the upper-right area of the [TiDB Cloud Vercel integration](https://vercel.com/integrations/tidb-cloud) page. The **Add TiDB Cloud** dialog is displayed.
-2. Select the scope of your integration in the drop-down list and click **Continue**.
-3. Select the Vercel projects to which the integration will be added and click **Continue**.
-4. Confirm the required permissions for integration and click **Add Integration**. Then you are directed to an integration page of the TiDB Cloud console.
-5. On the integration page, do the following:
+1. 在 [TiDB Cloud Vercel integration](https://vercel.com/integrations/tidb-cloud) 页面右上角点击 **Add Integration**，弹出 **Add TiDB Cloud** 对话框。
+2. 在下拉列表中选择集成范围，点击 **Continue**。
+3. 选择要添加集成的 Vercel 项目，点击 **Continue**。
+4. 确认集成所需权限，点击 **Add Integration**。随后会跳转到 TiDB Cloud 控制台的集成页面。
+5. 在集成页面，按以下步骤操作：
 
-    1. Select your target Vercel projects and click **Next**.
-    2. Select your target TiDB Cloud organization and project.
-    3. Select **Data App** as your connection type.
-    4. Select your target TiDB Data App.
-    6. Click **Add Integration and Return to Vercel**.
+    1. 选择目标 Vercel 项目，点击 **Next**。
+    2. 选择目标 TiDB Cloud 组织和项目。
+    3. 选择 **Data App** 作为连接类型。
+    4. 选择目标 TiDB Data App。
+    6. 点击 **Add Integration and Return to Vercel**。
 
 ![Vercel Integration Page](/media/tidb-cloud/vercel/integration-link-data-app-page.png)
 
-6. Get back to your Vercel dashboard, go to your Vercel project, click **Settings** > **Environment Variables**, and check whether the environment variables for your target Data App have been automatically added.
+6. 返回 Vercel 控制台，进入你的 Vercel 项目，点击 **Settings** > **Environment Variables**，检查目标 Data App 的环境变量是否已自动添加。
 
-    If the following variables have been added, the integration is completed.
+    如果以下变量已添加，说明集成完成。
 
     ```shell
     DATA_APP_BASE_URL
@@ -154,79 +154,79 @@ The detailed steps are as follows:
 </div>
 </SimpleTab>
 
-### Configure connections
+### 配置连接
 
-If you have installed [TiDB Cloud Vercel integration](https://vercel.com/integrations/tidb-cloud), you can add or remove connections inside the integration.
+如果你已安装 [TiDB Cloud Vercel integration](https://vercel.com/integrations/tidb-cloud)，可以在集成内添加或移除连接。
 
-1. In your Vercel dashboard, click **Integrations**.
-2. Click **Manage** in the TiDB Cloud entry.
-3. Click **Configure**.
-4. Click **Add Link** or **Remove** to add or remove connections.
+1. 在 Vercel 控制台点击 **Integrations**。
+2. 在 TiDB Cloud 条目下点击 **Manage**。
+3. 点击 **Configure**。
+4. 点击 **Add Link** 或 **Remove** 以添加或移除连接。
 
     ![Vercel Integration Configuration Page](/media/tidb-cloud/vercel/integration-vercel-configuration-page.png)
 
-    When you remove a connection, the environment variables set by the integration workflow are removed from the Vercel project, too. However, this action does not affect the data of the TiDB Cloud Serverless cluster.
+    当你移除连接时，集成流程设置的环境变量也会从 Vercel 项目中移除。但此操作不会影响 TiDB Cloud 集群中的数据。
 
-### Connect with TiDB Cloud Serverless branching
+### 使用 TiDB Cloud 分支功能连接 {#connect-with-branching}
 
-Vercel's [Preview Deployments](https://vercel.com/docs/deployments/preview-deployments) feature allows you to preview changes to your app in a live deployment without merging those changes to your Git project's production branch. With [TiDB Cloud Serverless Branching](/tidb-cloud/branch-overview.md), you can create a new instance for each branch of your Vercel project. This allows you to preview app changes in a live deployment without affecting your production data.
+Vercel 的 [Preview Deployments](https://vercel.com/docs/deployments/preview-deployments) 功能允许你在不将更改合并到 Git 项目的生产分支的情况下，在实时部署中预览应用更改。结合 [TiDB Cloud Branching](/tidb-cloud/branch-overview.md)，你可以为 Vercel 项目的每个分支创建一个新的实例，从而在不影响生产数据的情况下预览应用更改。
 
 > **Note:**
 >
-> Currently, TiDB Cloud Serverless branching only supports [Vercel projects associated with GitHub repositories](https://vercel.com/docs/deployments/git/vercel-for-github).
+> 目前，TiDB Cloud Branching 仅支持[关联 GitHub 仓库的 Vercel 项目](https://vercel.com/docs/deployments/git/vercel-for-github)。
 
-To enable TiDB Cloud Serverless Branching, you need to ensure the following in the [TiDB Cloud Vercel integration workflow](#integration-workflow):
+要启用 TiDB Cloud Branching，需要在 [TiDB Cloud Vercel 集成流程](#integration-workflow) 中确保：
 
-1. Select **Cluster** as your connection type. 
-2. Enable **Branching** to create new branches for preview environments.
+1. 选择 **Cluster** 作为连接类型。
+2. 启用 **Branching**，为预览环境创建新分支。
 
-After you push changes to the Git repository, Vercel will trigger a preview deployment. TiDB Cloud integration will automatically create a TiDB Cloud Serverless branch for the Git branch and set environment variables. The detailed steps are as follows:
+在你将更改推送到 Git 仓库后，Vercel 会触发预览部署。TiDB Cloud 集成会自动为该 Git 分支创建 TiDB Cloud 集群分支并设置环境变量。详细步骤如下：
 
-1. Create a new branch in your Git repository.
+1. 在 Git 仓库中创建新分支。
 
     ```shell
     cd tidb-prisma-vercel-demo1
     git checkout -b new-branch
     ```
 
-2. Add some changes and push the changes to the remote repository.
-3. Vercel will trigger a preview deployment for the new branch.
+2. 添加一些更改并推送到远程仓库。
+3. Vercel 会为新分支触发预览部署。
 
     ![Vercel Preview_Deployment](/media/tidb-cloud/vercel/vercel-preview-deployment.png)
 
-    1. During the deployment, TiDB Cloud integration will automatically create a TiDB Cloud Serverless branch with the same name as the Git branch. If the TiDB Cloud Serverless branch already exists, TiDB Cloud integration will skip this step.
+    1. 部署过程中，TiDB Cloud 集成会自动为你的集群创建与 Git 分支同名的分支。如果分支已存在，则跳过此步骤。
 
         ![TiDB_Cloud_Branch_Check](/media/tidb-cloud/vercel/tidbcloud-branch-check.png)
 
-    2. After the TiDB Cloud Serverless branch is ready, TiDB Cloud integration will set environment variables in the preview deployment for the Vercel project.
+    2. 分支就绪后，TiDB Cloud 集成会为 Vercel 项目的预览部署设置环境变量。
 
         ![Preview_Envs](/media/tidb-cloud/vercel/preview-envs.png)
 
-    3. TiDB Cloud integration will also register a blocking check to wait for the TiDB Cloud Serverless branch to be ready. You can rerun the check manually.
-4. After the check is passed, you can visit the preview deployment to see the changes.
+    3. TiDB Cloud 集成还会注册一个阻塞检查，等待分支就绪。你可以手动重新运行检查。
+4. 检查通过后，你可以访问预览部署查看更改。
 
 > **Note:**
 >
-> Due to a limitation of Vercel deployment workflow, the environment variable cannot be ensured to be set in the deployment. In this case, you need to redeploy the deployment.
+> 由于 Vercel 部署流程的限制，无法保证环境变量一定会在部署中设置。如遇此情况，你需要重新部署。
 
 > **Note:**
 >
-> For each organization in TiDB Cloud, you can create a maximum of five TiDB Cloud Serverless branches by default. To avoid exceeding the limit, you can delete the TiDB Cloud Serverless branches that are no longer needed. For more information, see [Manage TiDB Cloud Serverless branches](/tidb-cloud/branch-manage.md).
+> 在 TiDB Cloud 的每个组织中，默认最多可为 TiDB Cloud Serverless 集群创建 5 个分支。为避免超出限制，你可以删除不再需要的集群分支。更多信息请参见 [管理 TiDB Cloud 分支](/tidb-cloud/branch-manage.md)。
 
-## Connect via manually setting environment variables
+## 通过手动设置环境变量连接
 
 <SimpleTab>
 <div label="Cluster">
 
-1. Get the connection information of your TiDB cluster.
+1. 获取 TiDB 集群的连接信息。
 
-    You can get the connection information from the connection dialog of your cluster. To open the dialog, go to the [**Clusters**](https://tidbcloud.com/console/clusters) page of your project, click the name of your target cluster to go to its overview page, and then click **Connect** in the upper-right corner.
+    你可以在集群的连接对话框中获取连接信息。打开方式为：进入项目的 [**Clusters**](https://tidbcloud.com/project/clusters) 页面，点击目标集群名称进入概览页，然后点击右上角的 **Connect**。
 
-2. Go to your Vercel dashboard > Vercel project > **Settings** > **Environment Variables**, and then [declare each environment variable value](https://vercel.com/docs/concepts/projects/environment-variables#declare-an-environment-variable) according to the connection information of your TiDB cluster.
+2. 进入 Vercel 控制台 > Vercel 项目 > **Settings** > **Environment Variables**，根据 TiDB 集群的连接信息[声明每个环境变量的值](https://vercel.com/docs/concepts/projects/environment-variables#declare-an-environment-variable)。
 
     ![Vercel Environment Variables](/media/tidb-cloud/vercel/integration-vercel-environment-variables.png)
 
-Here we use a Prisma application as an example. The following is a datasource setting in the Prisma schema file for a TiDB Cloud Serverless cluster:
+这里以 Prisma 应用和 TiDB Cloud Serverless 集群为例，以下是 TiDB Cloud Serverless 集群在 Prisma schema 文件中的 datasource 设置：
 
 ```
 datasource db {
@@ -235,23 +235,23 @@ datasource db {
 }
 ```
 
-In Vercel, you can declare the environment variables as follows:
+在 Vercel 中，你可以这样声明环境变量：
 
 - **Key** = `DATABASE_URL`
 - **Value** = `mysql://<User>:<Password>@<Endpoint>:<Port>/<Database>?sslaccept=strict`
 
-You can get the information of `<User>`, `<Password>`, `<Endpoint>`, `<Port>`, and `<Database>` in the TiDB Cloud console.
+你可以在 TiDB Cloud 控制台获取 `<User>`、`<Password>`、`<Endpoint>`、`<Port>` 和 `<Database>` 的信息。
 
 </div>
 <div label="Data App">
 
-1. Follow the steps in [Manage a Data APP](/tidb-cloud/data-service-manage-data-app.md) and [Manage an Endpoint](/tidb-cloud/data-service-manage-endpoint.md) to create a Data App and its endpoints if you have not done that.
+1. 按照 [管理 Data APP](/tidb-cloud/data-service-manage-data-app.md) 和 [管理 Endpoint](/tidb-cloud/data-service-manage-endpoint.md) 的步骤创建 Data App 及其端点（如尚未创建）。
 
-2. Go to your Vercel dashboard > Vercel project > **Settings** > **Environment Variables**, and then [declare each environment variable value](https://vercel.com/docs/concepts/projects/environment-variables#declare-an-environment-variable) according to the connection information of your Data App.
+2. 进入 Vercel 控制台 > Vercel 项目 > **Settings** > **Environment Variables**，根据 Data App 的连接信息[声明每个环境变量的值](https://vercel.com/docs/concepts/projects/environment-variables#declare-an-environment-variable)。
 
     ![Vercel Environment Variables](/media/tidb-cloud/vercel/integration-vercel-environment-variables.png)
 
-    In Vercel, you can declare the environment variables as follows.
+    在 Vercel 中，你可以这样声明环境变量：
 
     - **Key** = `DATA_APP_BASE_URL`
     - **Value** = `<DATA_APP_BASE_URL>`
@@ -260,7 +260,7 @@ You can get the information of `<User>`, `<Password>`, `<Endpoint>`, `<Port>`, a
     - **Key** = `DATA_APP_PRIVATE_KEY`
     - **Value** = `<DATA_APP_PRIVATE_KEY>`
 
-    You can get the information of `<DATA_APP_BASE_URL>`, `<DATA_APP_PUBLIC_KEY>`, `<DATA_APP_PRIVATE_KEY>` from your [Data Service](https://tidbcloud.com/console/data-service) page of the TiDB Cloud console.
+    你可以在 TiDB Cloud 控制台的 [Data Service](https://tidbcloud.com/project/data-service) 页面获取 `<DATA_APP_BASE_URL>`、`<DATA_APP_PUBLIC_KEY>`、`<DATA_APP_PRIVATE_KEY>` 的信息。
 
 </div>
 </SimpleTab>

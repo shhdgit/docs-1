@@ -1,70 +1,70 @@
 ---
-title: Connect to TiDB with mysql.js
-summary: Learn how to connect to TiDB using mysql.js. This tutorial gives Node.js sample code snippets that work with TiDB using mysql.js.
+title: 使用 mysql.js 连接 TiDB
+summary: 学习如何使用 mysql.js 连接 TiDB。本教程提供了适用于 TiDB 的 Node.js 示例代码片段，基于 mysql.js 实现。
 ---
 
-# Connect to TiDB with mysql.js
+# 使用 mysql.js 连接 TiDB
 
-TiDB is a MySQL-compatible database, and [mysql.js](https://github.com/mysqljs/mysql) driver is a pure Node.js JavaScript client implementing the MySQL protocol.
+TiDB 是兼容 MySQL 的数据库，[mysql.js](https://github.com/mysqljs/mysql) 驱动是一个纯 Node.js JavaScript 客户端，实现了 MySQL 协议。
 
-In this tutorial, you can learn how to use TiDB and mysql.js driver to accomplish the following tasks:
+在本教程中，你可以学习如何使用 TiDB 和 mysql.js 驱动完成以下任务：
 
-- Set up your environment.
-- Connect to your TiDB cluster using mysql.js driver.
-- Build and run your application. Optionally, you can find [sample code snippets](#sample-code-snippets) for basic CRUD operations.
+- 搭建你的开发环境。
+- 使用 mysql.js 驱动连接到你的 TiDB 集群。
+- 构建并运行你的应用程序。你还可以在 [示例代码片段](#sample-code-snippets) 中找到基本的 CRUD 操作示例。
 
 > **Note:**
 >
-> This tutorial works with {{{ .starter }}}, TiDB Cloud Dedicated, and TiDB Self-Managed.
+> 本教程适用于 TiDB Cloud Serverless、TiDB Cloud Essential、TiDB Cloud Dedicated 以及自建 TiDB 集群。
 
-## Prerequisites
+## 前置条件
 
-To complete this tutorial, you need:
+完成本教程，你需要：
 
-- [Node.js](https://nodejs.org/en) >= 16.x installed on your machine.
-- [Git](https://git-scm.com/downloads) installed on your machine.
-- A TiDB cluster running.
+- 在你的机器上安装 [Node.js](https://nodejs.org/en) >= 16.x。
+- 在你的机器上安装 [Git](https://git-scm.com/downloads)。
+- 一个正在运行的 TiDB 集群。
 
-**If you don't have a TiDB cluster, you can create one as follows:**
+**如果你还没有 TiDB 集群，可以按如下方式创建：**
 
 <CustomContent platform="tidb">
 
-- (Recommended) Follow [Creating a {{{ .starter }}} cluster](/develop/dev-guide-build-cluster-in-cloud.md) to create your own TiDB Cloud cluster.
-- Follow [Deploy a local test TiDB cluster](/quick-start-with-tidb.md#deploy-a-local-test-cluster) or [Deploy a production TiDB cluster](/production-deployment-using-tiup.md) to create a local cluster.
+- （推荐）参考 [创建 TiDB Cloud Serverless 集群](/develop/dev-guide-build-cluster-in-cloud.md) 创建属于你自己的 TiDB Cloud 集群。
+- 参考 [部署本地测试 TiDB 集群](/quick-start-with-tidb.md#deploy-a-local-test-cluster) 或 [部署生产环境 TiDB 集群](/production-deployment-using-tiup.md) 创建本地集群。
 
 </CustomContent>
 <CustomContent platform="tidb-cloud">
 
-- (Recommended) Follow [Creating a {{{ .starter }}} cluster](/develop/dev-guide-build-cluster-in-cloud.md) to create your own TiDB Cloud cluster.
-- Follow [Deploy a local test TiDB cluster](https://docs.pingcap.com/tidb/stable/quick-start-with-tidb#deploy-a-local-test-cluster) or [Deploy a production TiDB cluster](https://docs.pingcap.com/tidb/stable/production-deployment-using-tiup) to create a local cluster.
+- （推荐）参考 [创建 TiDB Cloud Serverless 集群](/develop/dev-guide-build-cluster-in-cloud.md) 创建属于你自己的 TiDB Cloud 集群。
+- 参考 [部署本地测试 TiDB 集群](https://docs.pingcap.com/tidb/stable/quick-start-with-tidb#deploy-a-local-test-cluster) 或 [部署生产环境 TiDB 集群](https://docs.pingcap.com/tidb/stable/production-deployment-using-tiup) 创建本地集群。
 
 </CustomContent>
 
-## Run the sample app to connect to TiDB
+## 运行示例应用连接 TiDB
 
-This section demonstrates how to run the sample application code and connect to TiDB.
+本节演示如何运行示例应用代码并连接到 TiDB。
 
-### Step 1: Clone the sample app repository
+### 步骤 1：克隆示例应用仓库
 
-Run the following commands in your terminal window to clone the sample code repository:
+在终端窗口中运行以下命令，克隆示例代码仓库：
 
 ```shell
 git clone https://github.com/tidb-samples/tidb-nodejs-mysqljs-quickstart.git
 cd tidb-nodejs-mysqljs-quickstart
 ```
 
-### Step 2: Install dependencies
+### 步骤 2：安装依赖
 
-Run the following command to install the required packages (including `mysql` and `dotenv`) for the sample app:
+运行以下命令安装示例应用所需的依赖包（包括 `mysql` 和 `dotenv`）：
 
 ```shell
 npm install
 ```
 
 <details>
-<summary><b>Install dependencies to existing project</b></summary>
+<summary><b>为已有项目安装依赖</b></summary>
 
-For your existing project, run the following command to install the packages:
+如果是你的已有项目，运行以下命令安装依赖包：
 
 ```shell
 npm install mysql dotenv --save
@@ -72,33 +72,33 @@ npm install mysql dotenv --save
 
 </details>
 
-### Step 3: Configure connection information
+### 步骤 3：配置连接信息
 
-Connect to your TiDB cluster depending on the TiDB deployment option you've selected.
+根据你选择的 TiDB 部署方式，连接到你的 TiDB 集群。
 
 <SimpleTab>
-<div label="{{{ .starter }}}">
+<div label="TiDB Cloud Serverless or Essential">
 
-1. Navigate to the [**Clusters**](https://tidbcloud.com/console/clusters) page, and then click the name of your target cluster to go to its overview page.
+1. 进入 [**Clusters**](https://tidbcloud.com/console/clusters) 页面，点击目标集群名称进入集群概览页。
 
-2. Click **Connect** in the upper-right corner. A connection dialog is displayed.
+2. 点击右上角的 **Connect**，弹出连接对话框。
 
-3. Ensure the configurations in the connection dialog match your operating environment.
+3. 确认连接对话框中的配置与你的操作环境一致。
 
-    - **Connection Type** is set to `Public`.
-    - **Branch** is set to `main`.
-    - **Connect With** is set to `General`.
-    - **Operating System** matches the operating system where you run the application.
+    - **Connection Type** 设置为 `Public`。
+    - **Branch** 设置为 `main`。
+    - **Connect With** 设置为 `General`。
+    - **Operating System** 选择你运行应用的操作系统。
 
-4. If you have not set a password yet, click **Generate Password** to generate a random password.
+4. 如果你还未设置密码，点击 **Generate Password** 生成随机密码。
 
-5. Run the following command to copy `.env.example` and rename it to `.env`:
+5. 运行以下命令，复制 `.env.example` 并重命名为 `.env`：
 
     ```shell
     cp .env.example .env
     ```
 
-6. Edit the `.env` file, set up the environment variables as follows, replace the corresponding placeholders `{}` with connection parameters on the connection dialog:
+6. 编辑 `.env` 文件，按如下方式设置环境变量，将对应的占位符 `{}` 替换为连接对话框中的参数：
 
     ```dotenv
     TIDB_HOST={host}
@@ -111,30 +111,30 @@ Connect to your TiDB cluster depending on the TiDB deployment option you've sele
 
     > **Note**
     >
-    > For {{{ .starter }}}, TLS connection **MUST** be enabled via `TIDB_ENABLE_SSL` when using public endpoint.
+    > 对于 TiDB Cloud Serverless，使用公共连接地址时，**必须** 通过 `TIDB_ENABLE_SSL` 启用 TLS 连接。
 
-7. Save the `.env` file.
+7. 保存 `.env` 文件。
 
 </div>
 <div label="TiDB Cloud Dedicated">
 
-1. Navigate to the [**Clusters**](https://tidbcloud.com/console/clusters) page, and then click the name of your target cluster to go to its overview page.
+1. 进入 [**Clusters**](https://tidbcloud.com/console/clusters) 页面，点击目标集群名称进入集群概览页。
 
-2. Click **Connect** in the upper-right corner. A connection dialog is displayed.
+2. 点击右上角的 **Connect**，弹出连接对话框。
 
-3. In the connection dialog, select **Public** from the **Connection Type** drop-down list, and then click **CA cert** to download the CA certificate.
+3. 在连接对话框中，从 **Connection Type** 下拉列表选择 **Public**，然后点击 **CA cert** 下载 CA 证书。
 
-    If you have not configured the IP access list, click **Configure IP Access List** or follow the steps in [Configure an IP Access List](https://docs.pingcap.com/tidbcloud/configure-ip-access-list) to configure it before your first connection.
+    如果你还未配置 IP 访问列表，点击 **Configure IP Access List**，或参考 [配置 IP 访问列表](https://docs.pingcap.com/tidbcloud/configure-ip-access-list) 进行配置后再首次连接。
 
-    In addition to the **Public** connection type, TiDB Cloud Dedicated supports **Private Endpoint** and **VPC Peering** connection types. For more information, see [Connect to Your TiDB Cloud Dedicated Cluster](https://docs.pingcap.com/tidbcloud/connect-to-tidb-cluster).
+    除了 **Public** 连接类型，TiDB Cloud Dedicated 还支持 **Private Endpoint** 和 **VPC Peering** 连接类型。更多信息参见 [连接到你的 TiDB Cloud Dedicated 集群](https://docs.pingcap.com/tidbcloud/connect-to-tidb-cluster)。
 
-4. Run the following command to copy `.env.example` and rename it to `.env`:
+4. 运行以下命令，复制 `.env.example` 并重命名为 `.env`：
 
     ```shell
     cp .env.example .env
     ```
 
-5. Edit the `.env` file, set up the environment variables as follows, replace the corresponding placeholders `{}` with connection parameters on the connection dialog:
+5. 编辑 `.env` 文件，按如下方式设置环境变量，将对应的占位符 `{}` 替换为连接对话框中的参数：
 
     ```dotenv
     TIDB_HOST={host}
@@ -148,22 +148,22 @@ Connect to your TiDB cluster depending on the TiDB deployment option you've sele
 
     > **Note**
     >
-    > It is recommended to enable TLS connection when using the public endpoint to connect to TiDB Cloud Dedicated.
+    > 推荐在使用公共连接地址连接 TiDB Cloud Dedicated 时启用 TLS 连接。
     >
-    > To enable TLS connection, modify `TIDB_ENABLE_SSL` to `true` and using `TIDB_CA_PATH` to specify the file path of CA certificate downloaded from the connection dialog.
+    > 启用 TLS 连接时，将 `TIDB_ENABLE_SSL` 设置为 `true`，并通过 `TIDB_CA_PATH` 指定从连接对话框下载的 CA 证书文件路径。
 
-6. Save the `.env` file.
+6. 保存 `.env` 文件。
 
 </div>
-<div label="TiDB Self-Managed">
+<div label="TiDB 自建集群">
 
-1. Run the following command to copy `.env.example` and rename it to `.env`:
+1. 运行以下命令，复制 `.env.example` 并重命名为 `.env`：
 
     ```shell
     cp .env.example .env
     ```
 
-2. Edit the `.env` file, replace the corresponding placeholders `{}` with connection parameters of your cluster. The example configuration is as follows:
+2. 编辑 `.env` 文件，将对应的占位符 `{}` 替换为你的集群连接参数。示例配置如下：
 
     ```dotenv
     TIDB_HOST={host}
@@ -173,25 +173,25 @@ Connect to your TiDB cluster depending on the TiDB deployment option you've sele
     TIDB_DATABASE=test
     ```
 
-    If you are running TiDB locally, the default host address is `127.0.0.1`, and the password is empty.
+    如果你在本地运行 TiDB，默认主机地址为 `127.0.0.1`，密码为空。
 
-3. Save the `.env` file.
+3. 保存 `.env` 文件。
 
 </div>
 </SimpleTab>
 
-### Step 4: Run the code and check the result
+### 步骤 4：运行代码并查看结果
 
-Run the following command to execute the sample code:
+运行以下命令执行示例代码：
 
 ```shell
 npm start
 ```
 
-If the connection is successful, the console will output the version of the TiDB cluster as follows:
+如果连接成功，控制台会输出 TiDB 集群的版本信息，如下所示：
 
 ```
-🔌 Connected to TiDB cluster! (TiDB version: 8.0.11-TiDB-{{{ .tidb-version }}})
+🔌 Connected to TiDB cluster! (TiDB version: 8.0.11-TiDB-vv8.5.2)
 ⏳ Loading sample game data...
 ✅ Loaded sample game data.
 
@@ -201,15 +201,15 @@ If the connection is successful, the console will output the version of the TiDB
 🚮 Deleted 1 player data.
 ```
 
-## Sample code snippets
+## 示例代码片段
 
-You can refer to the following sample code snippets to complete your own application development.
+你可以参考以下示例代码片段，完成你自己的应用开发。
 
-For complete sample code and how to run it, check out the [tidb-samples/tidb-nodejs-mysqljs-quickstart](https://github.com/tidb-samples/tidb-nodejs-mysqljs-quickstart) repository.
+完整示例代码及运行方式请参考 [tidb-samples/tidb-nodejs-mysqljs-quickstart](https://github.com/tidb-samples/tidb-nodejs-mysqljs-quickstart) 仓库。
 
-### Connect with connection options
+### 使用连接参数连接
 
-The following code establishes a connection to TiDB with options defined in the environment variables:
+以下代码通过环境变量定义的参数建立到 TiDB 的连接：
 
 ```javascript
 // Step 1. Import the 'mysql' and 'dotenv' packages.
@@ -242,11 +242,11 @@ conn.end();
 
 > **Note**
 >
-> For {{{ .starter }}}, you **MUST** enable TLS connection via `TIDB_ENABLE_SSL` when using public endpoint. However, you **don't** have to specify an SSL CA certificate via `TIDB_CA_PATH`, because Node.js uses the built-in [Mozilla CA certificate](https://wiki.mozilla.org/CA/Included_Certificates) by default, which is trusted by {{{ .starter }}}.
+> 对于 TiDB Cloud Serverless 和 TiDB Cloud Essential，使用公共连接地址时，**必须** 通过 `TIDB_ENABLE_SSL` 启用 TLS 连接。但你**不需要**通过 `TIDB_CA_PATH` 指定 SSL CA 证书，因为 Node.js 默认使用内置的 [Mozilla CA 证书](https://wiki.mozilla.org/CA/Included_Certificates)，该证书已被 TiDB Cloud Serverless 信任。
 
-### Insert data
+### 插入数据
 
-The following query creates a single `Player` record and returns the ID of the newly created record:
+以下查询会创建一条 `Player` 记录，并返回新建记录的 ID：
 
 ```javascript
 conn.query('INSERT INTO players (coins, goods) VALUES (?, ?);', [100, 100], (err, ok) => {
@@ -258,11 +258,11 @@ conn.query('INSERT INTO players (coins, goods) VALUES (?, ?);', [100, 100], (err
 });
 ```
 
-For more information, refer to [Insert data](/develop/dev-guide-insert-data.md).
+更多信息请参考 [插入数据](/develop/dev-guide-insert-data.md)。
 
-### Query data
+### 查询数据
 
-The following query returns a single `Player` record by ID `1`:
+以下查询会根据 ID `1` 返回一条 `Player` 记录：
 
 ```javascript
 conn.query('SELECT id, coins, goods FROM players WHERE id = ?;', [1], (err, rows) => {
@@ -274,11 +274,11 @@ conn.query('SELECT id, coins, goods FROM players WHERE id = ?;', [1], (err, rows
 });
 ```
 
-For more information, refer to [Query data](/develop/dev-guide-get-data-from-single-table.md).
+更多信息请参考 [查询数据](/develop/dev-guide-get-data-from-single-table.md)。
 
-### Update data
+### 更新数据
 
-The following query adds `50` coins and `50` goods to the `Player` with ID `1`:
+以下查询会为 ID 为 `1` 的 `Player` 增加 `50` 个 coins 和 `50` 个 goods：
 
 ```javascript
 conn.query(
@@ -294,11 +294,11 @@ conn.query(
 );
 ```
 
-For more information, refer to [Update data](/develop/dev-guide-update-data.md).
+更多信息请参考 [更新数据](/develop/dev-guide-update-data.md)。
 
-### Delete data
+### 删除数据
 
-The following query deletes the `Player` record with ID `1`:
+以下查询会删除 ID 为 `1` 的 `Player` 记录：
 
 ```javascript
 conn.query('DELETE FROM players WHERE id = ?;', [1], (err, ok) => {
@@ -310,38 +310,38 @@ conn.query('DELETE FROM players WHERE id = ?;', [1], (err, ok) => {
 });
 ```
 
-For more information, refer to [Delete data](/develop/dev-guide-delete-data.md).
+更多信息请参考 [删除数据](/develop/dev-guide-delete-data.md)。
 
-## Useful notes
+## 实用说明
 
-- Using [connection pools](https://github.com/mysqljs/mysql#pooling-connections) to manage database connections can reduce the performance overhead caused by frequently establishing and destroying connections.
-- To avoid SQL injection attacks, it is recommended to use [Escaping query values](https://github.com/mysqljs/mysql#escaping-query-values) before executing SQL.
+- 使用 [连接池](https://github.com/mysqljs/mysql#pooling-connections) 管理数据库连接，可以减少频繁建立和销毁连接带来的性能开销。
+- 为避免 SQL 注入攻击，建议在执行 SQL 前使用 [转义查询参数](https://github.com/mysqljs/mysql#escaping-query-values)。
 
     > **Note**
     >
-    > The `mysqljs/mysql` package does not yet support prepared statements, it only escapes values on the client side (related issue: [mysqljs/mysql#274](https://github.com/mysqljs/mysql/issues/274)).
+    > `mysqljs/mysql` 包目前尚不支持预处理语句，仅在客户端对参数进行转义（相关 issue：[mysqljs/mysql#274](https://github.com/mysqljs/mysql/issues/274)）。
     >
-    > If you want to use this feature to avoid SQL injection or improve efficiency of batch insert/update, it is recommended to use [mysql2](https://github.com/sidorares/node-mysql2) package instead.
+    > 如果你希望通过该特性避免 SQL 注入或提升批量插入/更新效率，建议使用 [mysql2](https://github.com/sidorares/node-mysql2) 包。
 
-- Using ORM frameworks to improve development efficiency in scenarios without a number of complex SQL statements, such as: [Sequelize](https://sequelize.org/), [TypeORM](https://typeorm.io/), and [Prisma](/develop/dev-guide-sample-application-nodejs-prisma.md).
-- It is recommended to enable the `supportBigNumbers: true` option when dealing with big numbers (`BIGINT` and `DECIMAL` columns) in the database.
+- 在 SQL 语句不复杂的场景下，使用 ORM 框架可以提升开发效率，例如：[Sequelize](https://sequelize.org/)、[TypeORM](https://typeorm.io/)、[Prisma](/develop/dev-guide-sample-application-nodejs-prisma.md)。
+- 在处理数据库中的大数（`BIGINT` 和 `DECIMAL` 列）时，建议启用 `supportBigNumbers: true` 选项。
 
-## Next steps
+## 后续学习
 
-- Learn more usage of mysql.js driver from [the documentation of mysql.js](https://github.com/mysqljs/mysql#readme).
-- Learn the best practices for TiDB application development with the chapters in the [Developer guide](/develop/dev-guide-overview.md), such as: [Insert data](/develop/dev-guide-insert-data.md), [Update data](/develop/dev-guide-update-data.md), [Delete data](/develop/dev-guide-delete-data.md), [Query data](/develop/dev-guide-get-data-from-single-table.md), [Transactions](/develop/dev-guide-transaction-overview.md), [SQL performance optimization](/develop/dev-guide-optimize-sql-overview.md).
-- Learn through the professional [TiDB developer courses](https://www.pingcap.com/education/) and earn [TiDB certifications](https://www.pingcap.com/education/certification/) after passing the exam.
+- 通过 [mysql.js 文档](https://github.com/mysqljs/mysql#readme) 学习更多 mysql.js 驱动的用法。
+- 通过 [开发者指南](/develop/dev-guide-overview.md) 各章节学习 TiDB 应用开发最佳实践，例如：[插入数据](/develop/dev-guide-insert-data.md)、[更新数据](/develop/dev-guide-update-data.md)、[删除数据](/develop/dev-guide-delete-data.md)、[查询数据](/develop/dev-guide-get-data-from-single-table.md)、[事务](/develop/dev-guide-transaction-overview.md)、[SQL 性能优化](/develop/dev-guide-optimize-sql-overview.md)。
+- 通过专业的 [TiDB 开发者课程](https://www.pingcap.com/education/)，考试通过后获得 [TiDB 认证](https://www.pingcap.com/education/certification/)。
 
-## Need help?
+## 需要帮助？
 
 <CustomContent platform="tidb">
 
-Ask the community on [Discord](https://discord.gg/DQZ2dy3cuc?utm_source=doc) or [Slack](https://slack.tidb.io/invite?team=tidb-community&channel=everyone&ref=pingcap-docs), or [submit a support ticket](/support.md).
+欢迎在 [Discord](https://discord.gg/DQZ2dy3cuc?utm_source=doc) 或 [Slack](https://slack.tidb.io/invite?team=tidb-community&channel=everyone&ref=pingcap-docs) 社区提问，或 [提交支持工单](/support.md)。
 
 </CustomContent>
 
 <CustomContent platform="tidb-cloud">
 
-Ask the community on [Discord](https://discord.gg/DQZ2dy3cuc?utm_source=doc) or [Slack](https://slack.tidb.io/invite?team=tidb-community&channel=everyone&ref=pingcap-docs), or [submit a support ticket](https://tidb.support.pingcap.com/).
+欢迎在 [Discord](https://discord.gg/DQZ2dy3cuc?utm_source=doc) 或 [Slack](https://slack.tidb.io/invite?team=tidb-community&channel=everyone&ref=pingcap-docs) 社区提问，或 [提交支持工单](https://tidb.support.pingcap.com/)。
 
 </CustomContent>

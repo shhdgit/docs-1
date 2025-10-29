@@ -1,59 +1,59 @@
 ---
-title: Overview of Key Concepts
-summary: Learn about the key concepts in TiDB Cloud.
+title: 关键概念概览
+summary: 了解 TiDB Cloud 的关键概念。
 ---
 
-# Overview of Key Concepts
+# 关键概念概览
 
-This document provides an overview of the key concepts in [TiDB Cloud](https://www.pingcap.com/tidb-cloud/). Understanding these concepts helps you better use TiDB Cloud features and capabilities.
+本文档概述了 [TiDB Cloud](https://www.pingcap.com/tidb-cloud/) 的关键概念。理解这些概念有助于你更好地使用 TiDB Cloud 的功能和能力。
 
-## Architecture
+## 架构
 
-TiDB Cloud is built on a cloud-native distributed architecture that separates computing from storage, enabling elastic scaling and high availability. [Learn more about TiDB Cloud architecture](/tidb-cloud/architecture-concepts.md).
+TiDB Cloud 基于云原生分布式架构构建，实现了计算与存储分离，支持弹性扩展和高可用性。[了解更多关于 TiDB Cloud 架构](/tidb-cloud/architecture-concepts.md)。
 
-## Database schema
+## 数据库模式
 
-TiDB Cloud enables you to organize and structure your data using objects such as databases, tables, columns, indexes, and constraints. It also supports advanced features such as temporary tables, vector indexes, and cached tables. [Learn more about database schema](/tidb-cloud/database-schema-concepts.md).
+TiDB Cloud 允许你通过数据库、数据表、列、索引和约束等对象来组织和结构化你的数据。它还支持临时表、向量索引和缓存表等高级功能。[了解更多关于数据库模式](/tidb-cloud/database-schema-concepts.md)。
 
-## Transactions
+## 事务
 
-TiDB provides complete distributed transactions, and the model has some optimizations on the basis of [Google Percolator](https://research.google.com/pubs/pub36726.html). [Learn more about transactions](/tidb-cloud/transaction-concepts.md).
+TiDB 提供完整的分布式事务，并在 [Google Percolator](https://research.google.com/pubs/pub36726.html) 的基础上进行了部分优化。[了解更多关于事务](/tidb-cloud/transaction-concepts.md)。
 
 ## SQL
 
-TiDB is highly compatible with the MySQL protocol and the common features and syntax of MySQL 5.7 and MySQL 8.0. [Learn more about SQL in TiDB Cloud](/tidb-cloud/sql-concepts.md).
+TiDB 高度兼容 MySQL 协议，以及 MySQL 5.7 和 MySQL 8.0 的常用特性和语法。[了解更多关于 TiDB Cloud 中的 SQL](/tidb-cloud/sql-concepts.md)。
 
-## AI features
+## AI 功能
 
-The AI features in TiDB Cloud enable you to fully leverage advanced technologies for data exploration, search, and integration. [Learn more about AI features](/tidb-cloud/ai-feature-concepts.md).
+TiDB Cloud 的 AI 功能使你能够充分利用先进技术进行数据探索、搜索和集成。[了解更多关于 AI 功能](/tidb-cloud/ai-feature-concepts.md)。
 
-## Data Service (Beta)
+## Data Service（Beta）
 
-Data Service enables you to access TiDB Cloud data via an HTTPS request using a custom API endpoint. [Learn more about Data Service](/tidb-cloud/data-service-concepts.md).
+Data Service 允许你通过自定义 API 端点，使用 HTTPS 请求访问 TiDB Cloud 数据。[了解更多关于 Data Service](/tidb-cloud/data-service-concepts.md)。
 
-## Scalability
+## 可扩展性
 
-TiDB Cloud Dedicated lets you adjust its compute and storage resources separately to match your data volume or workload changes. [Learn more about scalability](/tidb-cloud/scalability-concepts.md).
+TiDB Cloud Dedicated 允许你分别调整计算和存储资源，以适应数据量或工作负载的变化。[了解更多关于可扩展性](/tidb-cloud/scalability-concepts.md)。
 
-## High availability
+## 高可用性
 
-TiDB Cloud ensures high availability in both TiDB Cloud Serverless and TiDB Cloud Dedicated clusters:
+TiDB Cloud 在 TiDB Cloud Serverless、TiDB Cloud Essential 和 TiDB Cloud Dedicated 集群中确保高可用性：
 
-- [High Availability in TiDB Cloud Serverless](/tidb-cloud/serverless-high-availability.md)
-- [High Availability in TiDB Cloud Dedicated](/tidb-cloud/high-availability-with-multi-az.md)
+- [TiDB Cloud Serverless 和 Essential 的高可用性](/tidb-cloud/serverless-high-availability.md)
+- [TiDB Cloud Dedicated 的高可用性](/tidb-cloud/high-availability-with-multi-az.md)
 
-## Monitoring
+## 监控
 
-TiDB Cloud provides comprehensive monitoring capabilities for cluster performance and health. [Learn more about monitoring](/tidb-cloud/monitoring-concepts.md).
+TiDB Cloud 提供了全面的集群性能和健康状况监控能力。[了解更多关于监控](/tidb-cloud/monitoring-concepts.md)。
 
-## Data streaming
+## 数据流
 
-TiDB Cloud lets you stream data changes from your TiDB Cluster to other systems such as Kafka, MySQL, and object storage. [Learn more about data streaming](/tidb-cloud/data-streaming-concepts.md).
+TiDB Cloud 允许你将 TiDB 集群中的数据变更流式传输到其他系统，如 Kafka、MySQL 和对象存储。[了解更多关于数据流](/tidb-cloud/data-streaming-concepts.md)。
 
-## Backup & Restore
+## 备份与恢复
 
-TiDB Cloud offers automated backup solutions and point-in-time recovery (PITR) capabilities. [Learn more about backup and restore](/tidb-cloud/backup-and-restore-concepts.md).
+TiDB Cloud 提供自动化备份方案和时间点恢复（PITR）能力。[了解更多关于备份与恢复](/tidb-cloud/backup-and-restore-concepts.md)。
 
-## Security
+## 安全
 
-TiDB Cloud provides a robust and flexible security framework designed to protect data, enforce access control, and meet modern compliance standards. [Learn more about security](/tidb-cloud/security-concepts.md).
+TiDB Cloud 提供强大且灵活的安全框架，旨在保护数据、实施访问控制，并满足现代合规标准。[了解更多关于安全](/tidb-cloud/security-concepts.md)。

@@ -1,27 +1,27 @@
 ---
-title: Configure Cluster Password Settings
-summary: Learn how to configure the root password to connect to your cluster.
+title: 配置集群密码设置
+summary: 了解如何配置 root 密码以连接到你的集群。
 ---
 
-# Configure Cluster Password Settings
+# 配置集群密码设置
 
-For TiDB Cloud Dedicated clusters, you can configure the root password and allowed IP addresses to connect to your cluster.
+对于 TiDB Cloud Dedicated 集群，你可以配置 root 密码以及允许连接到你集群的 IP 地址。
 
-> **Note:**
+> **注意：**
 >
-> For TiDB Cloud Serverless clusters, this document is inapplicable and you can refer to [TLS Connection to TiDB Cloud Serverless](/tidb-cloud/secure-connections-to-serverless-clusters.md) instead.
+> 对于 TiDB Cloud Serverless 或 TiDB Cloud Essential 集群，本篇文档不适用，你可以参考 [TLS Connection to TiDB Cloud Serverless or Essential](/tidb-cloud/secure-connections-to-serverless-clusters.md)。
 
-1. In the TiDB Cloud console, navigate to the [**Clusters**](https://tidbcloud.com/console/clusters) page of your project.
+1. 在 TiDB Cloud 控制台中，进入你的项目的 [**Clusters**](https://tidbcloud.com/project/clusters) 页面。
 
-    > **Tip:**
+    > **提示：**
     >
-    > If you have multiple projects, you can click <MDSvgIcon name="icon-left-projects" /> in the lower-left corner and switch to another project.
+    > 你可以使用左上角的下拉框在组织、项目和集群之间切换。
 
-2. In the row of your target cluster, click **...** and select **Password Settings**.
-3. Set the root password to connect to your cluster, and then click **Save**.
+2. 在目标集群所在的行，点击 **...** 并选择 **Password Settings**。
+3. 设置连接到你集群的 root 密码，然后点击 **Save**。
 
-    You can click **Auto-generate Password** to generate a random password. The generated password will not show again, so save your password in a secure location.
+    你可以点击 **Auto-generate Password** 来生成一个随机密码。生成的密码不会再次显示，请将你的密码保存在安全的位置。
 
-> **Tip:**
+> **提示：**
 >
-> If you are viewing the overview page of your cluster, you can click the **...** in the upper-right corner of the page, select **Password Settings**, and configure these settings, too.
+> 如果你正在查看集群的概览页面，也可以点击页面右上角的 **...**，选择 **Password Settings**，并进行这些设置。

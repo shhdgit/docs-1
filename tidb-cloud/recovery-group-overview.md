@@ -1,37 +1,37 @@
 ---
 title: Recovery Group Overview (Beta)
-summary: Learn how to protect your databases against disasters by using TiDB Cloud recovery groups.
+summary: 了解如何使用 TiDB Cloud recovery group 保护你的数据库免受灾难影响。
 ---
 
 # Recovery Group Overview (Beta)
 
-A TiDB Cloud recovery group allows you to replicate your databases between TiDB Cloud Dedicated clusters for protection against regional disasters. You can orchestrate the failover of databases from one cluster to another. After a failover to the secondary cluster, if the original primary cluster becomes available again, you can re-establish replication in the reverse direction to reprotect your databases.
+TiDB Cloud recovery group 允许你在 TiDB Cloud Dedicated 集群之间复制数据库，以防范区域性灾难。你可以编排数据库从一个集群到另一个集群的故障切换。在故障切换到辅助集群后，如果原主集群重新可用，你可以反向重新建立复制，以重新保护你的数据库。
 
-## Architecture
+## 架构
 
-A recovery group consists of a set of replicated databases that can be failed over together between two TiDB Cloud Dedicated clusters. Each recovery group is assigned a primary cluster, and databases on this primary cluster are associated with the group and are then replicated to the secondary cluster.
+一个 recovery group 由一组可以在两个 TiDB Cloud Dedicated 集群之间一起进行故障切换的复制数据库组成。每个 recovery group 都分配有一个主集群，主集群上的数据库会与该组关联，并被复制到辅助集群。
 
 ![Recovery Group](/media/tidb-cloud/recovery-group/recovery-group-overview.png)
 
-- Recovery Group: a group of databases that are replicated between two clusters
-- Primary Cluster: the cluster where the database is actively written by the application
-- Secondary Cluster: the cluster where replicas of the database are located
+- Recovery Group：在两个集群之间进行复制的一组数据库
+- Primary Cluster：应用主动写入数据库的集群
+- Secondary Cluster：数据库副本所在的集群
 
 > **Note**
 >
-> Client connections to the replica databases are not explicitly forced to be read-only by the Recovery Group feature. Ensuring that the application connecting to the replica databases only performs read-only queries is the responsibility of the application.
+> Recovery Group 功能不会强制客户端连接到副本数据库时为只读。确保连接到副本数据库的应用只执行只读查询是应用自身的责任。
 
-## Key features and limitations
+## 主要特性与限制
 
-- Currently, only TiDB Cloud Dedicated clusters hosted on AWS support recovery groups.
-- Recovery groups are established between two clusters.
-- Bi-directional replication of a database is not supported with recovery groups.
+- 目前，仅托管在 AWS 上的 TiDB Cloud Dedicated 集群支持 recovery group。
+- recovery group 是在两个集群之间建立的。
+- recovery group 不支持数据库的双向复制。
 
 > **Warning**
 >
-> This feature is in beta and not recommended for production environments.
+> 此功能处于 beta 阶段，不建议在生产环境中使用。
 
-## What's next
+## 后续操作
 
-- To get started with recovery groups, see [Create Database Recovery Group](/tidb-cloud/recovery-group-get-started.md).
-- To learn how to use a recovery group, see [Failover and Reprotect Databases](/tidb-cloud/recovery-group-failover.md).
+- 要开始使用 recovery group，请参见 [Create Database Recovery Group](/tidb-cloud/recovery-group-get-started.md)。
+- 要了解如何使用 recovery group，请参见 [Failover and Reprotect Databases](/tidb-cloud/recovery-group-failover.md)。
